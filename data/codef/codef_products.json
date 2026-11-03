@@ -1,0 +1,2774 @@
+{
+  "meta": {
+    "source": "https://developer.codef.io/sitemap.xml (CODEF 공식 개발가이드 사이트맵)",
+    "collected": "2026-11-03",
+    "status": "은행·저축은행·카드·증권·보험은 이름을 채움(확인된 것만, 나머지 null). 그 밖 분류(공공 등)는 주소만.",
+    "not_verified": [
+      "name_ko 가 null 인 상품의 이름·입출력 항목",
+      "각 상품의 샌드박스(연습장) 지원 여부",
+      "분류 코드 om, pg, lf, co, finance, car, etc 의 한글 뜻(오픈마켓·PG 는 개요 제목으로 보이나 이 파일에선 채우지 않음)",
+      "상품 페이지 직접 읽기는 실패함(사이트가 자동 읽기에 응답 안 함) — 이름은 검색 결과의 페이지 제목에서만 얻음"
+    ]
+  },
+  "counts": {
+    "bank": 20,
+    "bank2": 3,
+    "card": 14,
+    "co": 1,
+    "insurance": 15,
+    "lf": 1,
+    "om": 9,
+    "pg": 2,
+    "stock": 6,
+    "car": 3,
+    "etc": 50,
+    "finance": 2,
+    "public": 304
+  },
+  "total_product_pages": 430,
+  "categories": [
+    {
+      "category_code": "bank",
+      "category_ko": "은행",
+      "pages": [
+        {
+          "path": "products/bank/overview",
+          "url": "https://developer.codef.io/products/bank/overview",
+          "name_ko": "은행 개요",
+          "segment_ko": null,
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/b/account",
+          "url": "https://developer.codef.io/products/bank/common/b/account",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/bank/common/b/accountPasswordVerification",
+          "url": "https://developer.codef.io/products/bank/common/b/accountPasswordVerification",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/bank/common/b/exchange",
+          "url": "https://developer.codef.io/products/bank/common/b/exchange",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/bank/common/b/fastAccount",
+          "url": "https://developer.codef.io/products/bank/common/b/fastAccount",
+          "name_ko": "기업 빠른조회",
+          "segment_ko": "기업(개인사업자·법인)",
+          "description_ko": "인증서 없이 기업뱅킹 계좌 잔액·간편 거래내역 조회 (아이디 로그인)",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/b/fund",
+          "url": "https://developer.codef.io/products/bank/common/b/fund",
+          "name_ko": "기업 펀드 거래내역",
+          "segment_ko": "기업(개인사업자·법인)",
+          "description_ko": "기업뱅킹 펀드 계좌의 거래내역 조회. 평가금액, 투자 원금·수익률 확인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/b/installmentSavings",
+          "url": "https://developer.codef.io/products/bank/common/b/installmentSavings",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/bank/common/b/loan",
+          "url": "https://developer.codef.io/products/bank/common/b/loan",
+          "name_ko": "기업 대출 거래내역",
+          "segment_ko": "기업(개인사업자·법인)",
+          "description_ko": "기업뱅킹 대출 계좌의 거래내역 조회. 대출 잔액, 이자·상환 내역 확인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/b/transaction",
+          "url": "https://developer.codef.io/products/bank/common/b/transaction",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/bank/common/b/transfer-result",
+          "url": "https://developer.codef.io/products/bank/common/b/transfer-result",
+          "name_ko": "기업 이체결과",
+          "segment_ko": "기업(개인사업자·법인)",
+          "description_ko": "기업뱅킹 계좌의 이체 결과 조회. 이체 내역, 입금계좌·예금주 확인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/etc/accountHolder",
+          "url": "https://developer.codef.io/products/bank/common/etc/accountHolder",
+          "name_ko": null,
+          "segment_ko": "기타"
+        },
+        {
+          "path": "products/bank/common/etc/accountHolderAuth",
+          "url": "https://developer.codef.io/products/bank/common/etc/accountHolderAuth",
+          "name_ko": "기타 예금주명 인증(계좌 실명 인증)",
+          "segment_ko": "기타",
+          "description_ko": "예금주명을 실명확인번호와 함께 인증해 조회 (제휴 서비스)",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/etc/accountTransferAuthentication",
+          "url": "https://developer.codef.io/products/bank/common/etc/accountTransferAuthentication",
+          "name_ko": "기타 계좌 인증(1원 이체)",
+          "segment_ko": "기타",
+          "description_ko": "1원 이체로 계좌 소유 여부 인증 (제휴 서비스)",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/etc/exchangerate",
+          "url": "https://developer.codef.io/products/bank/common/etc/exchangerate",
+          "name_ko": "기타 환율조회",
+          "segment_ko": "기타",
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/p/account",
+          "url": "https://developer.codef.io/products/bank/common/p/account",
+          "name_ko": "개인 보유계좌",
+          "segment_ko": "개인",
+          "description_ko": "개인뱅킹 보유계좌와 잔액 조회. 예금·적금 잔액, 외화·펀드·보험 계좌 확인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/p/fastAccount",
+          "url": "https://developer.codef.io/products/bank/common/p/fastAccount",
+          "name_ko": "개인 빠른조회",
+          "segment_ko": "개인",
+          "description_ko": "인증서 없이 개인뱅킹 계좌 잔액·간편 거래내역 조회",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/p/installmentSavings",
+          "url": "https://developer.codef.io/products/bank/common/p/installmentSavings",
+          "name_ko": "개인 적금 거래내역",
+          "segment_ko": "개인",
+          "description_ko": "개인뱅킹 적금 계좌의 거래내역 조회. 납입내역, 만기·이율 확인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/p/loan",
+          "url": "https://developer.codef.io/products/bank/common/p/loan",
+          "name_ko": null,
+          "segment_ko": "개인"
+        },
+        {
+          "path": "products/bank/common/p/regit-status",
+          "url": "https://developer.codef.io/products/bank/common/p/regit-status",
+          "name_ko": "개인 등록여부",
+          "segment_ko": "개인",
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank/common/p/transaction",
+          "url": "https://developer.codef.io/products/bank/common/p/transaction",
+          "name_ko": "개인 수시입출 거래내역",
+          "segment_ko": "개인",
+          "description_ko": "개인뱅킹 수시입출 계좌의 거래내역 조회. 입출금 내역, 잔액 확인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        }
+      ]
+    },
+    {
+      "category_code": "bank2",
+      "category_ko": "저축은행",
+      "pages": [
+        {
+          "path": "products/bank2/overview",
+          "url": "https://developer.codef.io/products/bank2/overview",
+          "name_ko": "저축은행 개요",
+          "segment_ko": null,
+          "description_ko": "저축은행은 개인 API만 제공. 보유계좌, 수시입출 거래내역 (상품에 따라)",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/bank2/common/p/account",
+          "url": "https://developer.codef.io/products/bank2/common/p/account",
+          "name_ko": null,
+          "segment_ko": "개인"
+        },
+        {
+          "path": "products/bank2/common/p/transaction",
+          "url": "https://developer.codef.io/products/bank2/common/p/transaction",
+          "name_ko": null,
+          "segment_ko": "개인"
+        }
+      ]
+    },
+    {
+      "category_code": "card",
+      "category_ko": "카드",
+      "pages": [
+        {
+          "path": "products/card/overview",
+          "url": "https://developer.codef.io/products/card/overview",
+          "name_ko": "카드 개요",
+          "segment_ko": null,
+          "description_ko": "보유카드, 승인내역, 카드한도 (상품에 따라). 개인 API와 법인 API",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/card/common/b/account",
+          "url": "https://developer.codef.io/products/card/common/b/account",
+          "name_ko": "법인 보유카드",
+          "segment_ko": "기업(개인사업자·법인)",
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/card/common/b/approval",
+          "url": "https://developer.codef.io/products/card/common/b/approval",
+          "name_ko": "법인 승인내역",
+          "segment_ko": "기업(개인사업자·법인)",
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/card/common/b/billing",
+          "url": "https://developer.codef.io/products/card/common/b/billing",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/card/common/b/limit",
+          "url": "https://developer.codef.io/products/card/common/b/limit",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/card/common/b/prepayment-details",
+          "url": "https://developer.codef.io/products/card/common/b/prepayment-details",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/card/common/b/purchase-detail",
+          "url": "https://developer.codef.io/products/card/common/b/purchase-detail",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/card/common/b/the-day-approval",
+          "url": "https://developer.codef.io/products/card/common/b/the-day-approval",
+          "name_ko": null,
+          "segment_ko": "기업(개인사업자·법인)"
+        },
+        {
+          "path": "products/card/common/p/account",
+          "url": "https://developer.codef.io/products/card/common/p/account",
+          "name_ko": "개인 보유카드",
+          "segment_ko": "개인",
+          "description_ko": "개인 보유카드 목록·유효기간 조회. 공동인증서 또는 아이디 로그인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/card/common/p/approval",
+          "url": "https://developer.codef.io/products/card/common/p/approval",
+          "name_ko": "개인 승인내역",
+          "segment_ko": "개인",
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/card/common/p/billing",
+          "url": "https://developer.codef.io/products/card/common/p/billing",
+          "name_ko": "개인 청구내역",
+          "segment_ko": "개인",
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/card/common/p/limit",
+          "url": "https://developer.codef.io/products/card/common/p/limit",
+          "name_ko": null,
+          "segment_ko": "개인"
+        },
+        {
+          "path": "products/card/common/p/regit-status",
+          "url": "https://developer.codef.io/products/card/common/p/regit-status",
+          "name_ko": "개인 등록여부",
+          "segment_ko": "개인",
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/card/common/p/result-check",
+          "url": "https://developer.codef.io/products/card/common/p/result-check",
+          "name_ko": "개인 실적조회",
+          "segment_ko": "개인",
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        }
+      ]
+    },
+    {
+      "category_code": "co",
+      "category_ko": null,
+      "pages": [
+        {
+          "path": "products/co/overview",
+          "url": "https://developer.codef.io/products/co/overview",
+          "name_ko": null,
+          "segment_ko": null
+        }
+      ]
+    },
+    {
+      "category_code": "insurance",
+      "category_ko": "보험",
+      "pages": [
+        {
+          "path": "products/insurance/overview",
+          "url": "https://developer.codef.io/products/insurance/overview",
+          "name_ko": "보험 개요",
+          "segment_ko": null,
+          "description_ko": "보험사 계약정보, 보험다모아, 내보험다보여",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/insurance/common/a/contract-info",
+          "url": "https://developer.codef.io/products/insurance/common/a/contract-info",
+          "name_ko": "보험사 계약정보",
+          "segment_ko": "전체(증권사·보험사)",
+          "description_ko": "보험 계약정보 조회. 계약상태·보장내용, 해약환급금·대출가능액 확인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/insurance/each/credit4u/change-email",
+          "url": "https://developer.codef.io/products/insurance/each/credit4u/change-email",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/insurance/each/credit4u/changePWD",
+          "url": "https://developer.codef.io/products/insurance/each/credit4u/changePWD",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/insurance/each/credit4u/contactInfo",
+          "url": "https://developer.codef.io/products/insurance/each/credit4u/contactInfo",
+          "name_ko": "신용정보원(내보험다보여) 계약정보",
+          "segment_ko": null,
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/insurance/each/credit4u/findID",
+          "url": "https://developer.codef.io/products/insurance/each/credit4u/findID",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/insurance/each/credit4u/register",
+          "url": "https://developer.codef.io/products/insurance/each/credit4u/register",
+          "name_ko": "신용정보원(내보험다보여) 회원가입신청",
+          "segment_ko": null,
+          "description_ko": "내보험다보여 회원가입 신청",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/insurance/each/credit4u/register-status",
+          "url": "https://developer.codef.io/products/insurance/each/credit4u/register-status",
+          "name_ko": "신용정보원(내보험다보여) 가입여부",
+          "segment_ko": null,
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/insurance/each/credit4u/renewal-pwd",
+          "url": "https://developer.codef.io/products/insurance/each/credit4u/renewal-pwd",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/insurance/each/credit4u/unRegister",
+          "url": "https://developer.codef.io/products/insurance/each/credit4u/unRegister",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/insurance/each/damoa/insuranceFee",
+          "url": "https://developer.codef.io/products/insurance/each/damoa/insuranceFee",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/insurance/each/damoa/myCarInsuranceInfo",
+          "url": "https://developer.codef.io/products/insurance/each/damoa/myCarInsuranceInfo",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/insurance/each/damoa/myCarListInfo",
+          "url": "https://developer.codef.io/products/insurance/each/damoa/myCarListInfo",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/insurance/each/damoa/session",
+          "url": "https://developer.codef.io/products/insurance/each/damoa/session",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/insurance/each/kidi/car-discount-premium",
+          "url": "https://developer.codef.io/products/insurance/each/kidi/car-discount-premium",
+          "name_ko": null,
+          "segment_ko": null
+        }
+      ]
+    },
+    {
+      "category_code": "lf",
+      "category_ko": null,
+      "pages": [
+        {
+          "path": "products/lf/overview",
+          "url": "https://developer.codef.io/products/lf/overview",
+          "name_ko": null,
+          "segment_ko": null
+        }
+      ]
+    },
+    {
+      "category_code": "om",
+      "category_ko": null,
+      "pages": [
+        {
+          "path": "products/om/overview",
+          "url": "https://developer.codef.io/products/om/overview",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/om/common/interested-product-list-inquiry",
+          "url": "https://developer.codef.io/products/om/common/interested-product-list-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/om/common/order-delivery-inquiry",
+          "url": "https://developer.codef.io/products/om/common/order-delivery-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/om/common/order-delivery-product-detail-inquiry",
+          "url": "https://developer.codef.io/products/om/common/order-delivery-product-detail-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/om/common/order-payment-info-inquiry",
+          "url": "https://developer.codef.io/products/om/common/order-payment-info-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/om/common/point-inquiry",
+          "url": "https://developer.codef.io/products/om/common/point-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/om/common/product-detail-inquiry",
+          "url": "https://developer.codef.io/products/om/common/product-detail-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/om/common/sales-status",
+          "url": "https://developer.codef.io/products/om/common/sales-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/om/common/shopping-cart-inquiry",
+          "url": "https://developer.codef.io/products/om/common/shopping-cart-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        }
+      ]
+    },
+    {
+      "category_code": "pg",
+      "category_ko": null,
+      "pages": [
+        {
+          "path": "products/pg/overview",
+          "url": "https://developer.codef.io/products/pg/overview",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/pg/common/payment-history-inquiry",
+          "url": "https://developer.codef.io/products/pg/common/payment-history-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        }
+      ]
+    },
+    {
+      "category_code": "stock",
+      "category_ko": "증권",
+      "pages": [
+        {
+          "path": "products/stock/overview",
+          "url": "https://developer.codef.io/products/stock/overview",
+          "name_ko": "증권 개요",
+          "segment_ko": null,
+          "description_ko": "등록여부, 보유계좌, 입출금내역, 종합자산, 주식잔고 (상품에 따라). 개인·법인 구분 없음",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/stock/common/a/account",
+          "url": "https://developer.codef.io/products/stock/common/a/account",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/stock/common/a/assets",
+          "url": "https://developer.codef.io/products/stock/common/a/assets",
+          "name_ko": "증권사 종합자산",
+          "segment_ko": "전체(증권사·보험사)",
+          "description_ko": "주식·펀드·CMA 등 상품유형별 평가금액·수익률 확인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/stock/common/a/balance-inquiry",
+          "url": "https://developer.codef.io/products/stock/common/a/balance-inquiry",
+          "name_ko": "증권사 주식잔고조회",
+          "segment_ko": "전체(증권사·보험사)",
+          "description_ko": "국내·해외주식 종목별 보유수량·평가금액, 매입금액·수익률 확인",
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        },
+        {
+          "path": "products/stock/common/a/registered",
+          "url": "https://developer.codef.io/products/stock/common/a/registered",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/stock/common/a/transaction",
+          "url": "https://developer.codef.io/products/stock/common/a/transaction",
+          "name_ko": "증권사 입출금내역",
+          "segment_ko": "전체(증권사·보험사)",
+          "description_ko": null,
+          "name_source": "공식 문서 페이지 제목(검색 결과)"
+        }
+      ]
+    },
+    {
+      "category_code": "car",
+      "category_ko": null,
+      "pages": [
+        {
+          "path": "products/car/accidents",
+          "url": "https://developer.codef.io/products/car/accidents",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/car/flooded-vehicle",
+          "url": "https://developer.codef.io/products/car/flooded-vehicle",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/car/scrap-car-inquiry",
+          "url": "https://developer.codef.io/products/car/scrap-car-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        }
+      ]
+    },
+    {
+      "category_code": "etc",
+      "category_ko": null,
+      "pages": [
+        {
+          "path": "products/etc/each/ca/0001/cak-issue-no-cert",
+          "url": "https://developer.codef.io/products/etc/each/ca/0001/cak-issue-no-cert",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0002/kosca-cert-application",
+          "url": "https://developer.codef.io/products/etc/each/ca/0002/kosca-cert-application",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0002/kosca-issue-no-cert",
+          "url": "https://developer.codef.io/products/etc/each/ca/0002/kosca-issue-no-cert",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0003/kocea-cert-application",
+          "url": "https://developer.codef.io/products/etc/each/ca/0003/kocea-cert-application",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0003/kocea-issue-no-cert",
+          "url": "https://developer.codef.io/products/etc/each/ca/0003/kocea-issue-no-cert",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0004/fma-issue-no-cert",
+          "url": "https://developer.codef.io/products/etc/each/ca/0004/fma-issue-no-cert",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0005/kmcca-issue-no-cert",
+          "url": "https://developer.codef.io/products/etc/each/ca/0005/kmcca-issue-no-cert",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0006/kica-issue-no-cert",
+          "url": "https://developer.codef.io/products/etc/each/ca/0006/kica-issue-no-cert",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0006/kica-performance-statement",
+          "url": "https://developer.codef.io/products/etc/each/ca/0006/kica-performance-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0007/keca-issue-no-cert",
+          "url": "https://developer.codef.io/products/etc/each/ca/0007/keca-issue-no-cert",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0007/keca-performance-statement",
+          "url": "https://developer.codef.io/products/etc/each/ca/0007/keca-performance-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ca/0008/ekffa-performance-statement",
+          "url": "https://developer.codef.io/products/etc/each/ca/0008/ekffa-performance-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/ci/small-business-certificate-inquiry",
+          "url": "https://developer.codef.io/products/etc/each/ci/small-business-certificate-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/clm/used-car-common-info-detail",
+          "url": "https://developer.codef.io/products/etc/each/clm/used-car-common-info-detail",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/clm/used-car-common-info-n",
+          "url": "https://developer.codef.io/products/etc/each/clm/used-car-common-info-n",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/clm/used-car-common-option",
+          "url": "https://developer.codef.io/products/etc/each/clm/used-car-common-option",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/clm/used-car-common-price-info",
+          "url": "https://developer.codef.io/products/etc/each/clm/used-car-common-price-info",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/clm/used-car-common-price-info-detail",
+          "url": "https://developer.codef.io/products/etc/each/clm/used-car-common-price-info-detail",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gi/contract-detail",
+          "url": "https://developer.codef.io/products/etc/each/gi/contract-detail",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gi/contract-list",
+          "url": "https://developer.codef.io/products/etc/each/gi/contract-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/bldg-ecomileage",
+          "url": "https://developer.codef.io/products/etc/each/gp/bldg-ecomileage",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/car-ecomileage",
+          "url": "https://developer.codef.io/products/etc/each/gp/car-ecomileage",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/carbon-pay-my-practical-activities",
+          "url": "https://developer.codef.io/products/etc/each/gp/carbon-pay-my-practical-activities",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/carbon-pay-register",
+          "url": "https://developer.codef.io/products/etc/each/gp/carbon-pay-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/cpoint-energy-energy-usage",
+          "url": "https://developer.codef.io/products/etc/each/gp/cpoint-energy-energy-usage",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/cpoint-energy-point-awarded-status",
+          "url": "https://developer.codef.io/products/etc/each/gp/cpoint-energy-point-awarded-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/cpoint-energy-register",
+          "url": "https://developer.codef.io/products/etc/each/gp/cpoint-energy-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/ecomileage-energy-information-registration-change",
+          "url": "https://developer.codef.io/products/etc/each/gp/ecomileage-energy-information-registration-change",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/ecomileage-history",
+          "url": "https://developer.codef.io/products/etc/each/gp/ecomileage-history",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/ecomileage-member-status",
+          "url": "https://developer.codef.io/products/etc/each/gp/ecomileage-member-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/ecomileage-register",
+          "url": "https://developer.codef.io/products/etc/each/gp/ecomileage-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/ecomileage-vehicle-registration",
+          "url": "https://developer.codef.io/products/etc/each/gp/ecomileage-vehicle-registration",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/netzero-point",
+          "url": "https://developer.codef.io/products/etc/each/gp/netzero-point",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/gp/netzero-register",
+          "url": "https://developer.codef.io/products/etc/each/gp/netzero-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/hr/certificate/status",
+          "url": "https://developer.codef.io/products/etc/each/hr/certificate/status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/mp/campaign-imformation-dinnerqueen",
+          "url": "https://developer.codef.io/products/etc/each/mp/campaign-imformation-dinnerqueen",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/mp/campaign-imformation-gangnammatzip",
+          "url": "https://developer.codef.io/products/etc/each/mp/campaign-imformation-gangnammatzip",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/mp/campaign-imformation-reviewnote",
+          "url": "https://developer.codef.io/products/etc/each/mp/campaign-imformation-reviewnote",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/mp/campaign-imformation-reviewplace",
+          "url": "https://developer.codef.io/products/etc/each/mp/campaign-imformation-reviewplace",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/mp/campaign-imformation-seoulouba",
+          "url": "https://developer.codef.io/products/etc/each/mp/campaign-imformation-seoulouba",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/om/product-list-inquiry",
+          "url": "https://developer.codef.io/products/etc/each/om/product-list-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/sm/export-details-yes24",
+          "url": "https://developer.codef.io/products/etc/each/sm/export-details-yes24",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/sm/order-details-aladin",
+          "url": "https://developer.codef.io/products/etc/each/sm/order-details-aladin",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/sm/order-details-kyobobook",
+          "url": "https://developer.codef.io/products/etc/each/sm/order-details-kyobobook",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/sm/order-details-yes24",
+          "url": "https://developer.codef.io/products/etc/each/sm/order-details-yes24",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/sm/release-return-aladin",
+          "url": "https://developer.codef.io/products/etc/each/sm/release-return-aladin",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/sm/release-return-kyobobook",
+          "url": "https://developer.codef.io/products/etc/each/sm/release-return-kyobobook",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/tr/finding-id-pw",
+          "url": "https://developer.codef.io/products/etc/each/tr/finding-id-pw",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/tr/mileage-list",
+          "url": "https://developer.codef.io/products/etc/each/tr/mileage-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/etc/each/tr/tour-conduct-license",
+          "url": "https://developer.codef.io/products/etc/each/tr/tour-conduct-license",
+          "name_ko": null,
+          "segment_ko": null
+        }
+      ]
+    },
+    {
+      "category_code": "finance",
+      "category_ko": null,
+      "pages": [
+        {
+          "path": "products/finance/common/account",
+          "url": "https://developer.codef.io/products/finance/common/account",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/finance/common/transaction-list",
+          "url": "https://developer.codef.io/products/finance/common/transaction-list",
+          "name_ko": null,
+          "segment_ko": null
+        }
+      ]
+    },
+    {
+      "category_code": "public",
+      "category_ko": "공공",
+      "pages": [
+        {
+          "path": "products/public/each/a/kyc-alien-registration-card-back",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-alien-registration-card-back",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-alien-registration-card-front",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-alien-registration-card-front",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-business-registration-corporate",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-business-registration-corporate",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-business-registration-individual",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-business-registration-individual",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-corporate-registration",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-corporate-registration",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-corporate-seal-certificate",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-corporate-seal-certificate",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-drivers-license",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-drivers-license",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-face-match",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-face-match",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-liveness-verify",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-liveness-verify",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-passport",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-passport",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-passport-check-digit",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-passport-check-digit",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/a/kyc-registration-card",
+          "url": "https://developer.codef.io/products/public/each/a/kyc-registration-card",
+          "name_ko": null,
+          "segment_ko": "전체(증권사·보험사)"
+        },
+        {
+          "path": "products/public/each/c/aggregate-income-tax-return",
+          "url": "https://developer.codef.io/products/public/each/c/aggregate-income-tax-return",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/business",
+          "url": "https://developer.codef.io/products/public/each/c/business",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/business-data",
+          "url": "https://developer.codef.io/products/public/each/c/business-data",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/cache-receipt",
+          "url": "https://developer.codef.io/products/public/each/c/cache-receipt",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/cash-purchase-details",
+          "url": "https://developer.codef.io/products/public/each/c/cash-purchase-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/cash-sales-details",
+          "url": "https://developer.codef.io/products/public/each/c/cash-sales-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/cash-sales-sum-details",
+          "url": "https://developer.codef.io/products/public/each/c/cash-sales-sum-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/certificate-business-discontinuance",
+          "url": "https://developer.codef.io/products/public/each/c/certificate-business-discontinuance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/commercial-building-price",
+          "url": "https://developer.codef.io/products/public/each/c/commercial-building-price",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/credit-card-sales-data-list",
+          "url": "https://developer.codef.io/products/public/each/c/credit-card-sales-data-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/deduction-of-business-credit-card-purchase-amount",
+          "url": "https://developer.codef.io/products/public/each/c/deduction-of-business-credit-card-purchase-amount",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/final-return-base",
+          "url": "https://developer.codef.io/products/public/each/c/final-return-base",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/hometax-cert-status",
+          "url": "https://developer.codef.io/products/public/each/c/hometax-cert-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/income-classification-statement",
+          "url": "https://developer.codef.io/products/public/each/c/income-classification-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/income-tax-credit",
+          "url": "https://developer.codef.io/products/public/each/c/income-tax-credit",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/individual-business-check",
+          "url": "https://developer.codef.io/products/public/each/c/individual-business-check",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/Information-business-registration-manager",
+          "url": "https://developer.codef.io/products/public/each/c/Information-business-registration-manager",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/minimum-tax-adjustment-statement",
+          "url": "https://developer.codef.io/products/public/each/c/minimum-tax-adjustment-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-cashbill-cancel",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-cashbill-cancel",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-cashbill-Info",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-cashbill-Info",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-cashbill-keylist",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-cashbill-keylist",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-cashbill-regist",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-cashbill-regist",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-cashbill-status",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-cashbill-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-taxinvoice-cancel",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-taxinvoice-cancel",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-taxinvoice-Info",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-taxinvoice-Info",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-taxinvoice-join-member",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-taxinvoice-join-member",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-taxinvoice-keylist",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-taxinvoice-keylist",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-taxinvoice-regist-invoicer-trustee",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-taxinvoice-regist-invoicer-trustee",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-taxinvoice-revise-regist-invoicer-trustee",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-taxinvoice-revise-regist-invoicer-trustee",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-taxinvoice-status",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-taxinvoice-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/popbill-taxinvoice-tax-cert-url",
+          "url": "https://developer.codef.io/products/public/each/c/popbill-taxinvoice-tax-cert-url",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proof-issue-business-registration-change-history",
+          "url": "https://developer.codef.io/products/public/each/c/proof-issue-business-registration-change-history",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-additional-taxstandard",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-additional-taxstandard",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-all-business-registrations",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-all-business-registrations",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-civil-complaint-certificate-status",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-civil-complaint-certificate-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-corporate-registration",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-corporate-registration",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-financial-statements",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-financial-statements",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-payment-proof",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-payment-proof",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-paystatement-income",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-paystatement-income",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-paystatement-list",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-paystatement-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-paystatement-pension",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-paystatement-pension",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-paystatement-retirement",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-paystatement-retirement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-proof-income",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-proof-income",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-refund-check",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-refund-check",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-tax-cert-all",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-tax-cert-all",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/proofissue-taxfree-income",
+          "url": "https://developer.codef.io/products/public/each/c/proofissue-taxfree-income",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-acquisition-completion-report",
+          "url": "https://developer.codef.io/products/public/each/c/report-acquisition-completion-report",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-balance-sheet",
+          "url": "https://developer.codef.io/products/public/each/c/report-balance-sheet",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-business-income-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-business-income-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-check-tax-refund",
+          "url": "https://developer.codef.io/products/public/each/c/report-check-tax-refund",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-corporate-adjustment",
+          "url": "https://developer.codef.io/products/public/each/c/report-corporate-adjustment",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-corporate-base",
+          "url": "https://developer.codef.io/products/public/each/c/report-corporate-base",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-correction-claim",
+          "url": "https://developer.codef.io/products/public/each/c/report-correction-claim",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-deductible-tax-exemption-amount-additional-tax-to-be-paid",
+          "url": "https://developer.codef.io/products/public/each/c/report-deductible-tax-exemption-amount-additional-tax-to-be-paid",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-export-perfomance",
+          "url": "https://developer.codef.io/products/public/each/c/report-export-perfomance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-file-conversion",
+          "url": "https://developer.codef.io/products/public/each/c/report-file-conversion",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-general-vat",
+          "url": "https://developer.codef.io/products/public/each/c/report-general-vat",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-income-adjustment-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-income-adjustment-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-income-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-income-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-ledger-income-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-ledger-income-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-overseas-corp-finanstatement",
+          "url": "https://developer.codef.io/products/public/each/c/report-overseas-corp-finanstatement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-overseas-corp-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-overseas-corp-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-payment-slip",
+          "url": "https://developer.codef.io/products/public/each/c/report-payment-slip",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-research-humanresource-development",
+          "url": "https://developer.codef.io/products/public/each/c/report-research-humanresource-development",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-retained-earnings-disposition",
+          "url": "https://developer.codef.io/products/public/each/c/report-retained-earnings-disposition",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-simplicity-vat",
+          "url": "https://developer.codef.io/products/public/each/c/report-simplicity-vat",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-smbusiness-standard-reviewtable",
+          "url": "https://developer.codef.io/products/public/each/c/report-smbusiness-standard-reviewtable",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-special-parties-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-special-parties-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-statement-of-income-after-adjustment",
+          "url": "https://developer.codef.io/products/public/each/c/report-statement-of-income-after-adjustment",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-stock-fluctuations",
+          "url": "https://developer.codef.io/products/public/each/c/report-stock-fluctuations",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-summary-reconciliation-income",
+          "url": "https://developer.codef.io/products/public/each/c/report-summary-reconciliation-income",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-supplementary-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-supplementary-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-tax-credit-reconciliation",
+          "url": "https://developer.codef.io/products/public/each/c/report-tax-credit-reconciliation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-tax-deduction-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-tax-deduction-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-tax-refund-periodic",
+          "url": "https://developer.codef.io/products/public/each/c/report-tax-refund-periodic",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-tax-refund-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-tax-refund-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-tax-refund-statement-availability",
+          "url": "https://developer.codef.io/products/public/each/c/report-tax-refund-statement-availability",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-tax-result",
+          "url": "https://developer.codef.io/products/public/each/c/report-tax-result",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-withholding-tax",
+          "url": "https://developer.codef.io/products/public/each/c/report-withholding-tax",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-withholding-tax-file-conversion",
+          "url": "https://developer.codef.io/products/public/each/c/report-withholding-tax-file-conversion",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-zerotax-sale-statement",
+          "url": "https://developer.codef.io/products/public/each/c/report-zerotax-sale-statement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/report-zerotax-statement-submission",
+          "url": "https://developer.codef.io/products/public/each/c/report-zerotax-statement-submission",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/simplified-statement-payment",
+          "url": "https://developer.codef.io/products/public/each/c/simplified-statement-payment",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/small-business-tax-reduction",
+          "url": "https://developer.codef.io/products/public/each/c/small-business-tax-reduction",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/tax-agent-consent-appointment",
+          "url": "https://developer.codef.io/products/public/each/c/tax-agent-consent-appointment",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/tax-agent-consent-dismissal",
+          "url": "https://developer.codef.io/products/public/each/c/tax-agent-consent-dismissal",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/tax-agent-info",
+          "url": "https://developer.codef.io/products/public/each/c/tax-agent-info",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/tax-informaion-number-register",
+          "url": "https://developer.codef.io/products/public/each/c/tax-informaion-number-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/tax-payment-notice",
+          "url": "https://developer.codef.io/products/public/each/c/tax-payment-notice",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/tax-payment-rebate-notice-arrearage",
+          "url": "https://developer.codef.io/products/public/each/c/tax-payment-rebate-notice-arrearage",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/tax-report-details",
+          "url": "https://developer.codef.io/products/public/each/c/tax-report-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/tax-to-be-paid-list",
+          "url": "https://developer.codef.io/products/public/each/c/tax-to-be-paid-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/taxinvoice-check-list",
+          "url": "https://developer.codef.io/products/public/each/c/taxinvoice-check-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/taxinvoice-customer-detail",
+          "url": "https://developer.codef.io/products/public/each/c/taxinvoice-customer-detail",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/taxinvoice-customer-management",
+          "url": "https://developer.codef.io/products/public/each/c/taxinvoice-customer-management",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/taxinvoice-info-detail",
+          "url": "https://developer.codef.io/products/public/each/c/taxinvoice-info-detail",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/taxinvoice-integrated-list",
+          "url": "https://developer.codef.io/products/public/each/c/taxinvoice-integrated-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/taxinvoice-registration-status",
+          "url": "https://developer.codef.io/products/public/each/c/taxinvoice-registration-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/taxinvoice-sales-purhcase-statistics",
+          "url": "https://developer.codef.io/products/public/each/c/taxinvoice-sales-purhcase-statistics",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/taxinvoice-total-list",
+          "url": "https://developer.codef.io/products/public/each/c/taxinvoice-total-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/c/third-party-tax-invoice-issue",
+          "url": "https://developer.codef.io/products/public/each/c/third-party-tax-invoice-issue",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/auction-events",
+          "url": "https://developer.codef.io/products/public/each/ck/auction-events",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/corp-register",
+          "url": "https://developer.codef.io/products/public/each/ck/corp-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/corp-register-application-handling-list",
+          "url": "https://developer.codef.io/products/public/each/ck/corp-register-application-handling-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/corp-register-search-code",
+          "url": "https://developer.codef.io/products/public/each/ck/corp-register-search-code",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/corporate-seal-certificate-issuance-confirmation",
+          "url": "https://developer.codef.io/products/public/each/ck/corporate-seal-certificate-issuance-confirmation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/family-relations-exclusion-issue",
+          "url": "https://developer.codef.io/products/public/each/ck/family-relations-exclusion-issue",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/family-relations-register",
+          "url": "https://developer.codef.io/products/public/each/ck/family-relations-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/find-company-name-search",
+          "url": "https://developer.codef.io/products/public/each/ck/find-company-name-search",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/issued-copy-of-register",
+          "url": "https://developer.codef.io/products/public/each/ck/issued-copy-of-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/peruse-issue-list",
+          "url": "https://developer.codef.io/products/public/each/ck/peruse-issue-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/real-estate-address",
+          "url": "https://developer.codef.io/products/public/each/ck/real-estate-address",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/real-estate-register",
+          "url": "https://developer.codef.io/products/public/each/ck/real-estate-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/real-estate-register-application-handling-list",
+          "url": "https://developer.codef.io/products/public/each/ck/real-estate-register-application-handling-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/real-estate-register-identity-matching",
+          "url": "https://developer.codef.io/products/public/each/ck/real-estate-register-identity-matching",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/real-estate-sales-list",
+          "url": "https://developer.codef.io/products/public/each/ck/real-estate-sales-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/registration-information-confirm-password-use",
+          "url": "https://developer.codef.io/products/public/each/ck/registration-information-confirm-password-use",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/rehab-bankruptcy-anouncement",
+          "url": "https://developer.codef.io/products/public/each/ck/rehab-bankruptcy-anouncement",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/rehab-bankruptcy-list",
+          "url": "https://developer.codef.io/products/public/each/ck/rehab-bankruptcy-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ck/scourt-events",
+          "url": "https://developer.codef.io/products/public/each/ck/scourt-events",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/acquirer-of-business",
+          "url": "https://developer.codef.io/products/public/each/cw/acquirer-of-business",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/business-companymark",
+          "url": "https://developer.codef.io/products/public/each/cw/business-companymark",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/durunuri-support-info",
+          "url": "https://developer.codef.io/products/public/each/cw/durunuri-support-info",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/imposition-notice-insurance",
+          "url": "https://developer.codef.io/products/public/each/cw/imposition-notice-insurance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/industrial-accident",
+          "url": "https://developer.codef.io/products/public/each/cw/industrial-accident",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/kcomwel-business-current-status",
+          "url": "https://developer.codef.io/products/public/each/cw/kcomwel-business-current-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/kcomwel-business-insurance-qualification-report",
+          "url": "https://developer.codef.io/products/public/each/cw/kcomwel-business-insurance-qualification-report",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/kcomwel-business-rate",
+          "url": "https://developer.codef.io/products/public/each/cw/kcomwel-business-rate",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/qualification-history",
+          "url": "https://developer.codef.io/products/public/each/cw/qualification-history",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/qualifications-acquisition-loss-report",
+          "url": "https://developer.codef.io/products/public/each/cw/qualifications-acquisition-loss-report",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/total-remuneration-report",
+          "url": "https://developer.codef.io/products/public/each/cw/total-remuneration-report",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/cw/worker-companymark",
+          "url": "https://developer.codef.io/products/public/each/cw/worker-companymark",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ef/driver-license",
+          "url": "https://developer.codef.io/products/public/each/ef/driver-license",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ef/driver-license-detail",
+          "url": "https://developer.codef.io/products/public/each/ef/driver-license-detail",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ef/driver-license-penalty-point",
+          "url": "https://developer.codef.io/products/public/each/ef/driver-license-penalty-point",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ef/KoRoad-driver-license",
+          "url": "https://developer.codef.io/products/public/each/ef/KoRoad-driver-license",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ef/unmanned-crackdown-recent-list",
+          "url": "https://developer.codef.io/products/public/each/ef/unmanned-crackdown-recent-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ex/hi-pass-check-unpaid-toll-nonmember",
+          "url": "https://developer.codef.io/products/public/each/ex/hi-pass-check-unpaid-toll-nonmember",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ex/hi-pass-unpaid-toll-corporation",
+          "url": "https://developer.codef.io/products/public/each/ex/hi-pass-unpaid-toll-corporation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ex/hi-pass-unpaid-toll-nonmember",
+          "url": "https://developer.codef.io/products/public/each/ex/hi-pass-unpaid-toll-nonmember",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ex/hi-pass-unpaid-toll-payment-corporation",
+          "url": "https://developer.codef.io/products/public/each/ex/hi-pass-unpaid-toll-payment-corporation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ex/hi-pass-usage-corporation",
+          "url": "https://developer.codef.io/products/public/each/ex/hi-pass-usage-corporation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ex/hipass-usage-details",
+          "url": "https://developer.codef.io/products/public/each/ex/hipass-usage-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ex/unpaid-toll",
+          "url": "https://developer.codef.io/products/public/each/ex/unpaid-toll",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ex/unpaid-toll-payment-details",
+          "url": "https://developer.codef.io/products/public/each/ex/unpaid-toll-payment-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/fs/0001/financial-plan",
+          "url": "https://developer.codef.io/products/public/each/fs/0001/financial-plan",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/fs/0001/find-id",
+          "url": "https://developer.codef.io/products/public/each/fs/0001/find-id",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/fs/0001/my-pension",
+          "url": "https://developer.codef.io/products/public/each/fs/0001/my-pension",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/fs/0001/register",
+          "url": "https://developer.codef.io/products/public/each/fs/0001/register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/fs/0001/registration-status",
+          "url": "https://developer.codef.io/products/public/each/fs/0001/registration-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/fs/0001/reset-password",
+          "url": "https://developer.codef.io/products/public/each/fs/0001/reset-password",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/fs/0002/exposure-register",
+          "url": "https://developer.codef.io/products/public/each/fs/0002/exposure-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/fs/0002/report-list",
+          "url": "https://developer.codef.io/products/public/each/fs/0002/report-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ft/history",
+          "url": "https://developer.codef.io/products/public/each/ft/history",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ft/mail-order-sales",
+          "url": "https://developer.codef.io/products/public/each/ft/mail-order-sales",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ft/modify",
+          "url": "https://developer.codef.io/products/public/each/ft/modify",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ft/modify-finance",
+          "url": "https://developer.codef.io/products/public/each/ft/modify-finance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/ft/set-register",
+          "url": "https://developer.codef.io/products/public/each/ft/set-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/additional-info",
+          "url": "https://developer.codef.io/products/public/each/hw/additional-info",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/child-register-info",
+          "url": "https://developer.codef.io/products/public/each/hw/child-register-info",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/finding-id-pw",
+          "url": "https://developer.codef.io/products/public/each/hw/finding-id-pw",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/membership",
+          "url": "https://developer.codef.io/products/public/each/hw/membership",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/my-car-insurance",
+          "url": "https://developer.codef.io/products/public/each/hw/my-car-insurance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/my-medical-information",
+          "url": "https://developer.codef.io/products/public/each/hw/my-medical-information",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/my-medicine",
+          "url": "https://developer.codef.io/products/public/each/hw/my-medicine",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/my-vaccination",
+          "url": "https://developer.codef.io/products/public/each/hw/my-vaccination",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/pharmaceutical-receipt",
+          "url": "https://developer.codef.io/products/public/each/hw/pharmaceutical-receipt",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/vaccination",
+          "url": "https://developer.codef.io/products/public/each/hw/vaccination",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/vaccination-detail",
+          "url": "https://developer.codef.io/products/public/each/hw/vaccination-detail",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/hw/vaccination-total",
+          "url": "https://developer.codef.io/products/public/each/hw/vaccination-total",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/kc/b/user-number",
+          "url": "https://developer.codef.io/products/public/each/kc/b/user-number",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/kc/p/user-number",
+          "url": "https://developer.codef.io/products/public/each/kc/p/user-number",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/actual-transaction-price-apartment",
+          "url": "https://developer.codef.io/products/public/each/lt/actual-transaction-price-apartment",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/actual-transaction-price-house",
+          "url": "https://developer.codef.io/products/public/each/lt/actual-transaction-price-house",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/actual-transaction-price-serial-number",
+          "url": "https://developer.codef.io/products/public/each/lt/actual-transaction-price-serial-number",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/car-recall-situation",
+          "url": "https://developer.codef.io/products/public/each/lt/car-recall-situation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/car-repair-situation",
+          "url": "https://developer.codef.io/products/public/each/lt/car-repair-situation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/car-tax-calculation",
+          "url": "https://developer.codef.io/products/public/each/lt/car-tax-calculation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/kras-land-value",
+          "url": "https://developer.codef.io/products/public/each/lt/kras-land-value",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/kras-real-estate-housing-price",
+          "url": "https://developer.codef.io/products/public/each/lt/kras-real-estate-housing-price",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/kreb/estate-list",
+          "url": "https://developer.codef.io/products/public/each/lt/kreb/estate-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/kreb/market-price-information",
+          "url": "https://developer.codef.io/products/public/each/lt/kreb/market-price-information",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/reb-real-estate-housing-price",
+          "url": "https://developer.codef.io/products/public/each/lt/reb-real-estate-housing-price",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/lt/rent-home-registation-status",
+          "url": "https://developer.codef.io/products/public/each/lt/rent-home-registation-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mj/foreigner-registration-certificate",
+          "url": "https://developer.codef.io/products/public/each/mj/foreigner-registration-certificate",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mj/passport-number-identification",
+          "url": "https://developer.codef.io/products/public/each/mj/passport-number-identification",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mj/stay-expiration-date",
+          "url": "https://developer.codef.io/products/public/each/mj/stay-expiration-date",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/additional-tax-stanard-proof",
+          "url": "https://developer.codef.io/products/public/each/mw/additional-tax-stanard-proof",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/building-register-colligation",
+          "url": "https://developer.codef.io/products/public/each/mw/building-register-colligation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/building-register-general",
+          "url": "https://developer.codef.io/products/public/each/mw/building-register-general",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/building-register-set",
+          "url": "https://developer.codef.io/products/public/each/mw/building-register-set",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/business-registration-proof",
+          "url": "https://developer.codef.io/products/public/each/mw/business-registration-proof",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/car-registration-issuance",
+          "url": "https://developer.codef.io/products/public/each/mw/car-registration-issuance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/car-registration-issuance-second",
+          "url": "https://developer.codef.io/products/public/each/mw/car-registration-issuance-second",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/certificate-disability",
+          "url": "https://developer.codef.io/products/public/each/mw/certificate-disability",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/certificate-immigration",
+          "url": "https://developer.codef.io/products/public/each/mw/certificate-immigration",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/certificate-military",
+          "url": "https://developer.codef.io/products/public/each/mw/certificate-military",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/certification-registration-status",
+          "url": "https://developer.codef.io/products/public/each/mw/certification-registration-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/check-identity-card",
+          "url": "https://developer.codef.io/products/public/each/mw/check-identity-card",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/construction-registration",
+          "url": "https://developer.codef.io/products/public/each/mw/construction-registration",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/corporation-business-registration-proof",
+          "url": "https://developer.codef.io/products/public/each/mw/corporation-business-registration-proof",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/corporation-car-registration-b-issuance",
+          "url": "https://developer.codef.io/products/public/each/mw/corporation-car-registration-b-issuance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/corporation-car-registration-issuance",
+          "url": "https://developer.codef.io/products/public/each/mw/corporation-car-registration-issuance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/corporation-health-insurance-proof",
+          "url": "https://developer.codef.io/products/public/each/mw/corporation-health-insurance-proof",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/corporation-land-register-certified",
+          "url": "https://developer.codef.io/products/public/each/mw/corporation-land-register-certified",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/corporation-localtax-payment-certificate-inquiry",
+          "url": "https://developer.codef.io/products/public/each/mw/corporation-localtax-payment-certificate-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/corporation-tax-cert-all",
+          "url": "https://developer.codef.io/products/public/each/mw/corporation-tax-cert-all",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/corporation-tax-stanard-proof",
+          "url": "https://developer.codef.io/products/public/each/mw/corporation-tax-stanard-proof",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/driver-license-certificate",
+          "url": "https://developer.codef.io/products/public/each/mw/driver-license-certificate",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/health-insurance-proof",
+          "url": "https://developer.codef.io/products/public/each/mw/health-insurance-proof",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/identify-confirmation",
+          "url": "https://developer.codef.io/products/public/each/mw/identify-confirmation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/issuance-medical-license-certificate",
+          "url": "https://developer.codef.io/products/public/each/mw/issuance-medical-license-certificate",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/issuance-proof-income",
+          "url": "https://developer.codef.io/products/public/each/mw/issuance-proof-income",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/land-register-certified",
+          "url": "https://developer.codef.io/products/public/each/mw/land-register-certified",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/localtax-payment-certificate",
+          "url": "https://developer.codef.io/products/public/each/mw/localtax-payment-certificate",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/localtax-payment-certificate-inquiry",
+          "url": "https://developer.codef.io/products/public/each/mw/localtax-payment-certificate-inquiry",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/multiowned-buildings",
+          "url": "https://developer.codef.io/products/public/each/mw/multiowned-buildings",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/national-technical-certification",
+          "url": "https://developer.codef.io/products/public/each/mw/national-technical-certification",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/passport-data-status",
+          "url": "https://developer.codef.io/products/public/each/mw/passport-data-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/resident-abstract-issuance",
+          "url": "https://developer.codef.io/products/public/each/mw/resident-abstract-issuance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/resident-copy-issuance",
+          "url": "https://developer.codef.io/products/public/each/mw/resident-copy-issuance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/resident-reg-off",
+          "url": "https://developer.codef.io/products/public/each/mw/resident-reg-off",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/resident-reg-on",
+          "url": "https://developer.codef.io/products/public/each/mw/resident-reg-on",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/tax-cert-all",
+          "url": "https://developer.codef.io/products/public/each/mw/tax-cert-all",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/mw/vaccination-certificate",
+          "url": "https://developer.codef.io/products/public/each/mw/vaccination-certificate",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/nt/tax-payment-submit-attachments",
+          "url": "https://developer.codef.io/products/public/each/nt/tax-payment-submit-attachments",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pa/driver-license",
+          "url": "https://developer.codef.io/products/public/each/pa/driver-license",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/business-establishment-subscribers",
+          "url": "https://developer.codef.io/products/public/each/pp/business-establishment-subscribers",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/employment-detail",
+          "url": "https://developer.codef.io/products/public/each/pp/employment-detail",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/final-premium-determination",
+          "url": "https://developer.codef.io/products/public/each/pp/final-premium-determination",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/hi-insurance-calculation-details",
+          "url": "https://developer.codef.io/products/public/each/pp/hi-insurance-calculation-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/hi-nhis-cerebrovascular",
+          "url": "https://developer.codef.io/products/public/each/pp/hi-nhis-cerebrovascular",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/hi-nhis-diabetes",
+          "url": "https://developer.codef.io/products/public/each/pp/hi-nhis-diabetes",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/hi-nhis-fourinsu",
+          "url": "https://developer.codef.io/products/public/each/pp/hi-nhis-fourinsu",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/hi-nhis-health-age",
+          "url": "https://developer.codef.io/products/public/each/pp/hi-nhis-health-age",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/hi-nhis-insurance-details",
+          "url": "https://developer.codef.io/products/public/each/pp/hi-nhis-insurance-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/hi-nhis-kidney-disease",
+          "url": "https://developer.codef.io/products/public/each/pp/hi-nhis-kidney-disease",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/hi-nhis-myocardial-infarction",
+          "url": "https://developer.codef.io/products/public/each/pp/hi-nhis-myocardial-infarction",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/hi-nhis-stroke",
+          "url": "https://developer.codef.io/products/public/each/pp/hi-nhis-stroke",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/imposing-contribution-list",
+          "url": "https://developer.codef.io/products/public/each/pp/imposing-contribution-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/imposing-contribution-personal",
+          "url": "https://developer.codef.io/products/public/each/pp/imposing-contribution-personal",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/insurance-payment-certificate",
+          "url": "https://developer.codef.io/products/public/each/pp/insurance-payment-certificate",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-examination",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-examination",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-family-health-checkup-schedule",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-family-health-checkup-schedule",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-family-health-child-delete",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-family-health-child-delete",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-family-health-child-list",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-family-health-child-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-family-health-child-register",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-family-health-child-register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-family-health-child-update",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-family-health-child-update",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-family-health-national-vaccination",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-family-health-national-vaccination",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-health-check",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-health-check",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-individual-Insurance",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-individual-Insurance",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-insurance-identity-confirmation",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-insurance-identity-confirmation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-Insurance-Imposition",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-Insurance-Imposition",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-insurance-member-confirmation",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-insurance-member-confirmation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-insurance-payment-confirmation",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-insurance-payment-confirmation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-insurance-treatment-information",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-insurance-treatment-information",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-medical-History",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-medical-History",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-medical-use-status",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-medical-use-status",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-minwon-scoc-reg-desclist",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-minwon-scoc-reg-desclist",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-qualify-payment",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-qualify-payment",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-questionnaire-information-cancer",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-questionnaire-information-cancer",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-questionnaire-information-oral",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-questionnaire-information-oral",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nhis-scaling",
+          "url": "https://developer.codef.io/products/public/each/pp/nhis-scaling",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-application-my-pension",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-application-my-pension",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-confirm-pension-payment",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-confirm-pension-payment",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-confirm-pension-payment-issue",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-confirm-pension-payment-issue",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-expect-mypension",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-expect-mypension",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-join-issue",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-join-issue",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-join-list",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-join-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-member-join-history",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-member-join-history",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-member-verification",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-member-verification",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-member-verification-issue",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-member-verification-issue",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-my-pension",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-my-pension",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-pension-issue",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-pension-issue",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/nps-pension-list",
+          "url": "https://developer.codef.io/products/public/each/pp/nps-pension-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/pension-national-subsidies",
+          "url": "https://developer.codef.io/products/public/each/pp/pension-national-subsidies",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/pension-retroactive-history",
+          "url": "https://developer.codef.io/products/public/each/pp/pension-retroactive-history",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/recuperation-notification-list",
+          "url": "https://developer.codef.io/products/public/each/pp/recuperation-notification-list",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/pp/support-fund-detail",
+          "url": "https://developer.codef.io/products/public/each/pp/support-fund-detail",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/qa/animal/info-update",
+          "url": "https://developer.codef.io/products/public/each/qa/animal/info-update",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/qa/animal/register",
+          "url": "https://developer.codef.io/products/public/each/qa/animal/register",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/qa/animal/registration-number",
+          "url": "https://developer.codef.io/products/public/each/qa/animal/registration-number",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/sp/government-employee-in-office",
+          "url": "https://developer.codef.io/products/public/each/sp/government-employee-in-office",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/sp/private-school-staff-in-office",
+          "url": "https://developer.codef.io/products/public/each/sp/private-school-staff-in-office",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/wk/work24-support-payment",
+          "url": "https://developer.codef.io/products/public/each/wk/work24-support-payment",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/wk/work24-youth-employment-incentives",
+          "url": "https://developer.codef.io/products/public/each/wk/work24-youth-employment-incentives",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/wt/local-nontax-revenue-details",
+          "url": "https://developer.codef.io/products/public/each/wt/local-nontax-revenue-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/wt/local-nontax-revenue-imposition-details",
+          "url": "https://developer.codef.io/products/public/each/wt/local-nontax-revenue-imposition-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/wt/local-tax-imposition-details",
+          "url": "https://developer.codef.io/products/public/each/wt/local-tax-imposition-details",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/wt/local-tax-payment-confirmation",
+          "url": "https://developer.codef.io/products/public/each/wt/local-tax-payment-confirmation",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/wt/local-tax-payment-result",
+          "url": "https://developer.codef.io/products/public/each/wt/local-tax-payment-result",
+          "name_ko": null,
+          "segment_ko": null
+        },
+        {
+          "path": "products/public/each/wt/report-local-income-tax",
+          "url": "https://developer.codef.io/products/public/each/wt/report-local-income-tax",
+          "name_ko": null,
+          "segment_ko": null
+        }
+      ]
+    }
+  ],
+  "guide_pages": [
+    "https://developer.codef.io/",
+    "https://developer.codef.io/common-guide/add-auth",
+    "https://developer.codef.io/common-guide/connected-id",
+    "https://developer.codef.io/common-guide/connected-id/add",
+    "https://developer.codef.io/common-guide/connected-id/add-ref",
+    "https://developer.codef.io/common-guide/connected-id/cid",
+    "https://developer.codef.io/common-guide/connected-id/delete",
+    "https://developer.codef.io/common-guide/connected-id/list",
+    "https://developer.codef.io/common-guide/connected-id/list-account",
+    "https://developer.codef.io/common-guide/connected-id/register",
+    "https://developer.codef.io/common-guide/connected-id/update",
+    "https://developer.codef.io/common-guide/connected-id/update-ref",
+    "https://developer.codef.io/common-guide/error-code",
+    "https://developer.codef.io/common-guide/glossary",
+    "https://developer.codef.io/common-guide/multiple-requests",
+    "https://developer.codef.io/common-guide/rest-api",
+    "https://developer.codef.io/common-guide/retry-simple-auth",
+    "https://developer.codef.io/common-guide/sample-code",
+    "https://developer.codef.io/common-guide/webhook",
+    "https://developer.codef.io/product/api",
+    "https://developer.codef.io/product/cert"
+  ]
+}

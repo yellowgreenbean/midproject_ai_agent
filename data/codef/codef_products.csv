@@ -1,0 +1,59 @@
+﻿분류,구분,상품 이름,설명,문서 주소
+은행,,은행 개요,,https://developer.codef.io/products/bank/overview
+은행,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/bank/common/b/account
+은행,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/bank/common/b/accountPasswordVerification
+은행,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/bank/common/b/exchange
+은행,기업(개인사업자·법인),기업 빠른조회,인증서 없이 기업뱅킹 계좌 잔액·간편 거래내역 조회 (아이디 로그인),https://developer.codef.io/products/bank/common/b/fastAccount
+은행,기업(개인사업자·법인),기업 펀드 거래내역,"기업뱅킹 펀드 계좌의 거래내역 조회. 평가금액, 투자 원금·수익률 확인",https://developer.codef.io/products/bank/common/b/fund
+은행,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/bank/common/b/installmentSavings
+은행,기업(개인사업자·법인),기업 대출 거래내역,"기업뱅킹 대출 계좌의 거래내역 조회. 대출 잔액, 이자·상환 내역 확인",https://developer.codef.io/products/bank/common/b/loan
+은행,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/bank/common/b/transaction
+은행,기업(개인사업자·법인),기업 이체결과,"기업뱅킹 계좌의 이체 결과 조회. 이체 내역, 입금계좌·예금주 확인",https://developer.codef.io/products/bank/common/b/transfer-result
+은행,기타,(이름 미확인),,https://developer.codef.io/products/bank/common/etc/accountHolder
+은행,기타,기타 예금주명 인증(계좌 실명 인증),예금주명을 실명확인번호와 함께 인증해 조회 (제휴 서비스),https://developer.codef.io/products/bank/common/etc/accountHolderAuth
+은행,기타,기타 계좌 인증(1원 이체),1원 이체로 계좌 소유 여부 인증 (제휴 서비스),https://developer.codef.io/products/bank/common/etc/accountTransferAuthentication
+은행,기타,기타 환율조회,,https://developer.codef.io/products/bank/common/etc/exchangerate
+은행,개인,개인 보유계좌,"개인뱅킹 보유계좌와 잔액 조회. 예금·적금 잔액, 외화·펀드·보험 계좌 확인",https://developer.codef.io/products/bank/common/p/account
+은행,개인,개인 빠른조회,인증서 없이 개인뱅킹 계좌 잔액·간편 거래내역 조회,https://developer.codef.io/products/bank/common/p/fastAccount
+은행,개인,개인 적금 거래내역,"개인뱅킹 적금 계좌의 거래내역 조회. 납입내역, 만기·이율 확인",https://developer.codef.io/products/bank/common/p/installmentSavings
+은행,개인,(이름 미확인),,https://developer.codef.io/products/bank/common/p/loan
+은행,개인,개인 등록여부,,https://developer.codef.io/products/bank/common/p/regit-status
+은행,개인,개인 수시입출 거래내역,"개인뱅킹 수시입출 계좌의 거래내역 조회. 입출금 내역, 잔액 확인",https://developer.codef.io/products/bank/common/p/transaction
+bank2,,저축은행 개요,"저축은행은 개인 API만 제공. 보유계좌, 수시입출 거래내역 (상품에 따라)",https://developer.codef.io/products/bank2/overview
+bank2,개인,(이름 미확인),,https://developer.codef.io/products/bank2/common/p/account
+bank2,개인,(이름 미확인),,https://developer.codef.io/products/bank2/common/p/transaction
+카드,,카드 개요,"보유카드, 승인내역, 카드한도 (상품에 따라). 개인 API와 법인 API",https://developer.codef.io/products/card/overview
+카드,기업(개인사업자·법인),법인 보유카드,,https://developer.codef.io/products/card/common/b/account
+카드,기업(개인사업자·법인),법인 승인내역,,https://developer.codef.io/products/card/common/b/approval
+카드,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/card/common/b/billing
+카드,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/card/common/b/limit
+카드,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/card/common/b/prepayment-details
+카드,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/card/common/b/purchase-detail
+카드,기업(개인사업자·법인),(이름 미확인),,https://developer.codef.io/products/card/common/b/the-day-approval
+카드,개인,개인 보유카드,개인 보유카드 목록·유효기간 조회. 공동인증서 또는 아이디 로그인,https://developer.codef.io/products/card/common/p/account
+카드,개인,개인 승인내역,,https://developer.codef.io/products/card/common/p/approval
+카드,개인,개인 청구내역,,https://developer.codef.io/products/card/common/p/billing
+카드,개인,(이름 미확인),,https://developer.codef.io/products/card/common/p/limit
+카드,개인,개인 등록여부,,https://developer.codef.io/products/card/common/p/regit-status
+카드,개인,개인 실적조회,,https://developer.codef.io/products/card/common/p/result-check
+보험,,보험 개요,"보험사 계약정보, 보험다모아, 내보험다보여",https://developer.codef.io/products/insurance/overview
+보험,전체(증권사·보험사),보험사 계약정보,"보험 계약정보 조회. 계약상태·보장내용, 해약환급금·대출가능액 확인",https://developer.codef.io/products/insurance/common/a/contract-info
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/credit4u/change-email
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/credit4u/changePWD
+보험,,신용정보원(내보험다보여) 계약정보,,https://developer.codef.io/products/insurance/each/credit4u/contactInfo
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/credit4u/findID
+보험,,신용정보원(내보험다보여) 회원가입신청,내보험다보여 회원가입 신청,https://developer.codef.io/products/insurance/each/credit4u/register
+보험,,신용정보원(내보험다보여) 가입여부,,https://developer.codef.io/products/insurance/each/credit4u/register-status
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/credit4u/renewal-pwd
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/credit4u/unRegister
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/damoa/insuranceFee
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/damoa/myCarInsuranceInfo
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/damoa/myCarListInfo
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/damoa/session
+보험,,(이름 미확인),,https://developer.codef.io/products/insurance/each/kidi/car-discount-premium
+증권,,증권 개요,"등록여부, 보유계좌, 입출금내역, 종합자산, 주식잔고 (상품에 따라). 개인·법인 구분 없음",https://developer.codef.io/products/stock/overview
+증권,전체(증권사·보험사),(이름 미확인),,https://developer.codef.io/products/stock/common/a/account
+증권,전체(증권사·보험사),증권사 종합자산,주식·펀드·CMA 등 상품유형별 평가금액·수익률 확인,https://developer.codef.io/products/stock/common/a/assets
+증권,전체(증권사·보험사),증권사 주식잔고조회,"국내·해외주식 종목별 보유수량·평가금액, 매입금액·수익률 확인",https://developer.codef.io/products/stock/common/a/balance-inquiry
+증권,전체(증권사·보험사),(이름 미확인),,https://developer.codef.io/products/stock/common/a/registered
+증권,전체(증권사·보험사),증권사 입출금내역,,https://developer.codef.io/products/stock/common/a/transaction
