@@ -1,0 +1,340 @@
+{
+    "result": {
+        "code": "CF-00000",
+        "extraMessage": "",
+        "message": "성공",
+        "transactionId": "7d3f1a9c2b4e48e6a1c05f8e9b2d7c41"
+    },
+    "data": [
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "202911",
+            "resCardName": "OO체크카드-국제ATM",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20241119",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "6056122239920848"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "203101",
+            "resCardName": "할인카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20260128",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "6253812735825571"
+        },
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "202908",
+            "resCardName": "OO체크카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20240815",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4214573381014380"
+        },
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "202805",
+            "resCardName": "Deep Dream 체크|신한카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20230522",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4518316501723941"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "202711",
+            "resCardName": "Mr.Life|신한카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20221105",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4518091536370972"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "202711",
+            "resCardName": "taptap O|삼성카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20221127",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5310028161819524"
+        },
+        {
+            "resCardType": "본인신용",
+            "resValidPeriod": "202803",
+            "resCardName": "삼성 iD ON 카드|삼성카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20230305",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5310500328605491"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "203109",
+            "resCardName": "현대카드 M|현대카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20260917",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5433597795637181"
+        },
+        {
+            "resCardType": "주카드",
+            "resValidPeriod": "203002",
+            "resCardName": "현대카드 ZERO Edition3|현대카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20250208",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5433118946055585"
+        },
+        {
+            "resCardType": "부카드-가족",
+            "resValidPeriod": "202811",
+            "resCardName": "현대카드 ZERO Edition3|현대카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20231116",
+            "resUserNm": "김서연",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5433498571484205"
+        },
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "203009",
+            "resCardName": "KB국민 노리2 체크카드|KB국민카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20250923",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4579585324256703"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "202803",
+            "resCardName": "KB국민 My WE:SH 카드|KB국민카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20230314",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4579306387259074"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "202901",
+            "resCardName": "LOCA 365|롯데카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20240126",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5326619636691985"
+        },
+        {
+            "resCardType": "본인신용",
+            "resValidPeriod": "202903",
+            "resCardName": "LOCA LIKIT 1.2|롯데카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20240308",
+            "resUserNm": "김민준",
+            "resSleepYN": "Y",
+            "resState": "휴면",
+            "resCardNo": "5326621818714825"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "202807",
+            "resCardName": "카드의정석 EVERY DISCOUNT|우리카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20230705",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5365778048981376"
+        },
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "203008",
+            "resCardName": "카드의정석 COOKIE CHECK|우리카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20250828",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5365468010087929"
+        },
+        {
+            "resCardType": "체크 비자",
+            "resValidPeriod": "202804",
+            "resCardName": "트래블로그 체크카드|하나카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20230407",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4119194255951114"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "203106",
+            "resCardName": "원더카드 FREE|하나카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20260629",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "분실정지",
+            "resCardNo": "4119671807599566"
+        },
+        {
+            "resCardType": "본인카드",
+            "resValidPeriod": "202805",
+            "resCardName": "BC 바로 클리어 플러스|BC카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20230517",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "9490253795817520"
+        },
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "202805",
+            "resCardName": "참! 좋은친구카드_체크|IBK기업은행",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20230530",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "9490779366980859"
+        },
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "203010",
+            "resCardName": "K-패스 체크카드|IBK기업은행",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20251013",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "9490732981881507"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "202905",
+            "resCardName": "NH올원 파이카드|NH농협카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20240506",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5461068994488151"
+        },
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "203011",
+            "resCardName": "NH20 해봄 체크카드|NH농협카드",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20251121",
+            "resUserNm": "김민준",
+            "resSleepYN": "Y",
+            "resState": "휴면",
+            "resCardNo": "5461098263678752"
+        },
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "202612",
+            "resCardName": "토스뱅크 체크카드|토스뱅크",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20211203",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "5101237624960709"
+        },
+        {
+            "resCardType": "본인 비자",
+            "resValidPeriod": "202911",
+            "resCardName": "신한카드 Air One|신한카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20241105",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4518652790105980"
+        },
+        {
+            "resCardType": "부카드-가족",
+            "resValidPeriod": "202903",
+            "resCardName": "신한카드 Air One|신한카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20240326",
+            "resUserNm": "이정희",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4518496127738281"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "203010",
+            "resCardName": "삼성카드 & MILEAGE PLATINUM|삼성카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20251005",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "해지",
+            "resCardNo": "5310619858705495"
+        },
+        {
+            "resCardType": "신용/본인",
+            "resValidPeriod": "202708",
+            "resCardName": "KB국민 탄탄대로 올쇼핑 티타늄|KB국민카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20220808",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4579010794851529"
+        },
+        {
+            "resCardType": "본인",
+            "resValidPeriod": "203012",
+            "resCardName": "하이패스 전용카드|하나카드",
+            "resTrafficYN": "불가능",
+            "resIssueDate": "20251231",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "4119358579809320"
+        },
+        {
+            "resCardType": "체크/본인",
+            "resValidPeriod": "203102",
+            "resCardName": "카카오뱅크 프렌즈 체크카드|카카오뱅크",
+            "resTrafficYN": "가능",
+            "resIssueDate": "20260228",
+            "resUserNm": "김민준",
+            "resSleepYN": "N",
+            "resState": "정상",
+            "resCardNo": "6253788385008827"
+        }
+    ]
+}
