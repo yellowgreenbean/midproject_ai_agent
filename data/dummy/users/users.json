@@ -6,6 +6,9 @@
       "name": "김민준",
       "email": "minjun.kim@example.com",
       "email_verified_at": "2026-01-05T09:00:00+09:00",
+      "birth_date": "1988-01-01",
+      "gender": "M",
+      "payday": 25,
       "status": "ACTIVE",
       "created_at": "2026-01-05T08:50:00+09:00",
       "withdrawn_at": null
@@ -16,6 +19,9 @@
       "name": "이서연",
       "email": "seoyeon.lee@example.com",
       "email_verified_at": "2026-02-10T14:00:00+09:00",
+      "birth_date": "1995-06-08",
+      "gender": "F",
+      "payday": 10,
       "status": "ACTIVE",
       "created_at": "2026-02-10T13:50:00+09:00",
       "withdrawn_at": null
@@ -26,6 +32,9 @@
       "name": "박지호",
       "email": "jiho.park@example.com",
       "email_verified_at": "2025-07-31T14:37:00+09:00",
+      "birth_date": "1979-11-15",
+      "gender": "M",
+      "payday": null,
       "status": "ACTIVE",
       "created_at": "2025-07-31T14:27:00+09:00",
       "withdrawn_at": null
@@ -36,6 +45,9 @@
       "name": "최수아",
       "email": "sua.choi@example.com",
       "email_verified_at": "2026-02-13T17:54:00+09:00",
+      "birth_date": "2001-04-22",
+      "gender": "F",
+      "payday": 15,
       "status": "ACTIVE",
       "created_at": "2026-02-13T17:44:00+09:00",
       "withdrawn_at": null
@@ -46,6 +58,9 @@
       "name": "정도윤",
       "email": "doyun.jung@example.com",
       "email_verified_at": "2026-04-28T10:55:00+09:00",
+      "birth_date": "1992-09-01",
+      "gender": "M",
+      "payday": 21,
       "status": "ACTIVE",
       "created_at": "2026-04-28T10:45:00+09:00",
       "withdrawn_at": null
@@ -56,6 +71,9 @@
       "name": "강하은",
       "email": "haeun.kang@example.com",
       "email_verified_at": "2026-08-27T12:58:00+09:00",
+      "birth_date": "1985-02-08",
+      "gender": "F",
+      "payday": 25,
       "status": "ACTIVE",
       "created_at": "2026-08-27T12:48:00+09:00",
       "withdrawn_at": null
@@ -66,6 +84,9 @@
       "name": "조현우",
       "email": "hyunwoo.cho@example.com",
       "email_verified_at": "2026-09-02T18:39:00+09:00",
+      "birth_date": "1998-07-15",
+      "gender": "M",
+      "payday": 10,
       "status": "ACTIVE",
       "created_at": "2026-09-02T18:29:00+09:00",
       "withdrawn_at": null
@@ -76,6 +97,9 @@
       "name": "윤지아",
       "email": "jia.yoon@example.com",
       "email_verified_at": "2026-01-02T18:56:00+09:00",
+      "birth_date": "1990-12-22",
+      "gender": "F",
+      "payday": null,
       "status": "ACTIVE",
       "created_at": "2026-01-02T18:46:00+09:00",
       "withdrawn_at": null
@@ -86,6 +110,9 @@
       "name": "장시우",
       "email": "siwoo.jang@example.com",
       "email_verified_at": "2026-03-08T17:32:00+09:00",
+      "birth_date": "1983-05-01",
+      "gender": "M",
+      "payday": 15,
       "status": "ACTIVE",
       "created_at": "2026-03-08T17:22:00+09:00",
       "withdrawn_at": null
@@ -96,6 +123,9 @@
       "name": "임서윤",
       "email": "seoyun.lim@example.com",
       "email_verified_at": "2026-06-20T19:10:00+09:00",
+      "birth_date": "2003-10-08",
+      "gender": "F",
+      "payday": 25,
       "status": "ACTIVE",
       "created_at": "2026-06-20T19:00:00+09:00",
       "withdrawn_at": null
@@ -106,6 +136,9 @@
       "name": "한준서",
       "email": "junseo.han@example.com",
       "email_verified_at": "2026-01-12T13:15:00+09:00",
+      "birth_date": "1976-03-15",
+      "gender": "M",
+      "payday": 21,
       "status": "ACTIVE",
       "created_at": "2026-01-12T13:05:00+09:00",
       "withdrawn_at": null
@@ -116,6 +149,9 @@
       "name": "오예린",
       "email": "yerin.oh@example.com",
       "email_verified_at": "2025-06-02T10:32:00+09:00",
+      "birth_date": "1996-08-22",
+      "gender": "F",
+      "payday": 10,
       "status": "ACTIVE",
       "created_at": "2025-06-02T10:22:00+09:00",
       "withdrawn_at": null
@@ -126,6 +162,9 @@
       "name": "서건우",
       "email": "geonwoo.seo@example.com",
       "email_verified_at": "2025-07-27T14:04:00+09:00",
+      "birth_date": "1989-01-01",
+      "gender": "M",
+      "payday": null,
       "status": "ACTIVE",
       "created_at": "2025-07-27T13:54:00+09:00",
       "withdrawn_at": null
@@ -136,6 +175,9 @@
       "name": "신유진",
       "email": "yujin.shin@example.com",
       "email_verified_at": "2026-07-24T10:50:00+09:00",
+      "birth_date": "1993-06-08",
+      "gender": "F",
+      "payday": 25,
       "status": "ACTIVE",
       "created_at": "2026-07-24T10:40:00+09:00",
       "withdrawn_at": null
@@ -146,6 +188,9 @@
       "name": "권태민",
       "email": "taemin.kwon@example.com",
       "email_verified_at": "2026-01-17T09:21:00+09:00",
+      "birth_date": "1981-11-15",
+      "gender": "M",
+      "payday": 15,
       "status": "ACTIVE",
       "created_at": "2026-01-17T09:11:00+09:00",
       "withdrawn_at": null
@@ -156,6 +201,9 @@
       "name": "황나연",
       "email": "nayeon.hwang@example.com",
       "email_verified_at": "2026-07-23T17:32:00+09:00",
+      "birth_date": "2000-04-22",
+      "gender": "F",
+      "payday": 21,
       "status": "ACTIVE",
       "created_at": "2026-07-23T17:22:00+09:00",
       "withdrawn_at": null
@@ -166,6 +214,9 @@
       "name": "안재현",
       "email": "jaehyun.ahn@example.com",
       "email_verified_at": "2026-05-14T14:31:00+09:00",
+      "birth_date": "1987-09-01",
+      "gender": "M",
+      "payday": 25,
       "status": "ACTIVE",
       "created_at": "2026-05-14T14:21:00+09:00",
       "withdrawn_at": null
@@ -176,6 +227,9 @@
       "name": "송다은",
       "email": "daeun.song@example.com",
       "email_verified_at": "2025-09-16T15:56:00+09:00",
+      "birth_date": "1994-02-08",
+      "gender": "F",
+      "payday": null,
       "status": "ACTIVE",
       "created_at": "2025-09-16T15:46:00+09:00",
       "withdrawn_at": null
@@ -186,6 +240,9 @@
       "name": "류승민",
       "email": "seungmin.ryu@example.com",
       "email_verified_at": "2025-10-07T15:06:00+09:00",
+      "birth_date": "1978-07-15",
+      "gender": "M",
+      "payday": 10,
       "status": "ACTIVE",
       "created_at": "2025-10-07T14:56:00+09:00",
       "withdrawn_at": null
@@ -196,6 +253,9 @@
       "name": "전하윤",
       "email": "hayoon.jeon@example.com",
       "email_verified_at": "2026-09-19T15:15:00+09:00",
+      "birth_date": "1999-12-22",
+      "gender": "F",
+      "payday": 15,
       "status": "ACTIVE",
       "created_at": "2026-09-19T15:05:00+09:00",
       "withdrawn_at": null
@@ -206,6 +266,9 @@
       "name": "홍지훈",
       "email": "jihoon.hong@example.com",
       "email_verified_at": "2026-07-18T15:35:00+09:00",
+      "birth_date": "1991-05-01",
+      "gender": "M",
+      "payday": 25,
       "status": "ACTIVE",
       "created_at": "2026-07-18T15:25:00+09:00",
       "withdrawn_at": null
@@ -216,6 +279,9 @@
       "name": "문채원",
       "email": "chaewon.moon@example.com",
       "email_verified_at": "2026-06-17T17:55:00+09:00",
+      "birth_date": "1986-10-08",
+      "gender": "F",
+      "payday": 21,
       "status": "ACTIVE",
       "created_at": "2026-06-17T17:45:00+09:00",
       "withdrawn_at": null
@@ -226,6 +292,9 @@
       "name": "양동혁",
       "email": "donghyuk.yang@example.com",
       "email_verified_at": "2026-04-23T10:28:00+09:00",
+      "birth_date": "2002-03-15",
+      "gender": "M",
+      "payday": null,
       "status": "ACTIVE",
       "created_at": "2026-04-23T10:18:00+09:00",
       "withdrawn_at": null
@@ -236,6 +305,9 @@
       "name": "손예은",
       "email": "yeeun.son@example.com",
       "email_verified_at": "2026-06-06T14:58:00+09:00",
+      "birth_date": "1997-08-22",
+      "gender": "F",
+      "payday": 10,
       "status": "RESTRICTED",
       "created_at": "2026-06-06T14:48:00+09:00",
       "withdrawn_at": null
@@ -246,6 +318,9 @@
       "name": "배준영",
       "email": "junyoung.bae@example.com",
       "email_verified_at": "2025-07-16T18:40:00+09:00",
+      "birth_date": "1984-01-01",
+      "gender": "M",
+      "payday": 25,
       "status": "ACTIVE",
       "created_at": "2025-07-16T18:30:00+09:00",
       "withdrawn_at": null
@@ -256,6 +331,9 @@
       "name": "백소율",
       "email": "soyul.baek@example.com",
       "email_verified_at": "2026-03-03T14:09:00+09:00",
+      "birth_date": "1980-06-08",
+      "gender": "F",
+      "payday": 15,
       "status": "ACTIVE",
       "created_at": "2026-03-03T13:59:00+09:00",
       "withdrawn_at": null
@@ -266,6 +344,9 @@
       "name": "허민재",
       "email": "minjae.heo@example.com",
       "email_verified_at": "2025-10-26T16:58:00+09:00",
+      "birth_date": "2010-11-15",
+      "gender": "M",
+      "payday": null,
       "status": "ACTIVE",
       "created_at": "2025-10-26T16:48:00+09:00",
       "withdrawn_at": null
@@ -276,6 +357,9 @@
       "name": "남가영",
       "email": "gayoung.nam@example.com",
       "email_verified_at": null,
+      "birth_date": "1990-04-22",
+      "gender": "F",
+      "payday": 21,
       "status": "PENDING_VERIFICATION",
       "created_at": "2025-08-12T18:51:00+09:00",
       "withdrawn_at": null
@@ -286,6 +370,9 @@
       "name": "노성민",
       "email": "sungmin.noh@example.com",
       "email_verified_at": "2025-11-06T09:35:00+09:00",
+      "birth_date": "1982-09-01",
+      "gender": "M",
+      "payday": 25,
       "status": "WITHDRAWN",
       "created_at": "2025-11-06T09:25:00+09:00",
       "withdrawn_at": "2026-09-18T11:20:00+09:00"
@@ -296,6 +383,9 @@
       "name": "유아린",
       "email": "arin.yoo@example.com",
       "email_verified_at": "2026-08-09T15:27:00+09:00",
+      "birth_date": "1995-02-08",
+      "gender": "F",
+      "payday": 10,
       "status": "ACTIVE",
       "created_at": "2026-08-09T15:17:00+09:00",
       "withdrawn_at": null

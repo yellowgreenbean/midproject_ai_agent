@@ -10,7 +10,8 @@
       "applied_rate": "2.40",
       "start_date": "20250110",
       "maturity_date": "20270110",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     },
     {
       "id": "sub_002",
@@ -22,7 +23,8 @@
       "applied_rate": "2.40",
       "start_date": "20260221",
       "maturity_date": "20280221",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     },
     {
       "id": "sub_003",
@@ -34,7 +36,8 @@
       "applied_rate": "2.40",
       "start_date": "20250814",
       "maturity_date": "20270814",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     },
     {
       "id": "sub_004",
@@ -46,7 +49,8 @@
       "applied_rate": "2.40",
       "start_date": "20260315",
       "maturity_date": "20280314",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     },
     {
       "id": "sub_005",
@@ -58,7 +62,8 @@
       "applied_rate": "2.40",
       "start_date": "20260518",
       "maturity_date": "20280517",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     },
     {
       "id": "sub_006",
@@ -70,7 +75,8 @@
       "applied_rate": "2.40",
       "start_date": "20260919",
       "maturity_date": "20280918",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     },
     {
       "id": "sub_007",
@@ -82,7 +88,8 @@
       "applied_rate": "2.45",
       "start_date": "20260210",
       "maturity_date": "20270210",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     },
     {
       "id": "sub_008",
@@ -94,7 +101,8 @@
       "applied_rate": "3.60",
       "start_date": "20260520",
       "maturity_date": "20270520",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     },
     {
       "id": "sub_009",
@@ -106,7 +114,8 @@
       "applied_rate": "2.80",
       "start_date": "20260305",
       "maturity_date": "20270305",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     },
     {
       "id": "sub_010",
@@ -118,7 +127,8 @@
       "applied_rate": "3.75",
       "start_date": "20260812",
       "maturity_date": "20270212",
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "closed_at": null
     }
   ]
 }

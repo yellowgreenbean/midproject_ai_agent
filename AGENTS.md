@@ -5,22 +5,28 @@
 푸시 = 배포인가: 아니오
 
 ## 무엇을 만드는가 (3줄)
-- **토스 클론**(사용자 말, 2026-11-03)인 계좌 관리 서비스의 학습용 모의 버전 (기획서: `docs/회원_계좌기능_기획서.md` — 원본 2개는 `docs/_원본/`). 동작이 애매하면 **토스가 하는 방식**을 따르고, 조사 결과는 `docs/domain-rules.md` 에 출처와 함께 남긴다.
+- **토스 클론**(사용자 말, 2026-11-03)인 계좌 관리 서비스의 학습용 모의 버전 (기획서: `docs/회원_계좌기능_기획서.md` — 원본 2개는 `docs/_원본/` · 예금·적금 상품은 `docs/은행_상품_기획안.md` · 거래·카드는 `docs/거래_카드기능_기획서.md`(팀원 담당)). 동작이 애매하면 **토스가 하는 방식**을 따르고, 조사 결과는 `docs/domain-rules.md` 에 출처와 함께 남긴다.
 - 금융 데이터는 CODEF 샌드박스(가짜 데이터)와 직접 만든 더미 데이터로만 쓴다.
 - 증권·대출은 보류 (`docs/BACKLOG.md`).
 
 ## 폴더 구조
 ```
-docs/            통합 기획서 · 흐름도 · BACKLOG (사람이 읽는 문서). 기능 번호는 AUTH-Fxx(회원·인증) / ACCT-Fxx(계좌)
+docs/            통합 기획서 · 흐름도 · BACKLOG (사람이 읽는 문서). 기능 번호는 AUTH-Fxx(회원·인증) / ACCT-Fxx(계좌) / PROD-Fxx(상품, `docs/은행_상품_기획안.md`) / TRX-Fxx(거래) / CARD-Fxx(카드)
 data/codef/      CODEF 상품 조사 결과 (codef_products.json · .csv) — 참고 자료
-data/dummy/      직접 만든 더미 데이터 (CODEF 응답 모양을 따름) — 앱이 읽는 데이터
+data/dummy/      직접 만든 더미 데이터 (CODEF 응답 모양을 따름) — 앱이 읽는 데이터. 파트별 폴더:
+  users/         users.json
+  accounts/      accounts.json
+  transactions/  transactions.json                       (거래 파트)
+  cards/         cards.json · card_approvals.json · card_billing.json  (카드 파트)
+  products/      products.json · subscriptions.json · subscription_payments.json  (상품 파트)
 scripts/         CODEF 샌드박스 시험 코드 등 단발 실행 스크립트
 (앞으로) 앱 코드는 새 폴더(예: backend/ · frontend/)를 만들어 거기에 둔다. 루트에 파일을 늘어놓지 않는다.
 ```
-더미 데이터 파일 (`data/dummy/`):
-- `users` 사용자 30 (`user_001`~`user_030`, 가상의 한국 이름 · 이메일은 `example.com`) — 상태: ACTIVE 27 · RESTRICTED 1(024) · PENDING_VERIFICATION 1(028, 계좌 없음) · WITHDRAWN 1(029, 계좌 전부 해지). 비밀번호·PIN 은 넣지 않는다(앱이 해시로 만든다)
-- `accounts` 계좌 30 (유형 `CHECKING` 23 · `SAVINGS` 7, 상태 `ACTIVE` 23 · `SUSPENDED` 3 · `CLOSED` 4). 계좌 없는 사용자 9명. id 는 `acc_005` 를 건너뛴다(보류한 대출 계좌 자리, 재사용 금지). 해지 계좌는 잔액 0 + `closed_at` 필수.
-- `cards` 카드 30 (체크 15 · 신용 15; 정상 입출금 계좌가 있는 사용자 15명이 체크+신용 1장씩, 체크카드는 `resLinkedAccount` 로 본인 입출금 계좌에 연결) · `card_billing` 청구내역 30(신용카드 15장 × 9·10월) · `card_approvals` 승인내역 132(취소 5 포함) · `transactions` 거래내역 90건(계좌 19개 묶음, 이 중 17개 계좌에 거래 있음; 10월 한 달치, 거래마다 고유 `id`).
+더미 데이터 파일 (`data/dummy/<파트>/` — 위 폴더 구조):
+- `users` 사용자 30 (`user_001`~`user_030`, 가상의 한국 이름 · 이메일은 `example.com`) — 상태: ACTIVE 27 · RESTRICTED 1(024) · PENDING_VERIFICATION 1(028, 계좌 없음) · WITHDRAWN 1(029, 계좌 전부 해지). 생년월일 `birth_date`(`YYYY-MM-DD`)·성별 `gender`(`M` 15 · `F` 15)·월급일 `payday`(빈 값 6) — 미성년자는 `user_027`(만 15세, 계좌·카드 없음, 카드 심사 나이 거절 시험용) 하나, 카드 보유자는 모두 성인. 비밀번호·PIN 은 넣지 않는다(앱이 해시로 만든다)
+- `accounts` 계좌 24 (유형 `CHECKING` 23 · `SAVINGS`(저축예금) 1, 상태 `ACTIVE` 17 · `SUSPENDED` 3 · `CLOSED` 4). 계좌 없는 사용자 9명. id 는 `acc_005`(보류한 대출 계좌 자리)와 `acc_003`·`008`·`024`~`027`(자유적금 → `subscriptions` 로 옮김)을 건너뛴다(재사용 금지). 해지 계좌는 잔액 0 + `closed_at` 필수.
+- `products` 두린은행 상품 30(정기예금 11·적금 19) + 금리 구간 109 + 가입 조건 30 — 미확인 값은 `null`. `subscriptions` 예금·적금 가입 10(자유적금 6 + 정기예금 4, 출금 계좌는 본인 입출금 계좌, 전부 `ACTIVE` · `closed_at` 빈 값. `sub_005` 의 출금 계좌 `acc_011` 은 가입 뒤 정지된 경우 — 중도 해지 거절 시험용) · `subscription_payments` 적금 납입 1. 예금·적금은 계좌가 아니다(상품 기획안).
+- `cards` 카드 30 (체크 15 · 신용 15; 정상 입출금 계좌가 있는 사용자 15명이 체크+신용 1장씩, 체크카드는 `resLinkedAccount` 로 본인 입출금 계좌에 연결, 신용카드는 `credit_limit` 100만·300만·500만 원 — 체크카드는 `null`, 카드 상태 `status` 는 전부 `ACTIVE`) · `card_billing` 청구내역 30(신용카드 15장 × 9·10월) · `card_approvals` 승인내역 132(취소 5 포함) · `transactions` 거래내역 89건(계좌 18개 묶음, 이 중 16개 계좌에 거래 있음; 10월 한 달치, 거래마다 고유 `id`).
 - 거래·카드 기획은 다른 팀원 담당 — 이 더미는 화면·API 시험용으로 먼저 채워 둔 것이라, 팀원이 정한 모양과 다르면 그쪽에 맞춘다.
 - 모든 계좌·카드에 `user_id` 가 있다 — 다른 사용자 것에 접근 못 하는지 시험할 때 쓴다.
 
@@ -35,7 +41,7 @@ scripts/         CODEF 샌드박스 시험 코드 등 단발 실행 스크립트
 
 ## 게이트
 - `scripts/test_codef.py` 실행 시 `CF-00000` 반환 (설치: `pip install easycodefpy requests`)
-- 더미 데이터 정합성: 거래내역 마지막 잔액 = 계좌 잔액, **거래 중간 잔액도 음수 없음 + 거래 사이 계산이 맞음**, 카드 청구 합계 = 승인내역 합계(취소 제외), 9월 청구 = 10/14 카드대금 출금, 10월 체크카드 승인 = 연결 계좌 출금, 카드·계좌의 주인(`user_id`)이 같음, 거래·승인번호 `id` 중복 없음.
+- 더미 데이터 정합성: 거래내역 마지막 잔액 = 계좌 잔액, **거래 중간 잔액도 음수 없음 + 거래 사이 계산이 맞음**, 카드 청구 합계 = 승인내역 합계(취소 제외), 9월 청구 = 10/14 카드대금 출금, 10월 체크카드 승인 = 연결 계좌 출금, 카드·계좌의 주인(`user_id`)이 같음, 거래·승인번호 `id` 중복 없음, 가입 계약의 출금 계좌는 본인 `CHECKING`, 만기·해지된 계약(`MATURED`·`TERMINATED`)은 `closed_at` 필수, 적금 납입 = 출금 계좌의 같은 날·같은 금액 출금, 상품 금리 구간이 겹치지 않음, 신용카드 사용 중 금액(승인 합계 − 취소 − 결제된 청구) ≤ `credit_limit`. 거래 순서는 파일 순서(최신이 먼저)로 계산한다 — 같은 시각 거래가 있어 시각으로 다시 정렬하면 틀린다.
 
 ## 하우스룰
 - 실제 카드사 계정·개인 키·비밀번호를 코드나 저장소에 넣지 않는다.

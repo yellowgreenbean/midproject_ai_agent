@@ -164,27 +164,6 @@
       ]
     },
     {
-      "account_id": "acc_003",
-      "resAccount": "11000000000003",
-      "resAccountDisplay": "110-00-000003",
-      "resLastTranDate": "20261031",
-      "resTrHistoryList": [
-        {
-          "id": "tx_0012",
-          "resAccountTrDate": "20261031",
-          "resAccountTrTime": "090000",
-          "resAccountIn": "300000",
-          "resAccountOut": "0",
-          "resAfterTranBalance": "3600000",
-          "resAccountDesc1": "",
-          "resAccountDesc2": "적금납입",
-          "resAccountDesc3": "자유적금 납입",
-          "resAccountDesc4": "인터넷뱅킹",
-          "tranDesc": ""
-        }
-      ]
-    },
-    {
       "account_id": "acc_004",
       "resAccount": "11000000000004",
       "resAccountDisplay": "110-00-000004",
