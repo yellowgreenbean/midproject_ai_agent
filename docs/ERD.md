@@ -11,7 +11,7 @@
 
 ---
 
-## 0. 전체 연결 (파트 사이 관계만)
+## 0. 전체 연결 (파트 사이 주요 관계)
 
 ```mermaid
 erDiagram
@@ -79,6 +79,8 @@ erDiagram
         string user_id PK, FK
         string password_hash
         datetime password_updated_at
+        int failed_attempts "로그인·본인 확인 실패"
+        datetime locked_until
     }
     email_verifications {
         string id PK
@@ -139,7 +141,7 @@ erDiagram
     step_up_challenges {
         string id PK
         string user_id FK
-        string action "TRANSFER / SCHEDULED_TRANSFER / CARD_APPLICATION / CARD_TERMINATION / CARD_MANAGEMENT / SUBSCRIPTION / ACCOUNT_STATUS_CHANGE"
+        string action "TRANSFER / SCHEDULED_TRANSFER / CARD_APPLICATION / CARD_TERMINATION / CARD_MANAGEMENT / SUBSCRIPTION / ACCOUNT_STATUS_CHANGE / WITHDRAWAL / PROFILE_CHANGE"
         string session_id FK
         datetime expires_at
         datetime consumed_at
@@ -217,7 +219,7 @@ erDiagram
         string user_id FK
         string account_id FK "카드 알림이면 빈 값"
         string user_card_id FK "카드 알림이면"
-        string event_id "원인 이벤트"
+        string event_id "원인 이벤트, (event_id, user_id, type) 중복 금지"
         string type "TRANSACTION / PAYMENT_DUE / MATURITY ..."
         string title
         string body
@@ -292,7 +294,7 @@ erDiagram
         bigint fee
         string my_display_name
         string their_display_name
-        string status "PENDING / SUCCESS / FAILED / CANCELED"
+        string status "PENDING / SUCCESS / FAILED"
         string failure_reason
         string channel "APP / SCHEDULED / AUTO"
         string scheduled_transfer_id FK
@@ -400,6 +402,7 @@ erDiagram
         string maturity_date "YYYYMMDD"
         string status "ACTIVE / MATURED / TERMINATED"
         string closed_at "YYYYMMDD, 진행 중 null"
+        string idempotency_key UK "중복 가입 방지"
     }
     subscription_payments {
         string id PK
@@ -434,6 +437,7 @@ erDiagram
     promotions |o--o{ card_applications : "이벤트로"
     accounts |o--o{ card_applications : "연결 계좌"
     step_up_challenges |o--o{ card_applications : "본인 확인"
+    card_recommendations |o--o{ card_applications : "추천으로 신청"
     card_applications ||--o{ application_status_histories : "상태 이력"
     card_applications ||--o{ application_term_agreements : "약관 동의"
     terms ||--o{ application_term_agreements : "약관"
@@ -506,6 +510,7 @@ erDiagram
         bigint annual_income
         string linked_account_id FK
         int payment_day
+        bigint approved_credit_limit "심사 승인 한도(신용)"
         string reject_reason "AGE / NO_INCOME / DUPLICATE"
         datetime applied_at
     }

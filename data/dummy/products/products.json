@@ -1,6 +1,6 @@
 {
   "meta": {
-    "term_rule": "term_min·term_max 는 term_unit 단위(MONTH=개월, DAY=일)이며 양 끝을 포함한다. '12개월 이상 24개월 미만' 은 12~23. 일 단위 상품은 products 의 rules_json 에 term_days 도 적었다.",
+    "term_rule": "term_min·term_max 는 term_unit 단위(MONTH=개월, DAY=일)이며 양 끝을 포함한다. '12개월 이상 24개월 미만' 은 12~23. 일 단위 상품은 product_rules 의 rules_json 에 term_days(일수가 정해진 상품) 또는 term_days_min·term_days_max(범위가 있는 상품)도 적었다.",
     "rate_unit": "연 %, 세전, 문자열. bonus_rate 는 우대금리의 최대치."
   },
   "products": [

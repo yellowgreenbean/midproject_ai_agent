@@ -48,7 +48,7 @@
       "monthly_amount": null,
       "applied_rate": "2.40",
       "start_date": "20260315",
-      "maturity_date": "20280314",
+      "maturity_date": "20280315",
       "status": "ACTIVE",
       "closed_at": null
     },
@@ -61,7 +61,7 @@
       "monthly_amount": null,
       "applied_rate": "2.40",
       "start_date": "20260518",
-      "maturity_date": "20280517",
+      "maturity_date": "20280518",
       "status": "ACTIVE",
       "closed_at": null
     },
@@ -74,7 +74,7 @@
       "monthly_amount": null,
       "applied_rate": "2.40",
       "start_date": "20260919",
-      "maturity_date": "20280918",
+      "maturity_date": "20280919",
       "status": "ACTIVE",
       "closed_at": null
     },
