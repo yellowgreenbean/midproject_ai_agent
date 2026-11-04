@@ -6,9 +6,6 @@
   "data": [
     {
       "account_id": "acc_001",
-      "resAccount": "11000000000001",
-      "resAccountDisplay": "110-00-000001",
-      "resLastTranDate": "20261031",
       "resTrHistoryList": [
         {
           "id": "tx_0009",
@@ -131,9 +128,6 @@
     },
     {
       "account_id": "acc_002",
-      "resAccount": "11000000000002",
-      "resAccountDisplay": "110-00-000002",
-      "resLastTranDate": "20261031",
       "resTrHistoryList": [
         {
           "id": "tx_0011",
@@ -165,23 +159,14 @@
     },
     {
       "account_id": "acc_004",
-      "resAccount": "11000000000004",
-      "resAccountDisplay": "110-00-000004",
-      "resLastTranDate": "",
       "resTrHistoryList": []
     },
     {
       "account_id": "acc_006",
-      "resAccount": "11000000000005",
-      "resAccountDisplay": "110-00-000005",
-      "resLastTranDate": "",
       "resTrHistoryList": []
     },
     {
       "account_id": "acc_007",
-      "resAccount": "33000000000001",
-      "resAccountDisplay": "330-00-000001",
-      "resLastTranDate": "20261026",
       "resTrHistoryList": [
         {
           "id": "tx_0015",
@@ -226,9 +211,6 @@
     },
     {
       "account_id": "acc_009",
-      "resAccount": "44000000000009",
-      "resAccountDisplay": "440-00-000009",
-      "resLastTranDate": "20261027",
       "resTrHistoryList": [
         {
           "id": "tx_0021",
@@ -312,9 +294,6 @@
     },
     {
       "account_id": "acc_010",
-      "resAccount": "44000000000010",
-      "resAccountDisplay": "440-00-000010",
-      "resLastTranDate": "20261025",
       "resTrHistoryList": [
         {
           "id": "tx_0027",
@@ -398,9 +377,6 @@
     },
     {
       "account_id": "acc_012",
-      "resAccount": "44000000000012",
-      "resAccountDisplay": "440-00-000012",
-      "resLastTranDate": "20261028",
       "resTrHistoryList": [
         {
           "id": "tx_0033",
@@ -484,9 +460,6 @@
     },
     {
       "account_id": "acc_014",
-      "resAccount": "44000000000014",
-      "resAccountDisplay": "440-00-000014",
-      "resLastTranDate": "20261025",
       "resTrHistoryList": [
         {
           "id": "tx_0038",
@@ -557,9 +530,6 @@
     },
     {
       "account_id": "acc_015",
-      "resAccount": "44000000000015",
-      "resAccountDisplay": "440-00-000015",
-      "resLastTranDate": "20261025",
       "resTrHistoryList": [
         {
           "id": "tx_0042",
@@ -617,9 +587,6 @@
     },
     {
       "account_id": "acc_016",
-      "resAccount": "44000000000016",
-      "resAccountDisplay": "440-00-000016",
-      "resLastTranDate": "20261025",
       "resTrHistoryList": [
         {
           "id": "tx_0048",
@@ -703,9 +670,6 @@
     },
     {
       "account_id": "acc_018",
-      "resAccount": "44000000000018",
-      "resAccountDisplay": "440-00-000018",
-      "resLastTranDate": "20261025",
       "resTrHistoryList": [
         {
           "id": "tx_0052",
@@ -763,9 +727,6 @@
     },
     {
       "account_id": "acc_019",
-      "resAccount": "44000000000019",
-      "resAccountDisplay": "440-00-000019",
-      "resLastTranDate": "20261025",
       "resTrHistoryList": [
         {
           "id": "tx_0057",
@@ -836,9 +797,6 @@
     },
     {
       "account_id": "acc_021",
-      "resAccount": "44000000000021",
-      "resAccountDisplay": "440-00-000021",
-      "resLastTranDate": "20261027",
       "resTrHistoryList": [
         {
           "id": "tx_0062",
@@ -909,9 +867,6 @@
     },
     {
       "account_id": "acc_022",
-      "resAccount": "44000000000022",
-      "resAccountDisplay": "440-00-000022",
-      "resLastTranDate": "20261027",
       "resTrHistoryList": [
         {
           "id": "tx_0069",
@@ -1008,9 +963,6 @@
     },
     {
       "account_id": "acc_023",
-      "resAccount": "44000000000023",
-      "resAccountDisplay": "440-00-000023",
-      "resLastTranDate": "20261027",
       "resTrHistoryList": [
         {
           "id": "tx_0076",
@@ -1107,9 +1059,6 @@
     },
     {
       "account_id": "acc_028",
-      "resAccount": "44000000000028",
-      "resAccountDisplay": "440-00-000028",
-      "resLastTranDate": "20261027",
       "resTrHistoryList": [
         {
           "id": "tx_0083",
@@ -1206,9 +1155,6 @@
     },
     {
       "account_id": "acc_029",
-      "resAccount": "44000000000029",
-      "resAccountDisplay": "440-00-000029",
-      "resLastTranDate": "20261027",
       "resTrHistoryList": [
         {
           "id": "tx_0090",

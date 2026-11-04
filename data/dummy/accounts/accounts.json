@@ -16,9 +16,7 @@
       "resAccountDisplay": "110-00-000001",
       "resAccountName": "입출금통장",
       "resAccountNickName": "생활비",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20240315",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "1250000"
     },
@@ -34,9 +32,7 @@
       "resAccountDisplay": "110-00-000002",
       "resAccountName": "저축예금",
       "resAccountNickName": "비상금",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20230901",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "874890"
     },
@@ -52,9 +48,7 @@
       "resAccountDisplay": "110-00-000004",
       "resAccountName": "입출금통장",
       "resAccountNickName": "",
-      "resAccountStatus": "일시정지",
       "resAccountStartDate": "20220620",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "0"
     },
@@ -70,9 +64,7 @@
       "resAccountDisplay": "110-00-000005",
       "resAccountName": "입출금통장",
       "resAccountNickName": "예전 통장",
-      "resAccountStatus": "해지",
       "resAccountStartDate": "20210301",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "0"
     },
@@ -88,9 +80,7 @@
       "resAccountDisplay": "330-00-000001",
       "resAccountName": "입출금통장",
       "resAccountNickName": "용돈",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260210",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "530000"
     },
@@ -106,9 +96,7 @@
       "resAccountDisplay": "440-00-000009",
       "resAccountName": "입출금통장",
       "resAccountNickName": "",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20250817",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "2260000"
     },
@@ -124,9 +112,7 @@
       "resAccountDisplay": "440-00-000010",
       "resAccountName": "입출금통장",
       "resAccountNickName": "용돈",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260313",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "5040000"
     },
@@ -142,9 +128,7 @@
       "resAccountDisplay": "440-00-000011",
       "resAccountName": "입출금통장",
       "resAccountNickName": "학자금",
-      "resAccountStatus": "일시정지",
       "resAccountStartDate": "20260525",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "2209000"
     },
@@ -160,9 +144,7 @@
       "resAccountDisplay": "440-00-000012",
       "resAccountName": "입출금통장",
       "resAccountNickName": "비상금",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260912",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "2483500"
     },
@@ -178,9 +160,7 @@
       "resAccountDisplay": "440-00-000013",
       "resAccountName": "입출금통장",
       "resAccountNickName": "",
-      "resAccountStatus": "해지",
       "resAccountStartDate": "20260928",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "0"
     },
@@ -196,9 +176,7 @@
       "resAccountDisplay": "440-00-000014",
       "resAccountName": "입출금통장",
       "resAccountNickName": "여행자금",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260115",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "3210000"
     },
@@ -214,9 +192,7 @@
       "resAccountDisplay": "440-00-000015",
       "resAccountName": "입출금통장",
       "resAccountNickName": "학자금",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260404",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "4270000"
     },
@@ -232,9 +208,7 @@
       "resAccountDisplay": "440-00-000016",
       "resAccountName": "입출금통장",
       "resAccountNickName": "결혼자금",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260711",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "3430000"
     },
@@ -250,9 +224,7 @@
       "resAccountDisplay": "440-00-000017",
       "resAccountName": "입출금통장",
       "resAccountNickName": "월세",
-      "resAccountStatus": "일시정지",
       "resAccountStartDate": "20260202",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "0"
     },
@@ -268,9 +240,7 @@
       "resAccountDisplay": "440-00-000018",
       "resAccountName": "입출금통장",
       "resAccountNickName": "용돈",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20250624",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "2740000"
     },
@@ -286,9 +256,7 @@
       "resAccountDisplay": "440-00-000019",
       "resAccountName": "입출금통장",
       "resAccountNickName": "",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20250822",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "5060000"
     },
@@ -304,9 +272,7 @@
       "resAccountDisplay": "440-00-000020",
       "resAccountName": "입출금통장",
       "resAccountNickName": "",
-      "resAccountStatus": "해지",
       "resAccountStartDate": "20260823",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "0"
     },
@@ -322,9 +288,7 @@
       "resAccountDisplay": "440-00-000021",
       "resAccountName": "입출금통장",
       "resAccountNickName": "학자금",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260123",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "5180000"
     },
@@ -340,9 +304,7 @@
       "resAccountDisplay": "440-00-000022",
       "resAccountName": "입출금통장",
       "resAccountNickName": "생활비",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260817",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "2992700"
     },
@@ -358,9 +320,7 @@
       "resAccountDisplay": "440-00-000023",
       "resAccountName": "입출금통장",
       "resAccountNickName": "월급통장",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260609",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "4290000"
     },
@@ -376,9 +336,7 @@
       "resAccountDisplay": "440-00-000028",
       "resAccountName": "입출금통장",
       "resAccountNickName": "월급통장",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20250918",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "4153000"
     },
@@ -394,9 +352,7 @@
       "resAccountDisplay": "440-00-000029",
       "resAccountName": "입출금통장",
       "resAccountNickName": "",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20251026",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "2296600"
     },
@@ -412,9 +368,7 @@
       "resAccountDisplay": "440-00-000030",
       "resAccountName": "입출금통장",
       "resAccountNickName": "공과금",
-      "resAccountStatus": "정상",
       "resAccountStartDate": "20260607",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "3898000"
     },
@@ -430,9 +384,7 @@
       "resAccountDisplay": "440-00-000031",
       "resAccountName": "입출금통장",
       "resAccountNickName": "",
-      "resAccountStatus": "해지",
       "resAccountStartDate": "20251110",
-      "resAccountEndDate": "",
       "resAccountCurrency": "KRW",
       "resAccountBalance": "0"
     }

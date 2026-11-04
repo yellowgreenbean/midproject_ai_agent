@@ -183,11 +183,9 @@ erDiagram
         string resAccountName "상품명"
         string account_type "CHECKING / SAVINGS"
         string lifecycle_status "ACTIVE / SUSPENDED / CLOSED"
-        string resAccountStatus "화면용 글자"
         string resAccountNickName
         bool is_favorite
         string resAccountStartDate "YYYYMMDD"
-        string resAccountEndDate "YYYYMMDD"
         string closed_at "YYYYMMDD, 해지 전 null"
         int version
     }

@@ -4,6 +4,7 @@
 - **무엇**: 더미 데이터의 대출 계좌 1건(`acc_005`, user_001, 청년전세자금대출 80,000,000원)을 `data/dummy/accounts/accounts.json` 에서 뺐다.
 - **왜 보류**: 통합 기획서의 계좌 유형은 `CHECKING`/`SAVINGS` 2가지뿐이고 금리·만기 계산은 1차에서 하지 않는다. 한편 구현 목표(`AGENTS.md`)에는 "계좌 생성은 상품별 금리·가입 조건"이 있어 나중에 상품(대출·적금)이 필요해질 수 있다.
 - **다시 시작할 조건**: 기획서에 대출(또는 상품별 금리) 유형이 들어갈 때.
+- **주의 (2026-11-04)**: 계좌 표에서 `resAccountStatus`·`resAccountEndDate`를 뺐다. 아래 레코드를 되살릴 때 이 두 칸은 빼고, 대출 만기일은 대출 기획에서 둘 곳을 정한다. `closed_at` 빈 값은 `null`로 쓴다.
 - **되살리는 법**: 아래 레코드를 `accounts.json` 의 `data` 배열에 다시 넣는다. `id` 는 `acc_005` 를 그대로 쓴다(번호 재사용 금지라서 지금 계좌 id 가 `acc_005` 를 건너뛴다). 유형 값 `LOAN` 은 기획서에 정의되기 전까지 임시 값이다.
 ```json
 {"id": "acc_005", "user_id": "user_001", "account_type": "LOAN", "lifecycle_status": "ACTIVE", "is_favorite": false, "closed_at": "", "balance_as_of": "20261103090000", "resAccount": "22000000000001", "resAccountDisplay": "220-00-000001", "resAccountName": "청년전세자금대출", "resAccountNickName": "", "resAccountStatus": "정상", "resAccountStartDate": "20240501", "resAccountEndDate": "20260501", "resAccountCurrency": "KRW", "resAccountBalance": "80000000"}
