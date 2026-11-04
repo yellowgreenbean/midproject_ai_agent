@@ -67,3 +67,52 @@
 **알 수 있는 것**: 토스는 ① 잔액 0원 ② 자동이체·카드 해지 ③ 탈퇴 후 1개월 유예 ④ 압류 등 출금제한 계좌만 해지 불가. 정지·휴면 계좌는 앱에서 해지한다.
 
 **못 찾은 것**: 토스 앱에 "계좌 일시정지" 버튼이 따로 있다는 안내는 찾지 못했다(고객센터를 통한 이용제한만 확인). 우리 `ACCT-F05` 일시정지는 토스에 똑같은 기능이 확인되지 않는다. `toss.im/suspend` 페이지는 내용을 확인하지 못했다.
+
+## 5. 예금·적금 상품 금리 (더미 `data/dummy/products/products.json` 근거)
+
+조사일: 2026-11-04. 공식 상품 페이지에서 금리표를 읽었다.
+
+| 상품 | 내용 | 상태 | 출처 |
+|---|---|---|---|
+| 토스뱅크 원하는 날 만기되는 정기예금 | 기준일 2026-11-03, 세전. 1~3개월 미만 1.8% / 3~6 미만 3.3% / 6~9 미만 3.4% / 9~12 미만 3.5% / 12~24 미만 3.8% / 24~36 미만 3.0% / 36개월 3.0%. 100만~10억 원(만 원 단위), 1~36개월 | [원문 확인] | https://www.tossbank.com/product-service/savings/dday-deposit |
+| 토스뱅크 자유적금 | 기준일 2026-11-03. 3~5개월 2.60% / 6~11 2.90% / 12~23 3.25% / 24~35 2.50% / 36개월 2.50%. 월 최대 300만 원. 우대 연 0.5%(계약월수 1/2 이상 자동이체 성공) | [원문 확인] | https://www.tossbank.com/product-service/savings/savings-freedom |
+| 우리은행 예금·적금 30개 (더미에서는 "두린은행") | 아래 5-1 표. 2026-11-04 공식 페이지에서 직접 읽음 | [원문 확인] | 5-1 표 |
+
+토스뱅크 상품은 위 조사 기록으로만 남기고 더미 데이터(`products.json`)에서는 뺐다(사용자 결정, 2026-11-04).
+
+### 5-1. 두린은행 상품 30개의 출처 (원본: 우리은행, 확인일 2026-11-04)
+
+방법: 상품 목록 페이지(목돈굴리기 11개 + 목돈모으기 19개)에서 상품 코드를 얻고, 상품별 '미리보기'(가입대상·기간·금액)와 '금리표' 조각 페이지를 읽었다. 금리 기준일은 상품마다 달라 `products.json` 의 `effective_from` 에 있다. 금리표가 비어 있는 4개(CD plus예금·두루두루정기예금·미소드림적금·희망드림적금)는 금리 행이 없다. 더미의 `source_url` 은 모의 프로젝트용으로 비웠다.
+
+| 상품 번호 | 두린은행 상품 | 원본 상품명 | 상품 코드 | 출처 |
+|---|---|---|---|---|
+| prod_003 | 두린플러스 예금 | WON플러스 예금 | P010002491 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002491&PRD_YN=Y |
+| prod_004 | 두린 적금 | WON 적금 | P010002353 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002353&PRD_YN=Y |
+| prod_005 | 두린 369 정기예금 | 우리 369 정기예금 | P010002605 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002605&PRD_YN=Y |
+| prod_006 | 두린 첫거래우대 정기예금 | 우리 첫거래우대 정기예금 | P010002487 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002487&PRD_YN=Y |
+| prod_007 | 두린 SUPER 정기예금 | 우리 SUPER 정기예금 | P010002402 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002402&PRD_YN=Y |
+| prod_008 | 두린 기업정기예금 | WON 기업정기예금 | P010002385 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002385&PRD_YN=Y |
+| prod_009 | ISA정기예금 | ISA정기예금 | P010000002 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000002&PRD_YN=Y |
+| prod_010 | CD plus예금 | CD plus예금 | P010000364 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000364&PRD_YN=Y |
+| prod_011 | 정기예금 | 정기예금 | P010000196 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000196&PRD_YN=Y |
+| prod_012 | 표지어음 | 표지어음 | P010000344 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000344&PRD_YN=Y |
+| prod_013 | 양도성예금증서(CD) | 양도성예금증서(CD) | P010000343 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000343&PRD_YN=Y |
+| prod_014 | 두루두루정기예금 | 두루두루정기예금 | P010000361 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000361&PRD_YN=Y |
+| prod_015 | 두린 SUPER주거래 적금 | 우리 SUPER주거래 적금 | P010000109 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000109&PRD_YN=Y |
+| prod_016 | 두린 SUPER주거래 자유적금 | 우리 SUPER주거래 자유적금 | P010000110 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000110&PRD_YN=Y |
+| prod_017 | 두린금융 다함께 적금 2 | 우리금융 다함께 적금 2 | P010002603 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002603&PRD_YN=Y |
+| prod_018 | 두린 청년미래적금 | 우리 청년미래적금 | P010002592 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002592&PRD_YN=Y |
+| prod_019 | 두린 사장님 성장 적금 | 우리 사장님 성장 적금 | P010002588 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002588&PRD_YN=Y |
+| prod_020 | 두린 두근두근 행운적금 | 우리 두근두근 행운적금 | P010002582 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002582&PRD_YN=Y |
+| prod_021 | 삼성월렛머니 두린 적금 | 삼성월렛머니 우리 적금 | P010002576 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002576&PRD_YN=Y |
+| prod_022 | Npay 두린 적금 | Npay 우리 적금 | P010002570 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002570&PRD_YN=Y |
+| prod_023 | 두린모바일 적금 | 우리WON모바일 적금 | P010002566 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002566&PRD_YN=Y |
+| prod_024 | N일 적금(31일) | N일 적금(31일) | P010002514 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002514&PRD_YN=Y |
+| prod_025 | N일 적금(100일) | N일 적금(100일) | P010002515 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002515&PRD_YN=Y |
+| prod_026 | N일 적금(200일) | N일 적금(200일) | P010002516 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002516&PRD_YN=Y |
+| prod_027 | 두린 아이행복 적금2 | 우리 아이행복 적금2 | P010002494 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002494&PRD_YN=Y |
+| prod_028 | 두린 (영업점명) 적금 | 우리 (영업점명) 적금 | P010002482 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002482&PRD_YN=Y |
+| prod_029 | 두린 (업체명 임직원) 적금 | 우리 (업체명 임직원) 적금 | P010002373 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002373&PRD_YN=Y |
+| prod_030 | 두린 장병내일준비적금 | 우리은행 장병내일준비적금 | P010002283 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010002283&PRD_YN=Y |
+| prod_031 | 두린미소드림적금 | 우리미소드림적금 | P010000016 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000016&PRD_YN=Y |
+| prod_032 | 두린희망드림적금 | 우리희망드림적금 | P010000136 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000136&PRD_YN=Y |

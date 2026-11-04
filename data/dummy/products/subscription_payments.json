@@ -1,0 +1,10 @@
+{
+  "data": [
+    {
+      "id": "pay_001",
+      "subscription_id": "sub_001",
+      "paid_amount": "300000",
+      "paid_at": "20261031090000"
+    }
+  ]
+}
