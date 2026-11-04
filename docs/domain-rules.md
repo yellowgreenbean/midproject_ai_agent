@@ -117,6 +117,112 @@
 | prod_031 | 두린미소드림적금 | 우리미소드림적금 | P010000016 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000016&PRD_YN=Y |
 | prod_032 | 두린희망드림적금 | 우리희망드림적금 | P010000136 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0001&cc=c011240:c009166;c012263:c012399&PRD_CD=P010000136&PRD_YN=Y |
 
+### 5-2. 챗봇 RAG 문서 `data/rag/` 의 출처 (원본: 우리은행, 받은 날 2026-11-04)
+
+원본 PDF 를 그대로 저장했다(글자 변환·이름 바꾸기 안 함 — PDF 안에는 "우리은행" 이 그대로 있다). 받는 주소는 모두
+`https://spot.wooribank.com/pot/pot/mall/comm/download.jsp?PLM_BIZ_DSCD=<구분>&PLM_ANX_SAVE_FILE_NM=<파일코드>` 이고, 상품 설명서 링크는 각 상품 상세 페이지(5-1 표의 URL)에 걸려 있다.
+
+| 파일 | 원본 | 구분 · 파일코드 |
+|---|---|---|
+| `terms/deposit_basic_terms.pdf` | 예금거래기본약관 (2025-01-17 개정) | 00 · `PLM_P00XXXXXXX_A0101_20250118235506000274.pdf` |
+| `terms/time_deposit_terms.pdf` | 거치식예금약관 (파일명 정기예금약관) | 00 · `PLM_P00XXXXXXX_A0102_20211213142401000408.pdf` |
+| `terms/installment_savings_terms.pdf` | 적립식예금 약관 (2017-01-01) | 00 · `PLM_P00XXXXXXX_A0104_20211213142420000077.pdf` |
+| `terms/checking_account_terms.pdf` | 입출금이 자유로운 예금 약관 | 00 · `PLM_P00XXXXXXX_A0103_20240402180359000397.pdf` |
+| `terms/auto_transfer_terms.pdf` | 계좌간 자동이체 약관 (개정 후) | 00 · `PLM_P00XXXXXXX_A0105_20230313162334000064.pdf` |
+| `terms/tax_free_savings_rider.pdf` | 비과세종합저축 특약 | 00 · `PLM_P00XXXXXXX_A0196_20260102092526000492.pdf` |
+| `terms/auto_renewal_rider.pdf` | 「만기자금 자동재예치」 특약 | 00 · `PLM_P00XXXXXXX_A0197_20260330155556000223.pdf` |
+| `products/prod_XXX.pdf` (27개) | 상품설명서 (5-1 표의 상품번호와 같음) | 01 · `PLM_<상품코드>_DA001_<날짜>.pdf` |
+| `riders/prod_XXX.pdf` (27개) | 상품별 특약 (5-1 표의 상품번호와 같음, prod_015 는 상품코드 P010000109) | 01 · `PLM_<상품코드>_DF003_<날짜>.pdf` |
+| `consents/npay_savings_*.pdf` (2) | Npay 적금(prod_022) 개인(신용)정보 제3자 제공 동의서 · 금융거래정보 이용·제공 동의서 | 00 · `A05KA_20250701123307000371` · `A05KC_20250701123502000760` |
+| `consents/cjpay_account_*.pdf` (2) | CJ PAY 통장(입출금, 더미에 없음) 같은 두 동의서 | 00 · `A05K8_20250410165411000058` · `A05K0_20250410165458000681` |
+| `consents/nonface_account_block_check_consent.pdf` | 비대면 계좌개설 안심차단 등록 여부 조회용 개인(신용)정보 동의서 | 00 · `A05L6_20250205100456000079` |
+
+- 상품 설명서가 없는 상품: `prod_009` ISA정기예금(페이지에 공통 약관만), `prod_013` 양도성예금증서(CD)(내려받기 링크 없음). 특약이 없는 상품: `prod_009`·`prod_011`(정기예금)·`prod_013`.
+- 카드 약관 `cards/*.pdf` 2개(우리카드 「신용카드 개인회원 약관 전문(20260408개정 20260512시행)」 · 「체크카드 개인회원 약관」 전문)는 pc.wooricard.com 상품공시실 > 약관(`H1CCT211S09.do`)에서 받았다. 바로 받는 링크가 없고 업로드 위젯(RAONK)으로만 내려준다. 이 페이지는 목록 요청(`getMainDataList.pwkjson`)을 두 번 보내고 두 번째가 "동일한 거래 요청" 오류로 실패해 버튼이 안 그려지므로, Playwright 로 두 번째 요청에 첫 응답을 돌려준 뒤 「신용카드/체크카드 약관 다운로드」 버튼을 눌렀다.
+- 카드 부가 약관 31개(`cards/` 의 한글 파일명)는 우리카드 상품공시실 > 기타 약관 게시판(`H1CCT211S12.do`, 게시판 코드 1026, 글 212개)에서 받았다. 2022년 이후 글 중 같은 약관은 가장 새 버전 하나만 골랐다(36개). 목록 요청의 `pageSize` 를 300 으로 바꿔 한 화면에 띄우고, 상세 요청(`searchBbsDetail.pwkjson`)도 두 번 나가므로 첫 응답을 돌려준 뒤 첨부파일 버튼을 눌렀다. 빠진 것: 암호(DRM)가 걸려 열리지 않는 4개(자동차 리스 약정서 · 자동차 할부금융 약정서 · 포인트 바로지급 서비스 약관 · 자동차 시설대여(리스) 약관), 이미 받은 2026년판의 옛 버전인 「신용카드 개인회원 약관」(2022). 4개는 원본이 한글(HWP) 파일이라 그대로 두었다(글자는 olefile 로 뽑힌다). `자동차할부금융약관.hwp` 는 전문이 아니라 신·구조문 대비표뿐이다.
+
+| 파일 | 원본 글 제목 | 올린 날 |
+|---|---|---|
+| `cards/모바일카드이용약관.hwp` | 우리카드 「모바일카드 이용약관」 (2021.05.28 시행) — 2022년 전이지만 앱 카드 기능에 필요해 따로 받음 | 2021-04-28 |
+| `cards/모바일전용카드회원약관.pdf` | 「모바일 전용카드 회원 약관」(2021. 02. 10 시행) — 같은 이유 | 2021-01-08 |
+| `cards/해외전자상거래인증시스템이용약관.pdf` | 우리카드 「해외 전자상거래 인증시스템 이용약관」 (2026.09.10 시행) | 2026-07-30 |
+| `cards/우리WON멤버스이용약관.pdf` | 우리카드「우리WON멤버스 이용약관」(2026.07.31. 시행) | 2026-06-01 |
+| `cards/간편결제서비스이용약관.pdf` | 우리카드 「우리카드 간편결제 서비스 이용약관」 (2026.05.18 시행) | 2026-04-10 |
+| `cards/오픈뱅킹공동업무금융정보조회약관.pdf` | 우리카드 「오픈뱅킹공동업무 금융정보조회 약관」 (2026.05.18 시행) | 2026-04-10 |
+| `cards/ID_PW결제서비스이용약관.pdf` | 우리카드 「우리카드 ID/PW결제 서비스 이용약관」 (2026.05.18 시행) | 2026-04-10 |
+| `cards/오픈뱅킹서비스이용약관.pdf` | 우리카드 「오픈뱅킹 서비스 이용약관」 (2026.05.18 시행) | 2026-04-10 |
+| `cards/전자금융거래기본약관.pdf` | 우리카드 「전자금융거래 기본약관」 (2026.05.18 시행) | 2026-04-10 |
+| `cards/삼성페이용앱카드결제이용약관.pdf` | 우리카드 「우리카드 삼성페이용 앱카드 결제 이용 약관」 (2026.05.18 시행) | 2026-04-10 |
+| `cards/서울시지방세입전자송달서비스이용약관.pdf` | 우리카드 「서울시 지방세입 전자송달 서비스 이용약관」 (2026.05.18 시행) | 2026-04-10 |
+| `cards/TV간편결제서비스이용약관.pdf` | 우리카드 「TV간편결제서비스 이용약관」 (2026.05.18 시행) | 2026-04-10 |
+| `cards/국가간QR결제서비스이용약관.pdf` | 우리카드 국가간 QR결제 서비스 이용약관 | 2025-12-26 |
+| `cards/매주자동결제서비스이용약관.pdf` | 우리카드 「매주 자동결제 서비스」 이용약관 (2025.01.22 시행) | 2024-12-13 |
+| `cards/자동차할부금융약관.hwp` | 우리카드 「자동차 할부금융 약관」 (2024.10.17 시행) | 2024-10-30 |
+| `cards/개인신용대출약관.pdf` | 우리카드 「개인신용대출 약관」 (2024.10.17 시행) | 2024-10-28 |
+| `cards/여신거래기본약관.pdf` | 우리카드 「여신거래기본약관」 (2024.10.17 시행) | 2024-10-28 |
+| `cards/개인사업자신용대출약관.pdf` | 우리카드 「개인사업자신용대출 약관」 (2024.10.17 시행) | 2024-10-28 |
+| `cards/챗봇_톡상담서비스이용약관.pdf` | 우리카드 「챗봇·톡상담 서비스 이용약관」 (2024.09.20 시행) | 2024-09-03 |
+| `cards/계좌통합관리서비스이용약관.pdf` | 우리카드 「계좌통합관리서비스(내 카드 한눈에) 이용약관」 (2024.09.26. 시행) | 2024-08-26 |
+| `cards/월세카드납부서비스이용약관.hwp` | 우리카드 「월세카드납부 서비스」 이용약관 (2024.07.08 시행) | 2024-07-08 |
+| `cards/선불카드이용약관.pdf` | 「선불카드 이용약관」 (2024.3.4. 시행) | 2024-02-07 |
+| `cards/휴대폰메시지약관.pdf` | 우리카드 「휴대폰 메시지 약관」 (2023.07.24 시행) | 2023-07-24 |
+| `cards/일반금융리스약정서.pdf` | 우리카드 「일반 금융리스 약정서」 (2023.06.13 개정) | 2023-06-13 |
+| `cards/대출이동시스템을통한대환대출서비스이용약관.hwp` | 우리카드 「대출이동시스템을 통한 대환대출서비스 이용약관」 (2023.05.31 시행) | 2023-05-30 |
+| `cards/삼성페이웨어러블앱카드결제이용약관.pdf` | 우리카드 「삼성페이 웨어러블(Wearable) 앱카드 결제 이용약관」 (2023.02.24 시행) | 2023-02-24 |
+| `cards/재고금융약관.pdf` | 우리카드 「재고금융약관」 (2023. 1. 2 시행) | 2022-12-28 |
+| `cards/근보증서_자동차시설대여.pdf` | 근보증서[자동차 시설대여(리스)] | 2022-10-24 |
+| `cards/근보증서_자동차렌탈_제정.pdf` | 근보증서[자동차 렌탈(대여)] 제정 | 2022-10-24 |
+| `cards/통합결제플랫폼머니약관.pdf` | 우리카드 「통합결제플랫폼 머니 약관」(2022.7.12 제정) | 2022-07-12 |
+| `cards/온라인서비스이용약관.hwp` | 「온라인 서비스 이용약관」(2022. 6. 20 시행) | 2022-06-10 |
+| `cards/매출채권선정산대출관련약관_약정서및채권양도계약서.pdf` | 우리카드 「매출채권 선정산 대출」 관련 약관, 약정서 및 채권양도계약서(2022.4.26 시행) | 2022-05-02 |
+| `cards/일반시설대여약관.pdf` | 우리카드 「일반 시설대여(리스) 약관」 ( 2022. 3.29 제정 ) | 2022-03-29 |
+
+### 5-3. 웹페이지를 PDF 로 저장한 것 (`data/rag/guides/` · `terms/electronic_financial_transactions_terms.pdf`, 받은 날 2026-11-04)
+
+원본이 PDF 가 아닌 웹페이지라서 Playwright 로 화면을 PDF 로 인쇄했다. 접힌 FAQ 답은 펼치고, 높이가 고정된 스크롤 상자(약관 상자)는 높이 제한을 풀고 인쇄했다. FAQ 2개는 질문·답을 모아 한 문서로 다시 짰다.
+
+| 파일 | 내용 | 원본 |
+|---|---|---|
+| `terms/electronic_financial_transactions_terms.pdf` | 우리은행 회원가입 약관 동의 화면(전자금융거래 기본약관 등, 8쪽) | https://spot.wooribank.com/pot/Dream?withyou=CQMEM0014&__STEP=1 |
+| `guides/bank_fees_personal.pdf` | 개인뱅킹(인터넷·스마트) 이체수수료 | https://spot.wooribank.com/pot/Dream?withyou=CQIBG0007 |
+| `guides/bank_fees_deposit.pdf` | 예금 관련 수수료 | https://spot.wooribank.com/pot/Dream?withyou=PODEP0011 |
+| `guides/bank_faq.pdf` | 우리은행 FAQ 108문항(인터넷/스마트뱅킹 · 예금 · 텔레뱅킹 · 자동화기기 · 소득/세액공제 · 기타). 대출·외환·퇴직연금·신탁·펀드·우리틴틴은 앱 범위 밖이라 뺐다 | 목록 `pot/jcc?withyou=CQCCS0002&__ID=c009213&categoryid=…&DetailCategoryid=…&PageNo=…`, 답 `__ID=c009215&questionid=KNOW…` |
+| `guides/card_faq.pdf` | 우리카드 FAQ 전체 139문항 | https://pc.wooricard.com/dcpc/yh1/cct/cct03/H1CCT203S07.do (`getFaqList` · `getFaqContentsById`) |
+| `guides/deposit_protection_faq_kdic.pdf` | 예금보험공사 예금자보호제도 FAQ (보호한도 1억원 등) | https://www.kdic.or.kr/sp/dpstrprot/ProtSystFaq/selectScrn.do |
+| `guides/deposit_protection_easylaw.pdf` | 찾기쉬운 생활법령 「예금자보호제도」 | https://easylaw.go.kr/CSP/CnpClsMainBtr.laf?popMenu=ov&csmSeq=1771&ccfNo=3&cciNo=1&cnpClsNo=1&menuType=onhunqna |
+| `guides/bank_service_hours.pdf` | 우리은행 인터넷뱅킹 이용시간 안내(이체·조회 서비스별 시간, 정기점검) | https://spot.wooribank.com/pot/Dream?withyou=CQIBG0008 |
+| `guides/bank_transfer_limits.pdf` | 우리은행 이체한도 안내(보안등급별 1회·1일 한도) | https://spot.wooribank.com/pot/Dream?withyou=CQIBG0022 |
+| `guides/bank_privacy_policy.pdf` | 우리은행 개인정보처리방침 (9쪽) | https://spot.wooribank.com/pot/Dream?withyou=CQSCT0048 |
+| `cards/card_privacy_policy.pdf` | 우리카드 개인정보처리방침 (12쪽) | https://pc.wooricard.com/dcpc/yh1/cct/cct12/psninfprotplcy/H1CCT212S08.do |
+| `cards/card_customer_info_policy.pdf` | 우리카드 고객정보 취급방침 (현재판 — 약관 게시판의 2019년판 대신) | https://pc.wooricard.com/dcpc/yh1/cct/cct12/psninfprotplcy/H1CCT212S16.do |
+| `guides/mistaken_transfer_kdic_apply.pdf` | 예금보험공사 착오송금반환지원 신청방법 (온라인·방문, 준비물) | https://www.kdic.or.kr/sp/kmrs/kmrsItrdAplyMthd/selectScrn.do |
+| `guides/mistaken_transfer_kdic_process.pdf` | 착오송금반환지원 절차 (사전반환 신청 → 채권 매입 → 자진반환 권유 → 지급명령) | https://fins.kdic.or.kr/ir/aplygudn/MtrsGvbkSprtProc/selectScrn.do |
+| `guides/mistaken_transfer_kdic_sender_notes.pdf` | 착오송금인 유의사항 (건당 5만원 이상 1억원 이하, 송금일부터 1년 이내 등) | https://fins.kdic.or.kr/ir/msdrpr/MsdrprAttnMttr/selectScrn.do |
+| `guides/account_bulk_suspension_fsc.pdf` | 금융위원회 공식 블로그 「본인계좌 일괄지급정지 서비스」 카드뉴스 (2024-05-07 · 만 19세 이상 내국인, 신청 경로). 어카운트인포 서비스 화면은 동의 화면뿐이라 이것으로 대신 | https://m.blog.naver.com/blogfsc/223438936795 |
+| `guides/dormant_deposit_kinfa.pdf` | 서민금융진흥원 휴면예금 안내 (휴면예금 찾아줌) | https://www.kinfa.or.kr/financialLife/sleepmoney.do |
+| `cards/credit_card_standard_terms.pdf` | 신용카드 개인회원 표준약관 (2022-11-01 일부개정 · 39쪽). 웹페이지가 아니라 원본 PDF 그대로. 금융당국 게시본을 못 찾아 롯데카드가 올린 표준약관 전문을 받음(본문 회사명만 롯데카드). 우리카드 회원약관도 이 표준약관을 바탕으로 함 | https://image.lottecard.co.kr/webapp/pc/download/Standard-terms-for-credit-card-individual-members-1.pdf |
+| `terms/mydata_basic_terms.pdf` | 금융감독원이 배포한 「마이데이터 기본약관」(2022-05-03 · 8쪽, 마이데이터 연동 `CARD-F10`용). 원본 PDF 그대로. 회사명은 "○○○○주식회사"로 비어 있음 | 한국신용정보원 마이데이터 종합포털 게시글 https://www.mydatacenter.or.kr:3441/myd/bbsctt/normal1/normal/35efbc61-2c02-4643-b2ef-f813b9922d12/34/bbsctt.do |
+- `prod_015_016.pdf` 하나가 SUPER주거래 적금의 정액적립식(prod_015)·자유적립식(prod_016)을 함께 설명한다.
+- 전자금융거래 기본약관은 지금 공통 약관 목록에 없다(약관 게시판 링크가 자바스크립트 전용). 2020년에 다른 상품에 붙은 옛 파일만 있어 받지 않았다.
+- 법령 `laws/*.pdf` 14개는 국가법령정보센터(law.go.kr)의 「저장 → PDF」 버튼을 Playwright(브라우저 자동 조종, 저장소 밖에 설치)로 눌러 받았다. 바로 받는 링크는 없고, 저장 요청(`LSW/lsPdfPrint.do` POST)을 curl 로 흉내 내면 빈 파일이 온다. 조문 목록이 다 뜨기 전에 누르면 내려받기가 시작되지 않는다(3초 기다림). 본문·부칙이 함께 들어 있다.
+
+| 파일 | 법령 (원본 파일명) |
+|---|---|
+| `laws/depositor_protection_act.pdf` | 예금자보호법(법률)(제21065호)(20260102) · 22쪽 |
+| `laws/financial_consumer_protection_act.pdf` | 금융소비자 보호에 관한 법률(법률)(제21065호)(20260102) · 25쪽 |
+| `laws/electronic_financial_transactions_act.pdf` | 전자금융거래법(법률)(제22048호)(20261002) · 31쪽 |
+| `laws/depositor_protection_decree.pdf` | 예금자보호법 시행령(대통령령)(제35687호)(20250901) · 15쪽 |
+| `laws/financial_consumer_protection_decree.pdf` | 금융소비자 보호에 관한 법률 시행령(대통령령)(제36287호)(20260428) · 28쪽 |
+| `laws/electronic_financial_transactions_decree.pdf` | 전자금융거래법 시행령(대통령령)(제36281호)(20260428) · 21쪽 |
+| `laws/real_name_financial_transactions_act.pdf` | 금융실명거래 및 비밀보장에 관한 법률(법률)(제20894호)(20250401) · 6쪽 |
+| `laws/real_name_financial_transactions_decree.pdf` | 같은 법 시행령(대통령령)(제35038호)(20241227) · 5쪽 |
+| `laws/personal_information_protection_act.pdf` | 개인정보 보호법(법률)(제21445호)(20260911) · 47쪽 |
+| `laws/credit_information_act.pdf` | 신용정보의 이용 및 보호에 관한 법률(법률)(제21445호)(20260911) · 43쪽 |
+| `laws/specialized_credit_finance_business_act.pdf` | 여신전문금융업법(법률)(제21065호)(20251001) · 31쪽 |
+| `laws/specialized_credit_finance_business_decree.pdf` | 여신전문금융업법 시행령(대통령령)(제36314호)(20260506) · 25쪽 |
+| `laws/telecom_financial_fraud_act.pdf` | 전기통신금융사기 피해 방지 및 피해자산 환급에 관한 특별법(법률)(제22047호)(20261002) · 12쪽 — 예전 이름은 「…피해금 환급에 관한 특별법」 |
+| `laws/telecom_financial_fraud_decree.pdf` | 같은 법 시행령(대통령령)(제36729호)(20261001) · 11쪽 |
+
 ## 6. 카드 신청을 배송 중에 취소할 수 있는가 (`CARD-F05`·`CARD-F06` 신청 취소)
 
 조사일: 2026-11-04. 결론(우리 기획): **배송 시작 전까지만 앱에서 취소**, 배송 중·배송 완료는 받은 뒤 카드 해지로 안내.

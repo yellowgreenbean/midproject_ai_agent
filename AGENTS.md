@@ -19,6 +19,7 @@ data/dummy/      직접 만든 더미 데이터 (CODEF 응답 모양을 따름) 
   transactions/  transactions.json                       (거래 파트)
   cards/         cards.json · card_approvals.json · card_billing.json  (카드 파트)
   products/      products.json · subscriptions.json · subscription_payments.json  (상품 파트)
+data/rag/        챗봇 RAG 문서 — 우리은행 원본 PDF 그대로 (약관 terms/ · 상품설명서 products/ · 특약 riders/ · 동의서 consents/ · 카드 약관 cards/(우리카드) · 수수료·FAQ·예금자보호·착오송금·휴면예금 안내 guides/(웹페이지를 PDF 로) · 법령 laws/, 출처는 docs/domain-rules.md 5-2)
 scripts/         CODEF 샌드박스 시험 코드 등 단발 실행 스크립트
 (앞으로) 앱 코드는 새 폴더(예: backend/ · frontend/)를 만들어 거기에 둔다. 루트에 파일을 늘어놓지 않는다.
 ```
