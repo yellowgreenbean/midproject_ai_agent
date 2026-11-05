@@ -11,7 +11,8 @@
       "start_date": "20250110",
       "maturity_date": "20270110",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_001"
     },
     {
       "id": "sub_002",
@@ -24,7 +25,8 @@
       "start_date": "20260221",
       "maturity_date": "20280221",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_002"
     },
     {
       "id": "sub_003",
@@ -37,7 +39,8 @@
       "start_date": "20250814",
       "maturity_date": "20270814",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_003"
     },
     {
       "id": "sub_004",
@@ -50,7 +53,8 @@
       "start_date": "20260315",
       "maturity_date": "20280315",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_004"
     },
     {
       "id": "sub_005",
@@ -63,7 +67,8 @@
       "start_date": "20260518",
       "maturity_date": "20280518",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_005"
     },
     {
       "id": "sub_006",
@@ -76,7 +81,8 @@
       "start_date": "20260919",
       "maturity_date": "20280919",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_006"
     },
     {
       "id": "sub_007",
@@ -89,7 +95,8 @@
       "start_date": "20260210",
       "maturity_date": "20270210",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_007"
     },
     {
       "id": "sub_008",
@@ -102,7 +109,8 @@
       "start_date": "20260520",
       "maturity_date": "20270520",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_008"
     },
     {
       "id": "sub_009",
@@ -115,7 +123,8 @@
       "start_date": "20260305",
       "maturity_date": "20270305",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_009"
     },
     {
       "id": "sub_010",
@@ -128,7 +137,8 @@
       "start_date": "20260812",
       "maturity_date": "20270212",
       "status": "ACTIVE",
-      "closed_at": null
+      "closed_at": null,
+      "idempotency_key": "seed-sub_010"
     }
   ]
 }

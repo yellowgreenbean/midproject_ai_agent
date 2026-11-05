@@ -6,7 +6,7 @@
 
 - 테이블이 약 60개라 한 장에 그리지 않고 **파트별 그림 6장 + 전체 연결 그림 1장**으로 나눴습니다. 다른 파트 테이블은 그림 안에서 칸 없이 이름만 나옵니다.
 - `PK` = 그 테이블의 고유 번호, `FK` = 다른 테이블을 가리키는 칸. 선 끝 모양: `||` 꼭 1개, `o|` 0 또는 1개, `o{` 0개 이상.
-- ID는 문자열(`user_001` 등), 금액은 원 단위 정수, 시각은 `+09:00`, 우리가 만든 빈 칸은 `null`입니다(C-5). 카드 테이블과 일부 거래 테이블(`scheduled_transfers`)은 주요 칸만 적었습니다. 전체 칸은 `docs/기획서.md`의 각 Part에 있습니다.
+- ID는 문자열(`user_001` 등), 금액은 원 단위 정수, 시각은 `+09:00`, 우리가 만든 빈 칸은 `null`입니다(C-5). `docs/기획서.md`에 나오는 칸은 모두 적었습니다(2026-11-05 대조). 카드 테이블은 팀 브랜치 `schema.sql`에 기획서에 없는 칸이 더 있을 수 있습니다.
 - 그림에는 **실제 참조(FK)만** 그렸습니다. "카드 대금 → 거래 원장 기록"처럼 API로 이어지는 연결은 맨 아래 표에 있습니다.
 
 ---
@@ -79,7 +79,7 @@ erDiagram
         string user_id PK, FK
         string password_hash
         datetime password_updated_at
-        int failed_attempts "로그인·본인 확인 실패"
+        int failed_attempts "본인 확인 연속 실패 횟수(로그인과 같은 잠금 규칙)"
         datetime locked_until
     }
     email_verifications {
@@ -321,6 +321,9 @@ erDiagram
         string status
         string step_up_challenge_id FK
         datetime created_at
+        string my_display_name
+        string their_display_name
+        datetime updated_at
     }
     favorite_accounts {
         string id PK
@@ -397,7 +400,7 @@ erDiagram
         string product_id FK
         string source_account_id FK
         bigint principal
-        bigint monthly_amount
+        bigint monthly_amount "적금 월 납입액, 자유적금·예금은 null 가능"
         string applied_rate
         string start_date "YYYYMMDD"
         string maturity_date "YYYYMMDD"
@@ -468,6 +471,7 @@ erDiagram
         int annual_fee_overseas
         int min_age
         bool is_active
+        string image_url
     }
     card_performance_tiers {
         string id PK
@@ -484,6 +488,9 @@ erDiagram
         string value_type
         decimal benefit_value
         int monthly_limit_amount
+        string benefit_type
+        bigint min_payment_amount
+        int monthly_limit_count
     }
     categories {
         string id PK
@@ -514,6 +521,9 @@ erDiagram
         bigint approved_credit_limit "심사 승인 한도(신용)"
         string reject_reason "AGE / NO_INCOME / DUPLICATE"
         datetime applied_at
+        string delivery_address
+        string tracking_no
+        datetime decided_at "심사 끝난 시각"
     }
     application_status_histories {
         string id PK
@@ -542,6 +552,14 @@ erDiagram
         string status "ACTIVE / SUSPENDED / LOST / EXPIRED / TERMINATED"
         datetime issued_at
         datetime terminated_at
+        string org_card_id "마이데이터 카드사 쪽 카드 번호"
+        string nickname
+        string last4
+        datetime expires_at
+        datetime activated_at
+        bigint annual_fee_amount
+        date next_annual_fee_date
+        datetime last_used_at
     }
     user_card_settings {
         string user_card_id PK, FK
@@ -566,6 +584,7 @@ erDiagram
         string before_value
         string after_value
         datetime requested_at
+        string result
     }
     card_terminations {
         string id PK
@@ -576,6 +595,10 @@ erDiagram
         bigint unpaid_amount
         bigint remaining_installment_amount
         datetime completed_at
+        string reason_detail
+        int linked_recurring_count
+        bigint forfeited_points
+        bigint refunded_annual_fee
     }
 ```
 
@@ -624,6 +647,10 @@ erDiagram
         bigint canceled_amount
         string applied_benefit_id FK
         bool is_performance_counted
+        bool is_overseas
+        string currency
+        decimal foreign_amount
+        bigint benefit_amount
     }
     merchants {
         string id PK
@@ -642,13 +669,14 @@ erDiagram
     card_bills {
         string id PK
         string user_card_id FK
-        string billing_ym "YYYYMM"
+        string billing_ym "YYYYMM, 결제하는 달(더미 resBillingMonth은 이용월)"
         date usage_start
         date usage_end
         date payment_date
         bigint total_amount
         bigint paid_amount
         string status "SCHEDULED / CONFIRMED / PAID / OVERDUE"
+        datetime paid_at
     }
     card_bill_items {
         string id PK
@@ -667,6 +695,7 @@ erDiagram
         int expected_day
         string detected_by "AUTO / USER"
         bool is_active
+        datetime last_paid_at
     }
     spending_forecasts {
         string id PK
@@ -674,12 +703,20 @@ erDiagram
         string billing_ym
         bigint predicted_total
         string model_type "MOVING_AVG / LINEAR / ML"
+        bigint spent_to_date
+        bigint confirmed_installment
+        bigint fixed_expected
+        bigint variable_expected
     }
     daily_card_spending {
         string user_card_id PK, FK
         date spend_date PK
         bigint total_amount
         int tx_count
+        bigint fixed_amount
+        int weekday
+        int days_from_payday
+        bool is_holiday
     }
     card_recommendations {
         string id PK
@@ -687,6 +724,9 @@ erDiagram
         string card_product_id FK
         bigint net_annual_benefit
         int rank_no
+        bigint expected_monthly_benefit
+        bigint annual_fee
+        string reason
     }
     card_recommendation_details {
         string recommendation_id PK, FK
@@ -703,6 +743,8 @@ erDiagram
         string card_product_id FK
         int rank_no
         int issue_count
+        string card_type "CREDIT / CHECK"
+        int prev_rank_no "직전 기간 순위"
     }
     card_points {
         string id PK
@@ -711,6 +753,8 @@ erDiagram
         string point_name
         bigint balance
         bigint expiring_amount
+        date expiring_date
+        datetime synced_at
     }
     point_cashouts {
         string id PK
@@ -719,6 +763,7 @@ erDiagram
         bigint amount
         string status
         datetime completed_at
+        datetime requested_at
     }
     mydata_consents {
         string id PK
@@ -727,6 +772,10 @@ erDiagram
         string scope
         string status
         datetime expires_at
+        string access_token_enc "암호화 저장"
+        string refresh_token_enc "암호화 저장"
+        datetime consented_at
+        datetime last_synced_at
     }
     mydata_sync_logs {
         string id PK
@@ -734,6 +783,9 @@ erDiagram
         string api_type
         string result
         datetime started_at
+        datetime finished_at
+        int fetched_count
+        string error_message
     }
 ```
 

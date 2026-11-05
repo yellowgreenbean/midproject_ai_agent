@@ -94,6 +94,10 @@ for s in subs:
     if s["product_id"] not in pids: E(f"{s['id']} 상품 없음")
     if s["start_date"] < a["resAccountStartDate"]: E(f"{s['id']} 출금 계좌 개설 전 시작")
     if s["start_date"] < ymd(users[s["user_id"]]["created_at"]): E(f"{s['id']} 회원 가입 전 시작")
+ik = collections.Counter(s.get("idempotency_key") for s in subs)
+for k, v in ik.items():
+    if not k: E("가입 계약에 idempotency_key 없음")
+    elif v > 1: E(f"idempotency_key 중복 {k}")
 for p in pays:
     s = next(x for x in subs if x["id"] == p["subscription_id"])
     if not [r for aid, r in txs if aid == s["source_account_id"] and r["resAccountTrDate"] == p["paid_at"][:8] and r["resAccountOut"] == p["paid_amount"]]:
