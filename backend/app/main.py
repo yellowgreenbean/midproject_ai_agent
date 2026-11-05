@@ -34,6 +34,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PATCH", "DELETE"],
     # Idempotency-Key: 이체·가입 중복 방지(Part 5 16장), X-User-Id: 개발용 회원 지정(AUTH_DEV_HEADER=true 일 때만)
     allow_headers=["Content-Type", "Idempotency-Key", "X-User-Id"],
+    # 다른 포트의 화면이 세션 만료 시각(app/deps.py set_session_expires_header)을 읽을 수 있게
+    expose_headers=["X-Session-Expires-At"],
 )
 
 app.include_router(auth.router)

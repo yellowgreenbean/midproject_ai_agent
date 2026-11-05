@@ -12,14 +12,14 @@
 from dataclasses import dataclass
 from typing import Annotated
 
-from fastapi import Depends, Header, Request
+from fastapi import Depends, Header, Request, Response
 from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db import get_db
 from app.errors import ApiError, unauthorized
 from app.models import AuthSession, User
-from app.rules import SESSION_COOKIE, SESSION_IDLE, SESSION_TOUCH_INTERVAL, now_kst
+from app.rules import KST, SESSION_COOKIE, SESSION_IDLE, SESSION_TOUCH_INTERVAL, now_kst
 from app.security import session_id_for
 
 DB = Annotated[Session, Depends(get_db)]
@@ -33,6 +33,18 @@ def is_session_alive(s: AuthSession, now) -> bool:
     return s.revoked_at is None and now < s.expires_at and now < s.last_seen_at + SESSION_IDLE
 
 
+SESSION_EXPIRES_HEADER = "X-Session-Expires-At"
+
+
+def set_session_expires_header(response: Response, s: AuthSession) -> None:
+    """이 세션이 끊길 시각(유휴 10분과 최대 12시간 중 먼저 오는 것)을 화면에 알린다.
+    화면(frontend SessionTimer)은 이 값으로 남은 시간·「로그인 연장」 창을 띄운다 — 판정은 언제나 서버가 한다."""
+    at = min(s.expires_at, s.last_seen_at + SESSION_IDLE)
+    if at.tzinfo is None:
+        at = at.replace(tzinfo=KST)
+    response.headers[SESSION_EXPIRES_HEADER] = at.isoformat()
+
+
 @dataclass
 class Login:
     user: User
@@ -41,6 +53,7 @@ class Login:
 
 def get_login(
     request: Request,
+    response: Response,
     db: DB,
     x_user_id: Annotated[str | None, Header(description="개발용 — AUTH_DEV_HEADER=true 일 때만 쓰임")] = None,
 ) -> Login:
@@ -56,6 +69,7 @@ def get_login(
         if now - session.last_seen_at >= SESSION_TOUCH_INTERVAL:
             session.last_seen_at = now
             db.commit()
+        set_session_expires_header(response, session)
         user = db.get(User, session.user_id)
     elif settings.auth_dev_header and x_user_id:
         user = db.get(User, x_user_id)

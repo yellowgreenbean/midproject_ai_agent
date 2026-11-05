@@ -22,8 +22,16 @@ export type SessionUser = { user_id: string; username: string; name: string; sta
 export type Account = { id: string; name: string; number: string; type: string; status: string; isFavorite: boolean; balance: number }
 export type Product = { id: string; name: string; description: string; maxRate: string; termLabel: string; icon: 'safe' | 'coins' }
 
-// shortcut: 서버 주소를 화면 주소의 8010번 문으로 고정 (8000 은 다른 프로젝트가 씀). 서버를 다른 곳에 두게 되면 환경 변수로 뺀다.
-const API = `${location.protocol}//${location.hostname}:8010`
+// 서버 주소: 환경 변수 VITE_API_URL(frontend/.env.local) 이 있으면 그것, 없으면 화면 주소의 8010번 문 (8000 은 다른 프로젝트가 씀).
+// backend 는 `uvicorn app.main:app --port 8010` 으로 켠다(backend/README.md).
+const API = (import.meta.env?.VITE_API_URL as string | undefined)?.replace(/\/$/, '') || `${location.protocol}//${location.hostname}:8010`
+
+// ---- backend/ 와 맞추기 ----
+// backend 는 기획서 C-5 이름(CODEF resAccount… · snake_case)으로 답하고, 성공 응답은 감싸지 않는다(backend/app/errors.py).
+// 그래서 아래 call() 이 성공 응답을 { success: true, data } 로 감싸고, 함수마다 backend 모양 → 화면 모양으로 바꾼다.
+// backend 에 아직 없는 주소(라우트 없음 404·405)는 NOT_IMPLEMENTED 로 알린다 — 「계좌를 찾을 수 없어요」 같은 업무 404 와 구분.
+export const NOT_IMPLEMENTED = 'NOT_IMPLEMENTED'
+const notImplemented = { code: NOT_IMPLEMENTED, message: '아직 서버에 없는 기능이에요.' }
 
 // 로그인한 요청마다 서버가 새 만료 시각을 X-Session-Expires-At 헤더로 준다 → 「로그인 연장」 창(SessionTimer)이 듣는다
 let sessionExpiresAt: number | null = null
@@ -52,7 +60,22 @@ async function call<T>(method: 'GET' | 'POST' | 'PATCH' | 'DELETE', path: string
     })
     const exp = res.headers.get('X-Session-Expires-At')
     if (exp) setSessionExpires(Date.parse(exp))
-    return (await res.json()) as ApiResult<T>
+    const text = await res.text() // 204(로그아웃 등)는 본문이 없다
+    const json: unknown = text ? JSON.parse(text) : null
+    if (!res.ok) {
+      const err = (json as { error?: ApiError } | null)?.error
+      if (!err) return { success: false, error: { code: `HTTP_${res.status}`, message: '서버에서 오류가 났어요. 잠시 후 다시 시도해 주세요.' } }
+      if ((res.status === 404 || res.status === 405) && (err.code === 'NOT_FOUND' || err.code === 'METHOD_NOT_ALLOWED'))
+        return { success: false, error: notImplemented }
+      // 로그인 안 함(UNAUTHORIZED)·세션 끝남(SESSION_EXPIRED) → 화면들은 UNAUTHENTICATED 하나로 본다(로그인 화면·손님 화면으로)
+      if (res.status === 401 && (err.code === 'UNAUTHORIZED' || err.code === 'SESSION_EXPIRED')) {
+        setSessionExpires(null)
+        return { success: false, error: { code: 'UNAUTHENTICATED', message: err.message } }
+      }
+      return { success: false, error: err }
+    }
+    if (json !== null && typeof json === 'object' && 'success' in json) return json as ApiResult<T>
+    return { success: true, data: (json ?? {}) as T }
   } catch {
     // 서버가 꺼져 있거나 응답이 JSON 이 아닐 때 — 화면에 그대로 알린다
     return { success: false, error: { code: 'NETWORK', message: '서버에 연결할 수 없어요. 서버가 켜져 있는지 확인해 주세요.' } }
@@ -114,8 +137,13 @@ export const register = (b: RegisterBody) =>
 
 // ---- 로그인 · 로그아웃 (AUTH-F05) ----
 
-/** POST /auth/login */
-export const login = (username: string, password: string) => call<SessionUser>('POST', '/auth/login', { username, password })
+/** POST /auth/login — backend 는 { user_id, status } 만 주므로, 성공하면 /users/me 로 이름·아이디를 채운다 */
+export async function login(username: string, password: string): Promise<ApiResult<SessionUser>> {
+  const r = await call<{ user_id: string; status: string }>('POST', '/auth/login', { username, password })
+  if (!r.success) return r
+  const me = await getMe()
+  return me.success ? me : { success: true, data: { user_id: r.data.user_id, username, name: '', status: r.data.status } }
+}
 
 /** POST /auth/logout */
 export async function logout() {
@@ -124,11 +152,27 @@ export async function logout() {
   return r
 }
 
-/** POST /auth/session/extend — 「로그인 연장」. 새 만료 시각은 헤더로 온다(위 onSessionExpires) */
-export const extendSession = () => call<object>('POST', '/auth/session/extend')
+/** 「로그인 연장」 — backend 에는 따로 연장 API 가 없고(기획서에도 없음), 로그인한 요청이 오면 서버가 마지막 사용 시각을
+ *  1분에 한 번 새로 적는다(backend/app/deps.py). 그래서 가벼운 GET /users/me 를 한 번 부른다. 새 만료 시각은 헤더로 온다 */
+export const extendSession = () => call<object>('GET', '/users/me')
 
-/** GET /users/me — 로그인 안 했으면 UNAUTHENTICATED */
-export const getMe = () => call<SessionUser>('GET', '/users/me')
+/** backend GET /users/me 모양 (backend/app/routers/users.py MeOut) */
+type MeRaw = {
+  id: string
+  username: string
+  name: string
+  email: string | null
+  email_verified_at: string | null
+  birth_date: string
+  gender: 'M' | 'F'
+  payday: number | null
+  status: string
+  created_at: string
+}
+const toSessionUser = (m: MeRaw): SessionUser => ({ user_id: m.id, username: m.username, name: m.name, status: m.status })
+
+/** GET /users/me — 로그인 안 했으면 UNAUTHORIZED */
+export const getMe = async () => map(await call<MeRaw>('GET', '/users/me'), toSessionUser)
 
 // ---- 설정: 내 정보 · 비밀번호 · 약관 · 회원 탈퇴 (AUTH-F07~F10) ----
 
@@ -156,8 +200,20 @@ const toProfile = (p: ProfileRaw): Profile => ({
   createdAt: p.created_at,
 })
 
+const meToProfile = (m: MeRaw): Profile => ({
+  userId: m.id,
+  username: m.username,
+  name: m.name,
+  email: m.email ?? '',
+  emailVerified: m.email_verified_at !== null,
+  birthDate: m.birth_date,
+  gender: m.gender,
+  payday: m.payday,
+  createdAt: m.created_at,
+})
+
 /** GET /users/me — 내 정보 화면용 (getMe 와 같은 주소, 칸을 더 쓴다) */
-export const getProfile = async () => map(await call<ProfileRaw>('GET', '/users/me'), toProfile)
+export const getProfile = async () => map(await call<MeRaw>('GET', '/users/me'), meToProfile)
 
 /** PATCH /users/me — 1차는 월급일만 (null = 비움) */
 export const updatePayday = async (payday: number | null) => map(await call<ProfileRaw>('PATCH', '/users/me', { payday }), toProfile)
@@ -203,8 +259,27 @@ const toLimit = (l: TransferLimitRaw): TransferLimit => ({
   isDefault: l.is_default,
 })
 
-/** GET /users/me/transfer-limits — 해지 안 한 내 계좌마다 지금 한도와 오늘 보낸 금액 */
-export const getTransferLimits = async () => map(await call<TransferLimitRaw[]>('GET', '/users/me/transfer-limits'), (d) => d.map(toLimit))
+/** 해지 안 한 내 계좌마다 지금 한도와 오늘 보낸 금액.
+ *  backend 에는 계좌별 GET /accounts/{id}/transfer-limits 만 있어서(기획서 Part 5 16장) 계좌 목록 → 계좌마다 한도를 부른다 */
+export async function getTransferLimits(): Promise<ApiResult<TransferLimit[]>> {
+  const accounts = await call<AccountRaw[]>('GET', '/accounts')
+  if (!accounts.success) return accounts
+  const limits = await Promise.all(
+    accounts.data.map((a) =>
+      call<{ account_id: string; per_transfer_limit: string; daily_limit: string; used_today: string; is_default: boolean }>(
+        'GET',
+        `/accounts/${encodeURIComponent(a.id)}/transfer-limits`,
+      ),
+    ),
+  )
+  const out: TransferLimit[] = []
+  for (const [i, r] of limits.entries()) {
+    if (!r.success) return r
+    const a = toAccount(accounts.data[i])
+    out.push(toLimit({ ...r.data, account_name: a.name, account_number: a.number }))
+  }
+  return { success: true, data: out }
+}
 
 /** PATCH /users/me/transfer-limits/{id} — 하나라도 올리면 stepUpChallengeId 가 있어야 한다 */
 export const setTransferLimit = async (accountId: string, perTransfer: number, daily: number, stepUpChallengeId?: string) =>
@@ -268,24 +343,41 @@ export async function withdraw(stepUpChallengeId: string) {
 
 // ---- 홈 ----
 
-type AccountRaw = { id: string; name: string; number: string; account_type: string; status: string; is_favorite: boolean; balance: string }
+/** backend 계좌 한 줄 (backend/app/schemas.py AccountOut — 기획서 C-5 의 CODEF 이름) */
+type AccountRaw = {
+  id: string
+  resAccount: string
+  resAccountDisplay: string
+  resAccountName: string
+  resAccountNickName: string // 별명이 없으면 ""
+  account_type: string
+  lifecycle_status: string
+  is_favorite: boolean
+  resAccountStartDate: string // YYYYMMDD
+  closed_at: string | null // YYYYMMDD
+  version: number
+  resAccountCurrency: string
+  resAccountBalance: string
+  balance_as_of: string // YYYYMMDDHHmmss
+}
 const toAccount = (a: AccountRaw): Account => ({
   id: a.id,
-  name: a.name,
-  number: a.number,
+  name: a.resAccountNickName || a.resAccountName,
+  number: a.resAccountDisplay || a.resAccount,
   type: a.account_type,
-  status: a.status,
+  status: a.lifecycle_status,
   isFavorite: a.is_favorite,
-  balance: Number(a.balance),
+  balance: Number(a.resAccountBalance),
 })
 
-/** GET /account-dashboard/summary (ACCT-F08) — 해지 계좌는 빠진다 */
+/** 홈 계좌 모아 보기 (ACCT-F08) — 해지 계좌는 빠진다.
+ *  backend 에 GET /account-dashboard/summary 가 아직 없어 GET /accounts(기본값이 해지 제외)로 합계를 낸다 */
 export async function getAccountDashboard(): Promise<ApiResult<{ totalBalance: number; accounts: Account[] }>> {
-  const r = await call<{ total_balance: string; accounts: AccountRaw[] }>('GET', '/account-dashboard/summary')
-  return map(r, (d) => ({
-    totalBalance: Number(d.total_balance),
-    accounts: d.accounts.map(toAccount),
-  }))
+  const r = await call<AccountRaw[]>('GET', '/accounts')
+  return map(r, (as) => {
+    const accounts = as.map(toAccount)
+    return { totalBalance: accounts.reduce((s, a) => s + a.balance, 0), accounts }
+  })
 }
 
 type ProductRaw = { id: string; name: string; description: string; max_rate: string; term_label: string; icon: 'safe' | 'coins' }
@@ -558,41 +650,37 @@ export type AccountDetail = Account & {
   notificationsEnabled: boolean
   closeBlockers: CloseBlocker[]
 }
-type AccountDetailRaw = AccountRaw & {
-  default_name: string
-  nickname: string | null
-  start_date: string
-  closed_at: string | null
-  balance_as_of: string
-  notifications_enabled: boolean
-  close_blockers: CloseBlocker[]
-}
-const toAccountDetail = (a: AccountDetailRaw): AccountDetail => ({
+// backend 상세는 목록과 같은 AccountOut 이다. 알림 설정·해지 막힘 사유는 backend 에 아직 없어 기본값으로 둔다
+// (알림 켜기·해지는 쓰기 API 라 지금은 NOT_IMPLEMENTED 로 막힌다).
+const toAccountDetail = (a: AccountRaw): AccountDetail => ({
   ...toAccount(a),
-  defaultName: a.default_name,
-  nickname: a.nickname,
-  startDate: a.start_date,
+  defaultName: a.resAccountName,
+  nickname: a.resAccountNickName || null,
+  startDate: a.resAccountStartDate,
   closedAt: a.closed_at,
   balanceAsOf: a.balance_as_of,
-  notificationsEnabled: a.notifications_enabled,
-  closeBlockers: a.close_blockers,
+  notificationsEnabled: false,
+  closeBlockers: [],
 })
 const acct = (id: string) => `/accounts/${encodeURIComponent(id)}`
 
-/** GET /accounts — 해지 계좌도 함께 온다 */
+/** 내 계좌 전부 — 해지 계좌도 함께. backend GET /accounts 는 해지를 빼고 주므로(ACCT-F02) ?status=CLOSED 를 한 번 더 불러 붙인다 */
 export async function getAccounts(): Promise<ApiResult<Account[]>> {
-  return map(await call<AccountRaw[]>('GET', '/accounts'), (as) => as.map(toAccount))
+  const [open, closed] = await Promise.all([call<AccountRaw[]>('GET', '/accounts'), call<AccountRaw[]>('GET', '/accounts?status=CLOSED')])
+  if (!open.success) return open
+  if (!closed.success) return closed
+  return { success: true, data: [...open.data, ...closed.data].map(toAccount) }
 }
 
 /** POST /accounts — 같은 idempotencyKey 로 다시 보내면 새 계좌 없이 처음 결과를 돌려준다 */
 export async function openAccount(type: 'CHECKING' | 'SAVINGS', idempotencyKey: string): Promise<ApiResult<AccountDetail>> {
   const body = { account_type: type, consents: ['required_terms'] }
-  return map(await call<AccountDetailRaw>('POST', '/accounts', body, { 'Idempotency-Key': idempotencyKey }), toAccountDetail)
+  return map(await call<AccountRaw>('POST', '/accounts', body, { 'Idempotency-Key': idempotencyKey }), toAccountDetail)
 }
 
 /** GET /accounts/{accountId} */
 export async function getAccount(id: string): Promise<ApiResult<AccountDetail>> {
-  return map(await call<AccountDetailRaw>('GET', acct(id)), toAccountDetail)
+  return map(await call<AccountRaw>('GET', acct(id)), toAccountDetail)
 }
 
 /** GET /accounts/{accountId}/balance — 잔액만 다시 읽기(새로고침) */
@@ -610,38 +698,59 @@ export type AccountTransaction = {
   displayName: string
   createdAt: string // 2026-10-31T09:00:01+09:00
 }
-type AccountTransactionRaw = { id: string; type: string; direction: 'IN' | 'OUT'; amount: string; balance_after: string; display_name: string; created_at: string }
+/** backend 거래 한 줄 (backend/app/schemas.py TransactionOut) */
+type AccountTransactionRaw = {
+  id: string
+  type: string
+  direction: 'IN' | 'OUT'
+  amount: string
+  balance_after: string
+  display_name: string | null
+  counterpart_bank: string | null
+  created_at: string
+}
 
-/** GET /accounts/{accountId}/transactions — 입출금 내역, 최신이 먼저. direction 을 주면 입금만·출금만 */
+/** GET /accounts/{accountId}/transactions — 입출금 내역, 최신이 먼저. direction 을 주면 입금만·출금만.
+ *  backend 는 { items, next_cursor } 로 100건씩 나눠 주므로 끝까지 이어 부른다(화면은 한 번에 다 그림) */
 export async function getAccountTransactions(id: string, direction?: 'IN' | 'OUT'): Promise<ApiResult<AccountTransaction[]>> {
-  const r = await call<AccountTransactionRaw[]>('GET', `${acct(id)}/transactions${direction ? `?direction=${direction}` : ''}`)
-  return map(r, (ts) =>
-    ts.map((t) => ({
+  const all: AccountTransactionRaw[] = []
+  let cursor: string | null = null
+  for (let page = 0; page < 50; page++) {
+    const q = new URLSearchParams({ limit: '100', ...(direction ? { direction } : {}), ...(cursor ? { cursor } : {}) })
+    const r: ApiResult<{ items: AccountTransactionRaw[]; next_cursor: string | null }> = await call('GET', `${acct(id)}/transactions?${q}`)
+    if (!r.success) return r
+    all.push(...r.data.items)
+    cursor = r.data.next_cursor
+    if (!cursor) break
+  }
+  return {
+    success: true,
+    data: all.map((t) => ({
       id: t.id,
       type: t.type,
       direction: t.direction,
       amount: Number(t.amount),
       balanceAfter: Number(t.balance_after),
-      displayName: t.display_name,
+      displayName: t.display_name ?? t.counterpart_bank ?? '',
       createdAt: t.created_at,
     })),
-  )
+  }
 }
 
 /** PATCH /accounts/{accountId}/preferences — 별명 "" 은 기본 이름으로 */
 export async function updateAccountPreferences(id: string, b: { nickname?: string; isFavorite?: boolean }): Promise<ApiResult<AccountDetail>> {
   const body = { nickname: b.nickname, is_favorite: b.isFavorite }
-  return map(await call<AccountDetailRaw>('PATCH', `${acct(id)}/preferences`, body), toAccountDetail)
+  return map(await call<AccountRaw>('PATCH', `${acct(id)}/preferences`, body), toAccountDetail)
 }
 
 /** POST /accounts/{accountId}/suspend · resume · close — 본인 확인(ACCOUNT_STATUS_CHANGE) 필요 */
 export async function changeAccountStatus(id: string, op: 'suspend' | 'resume' | 'close', stepUpChallengeId: string): Promise<ApiResult<AccountDetail>> {
-  return map(await call<AccountDetailRaw>('POST', `${acct(id)}/${op}`, { step_up_challenge_id: stepUpChallengeId }), toAccountDetail)
+  return map(await call<AccountRaw>('POST', `${acct(id)}/${op}`, { step_up_challenge_id: stepUpChallengeId }), toAccountDetail)
 }
 
 /** PATCH /accounts/{accountId}/notification-settings — 입출금 알림 켜기·끄기 */
 export async function setAccountNotifications(id: string, enabled: boolean): Promise<ApiResult<AccountDetail>> {
-  return map(await call<AccountDetailRaw>('PATCH', `${acct(id)}/notification-settings`, { enabled }), toAccountDetail)
+  return map(await call<AccountRaw>('PATCH', `${acct(id)}/notification-settings`, { enabled }), toAccountDetail)
 }
 
 export type AppNotification = { id: string; type: string; title: string; body: string; createdAt: string; read: boolean }
@@ -664,11 +773,9 @@ export type TransferTarget = { accountNo: string; accountDisplay: string; holder
 /** GET /transfer-targets/verify — 받는 계좌 확인. amount 를 주면 재확인 화면 경고도 온다 */
 export async function verifyTransferTarget(accountNo: string, fromAccountId: string, amount?: number): Promise<ApiResult<TransferTarget>> {
   const q = new URLSearchParams({ bank: BANK, account_no: accountNo, from_account_id: fromAccountId, ...(amount ? { amount: String(amount) } : {}) })
-  const r = await call<{ account_no: string; account_display: string; holder_name: string; is_mine: boolean; warnings: TransferWarning[] }>(
-    'GET',
-    `/transfer-targets/verify?${q}`,
-  )
-  return map(r, (t) => ({ accountNo: t.account_no, accountDisplay: t.account_display, holderName: t.holder_name, isMine: t.is_mine, warnings: t.warnings }))
+  // backend(TransferTargetOut)는 표시용 번호·재확인 경고를 아직 주지 않는다 → 번호 그대로, 경고 없음
+  const r = await call<{ bank: string; account_no: string; holder_name: string; account_status: string; is_mine: boolean }>('GET', `/transfer-targets/verify?${q}`)
+  return map(r, (t) => ({ accountNo: t.account_no, accountDisplay: t.account_no, holderName: t.holder_name, isMine: t.is_mine, warnings: [] }))
 }
 
 /** 간편 송금 목록 한 줄 (Part 5 6장) — 최근 보낸 계좌는 id 가 null */
@@ -687,9 +794,10 @@ export async function getRecentTargets(): Promise<ApiResult<SavedTarget[]>> {
   return map(await call<SavedTargetRaw[]>('GET', '/transfer-targets/recent'), (l) => l.map(toSaved))
 }
 
-/** GET /favorite-accounts — 자주 쓰는 계좌 */
+/** GET /favorite-accounts — 자주 쓰는 계좌 (backend FavoriteAccountOut: 표시용 번호가 없어 번호 그대로 보여 준다) */
 export async function getFavorites(): Promise<ApiResult<SavedTarget[]>> {
-  return map(await call<SavedTargetRaw[]>('GET', '/favorite-accounts'), (l) => l.map(toSaved))
+  const r = await call<{ id: string; bank: string; account_no: string; holder_name: string; nickname: string | null; sort_order: number }[]>('GET', '/favorite-accounts')
+  return map(r, (l) => l.map((f) => toSaved({ id: f.id, account_no: f.account_no, account_display: f.account_no, holder_name: f.holder_name, nickname: f.nickname })))
 }
 
 /** POST /favorite-accounts — 이미 있으면 그 줄을 그대로 돌려준다 */
@@ -766,6 +874,26 @@ const toTransfer = (t: TransferRaw): Transfer => ({
   completedAt: t.completed_at,
 })
 
+/** backend 이체 한 줄 (backend/app/schemas.py TransferOut) — 표시용 번호·이체 뒤 잔액은 없다 */
+type TransferOutRaw = Omit<TransferRaw, 'from_account_display' | 'to_account_display' | 'balance_after' | 'my_display_name' | 'their_display_name'> & {
+  my_display_name: string | null
+  their_display_name: string | null
+}
+/** 내 계좌 id → 화면 표시 번호 (해지 계좌 포함). 못 불러오면 빈 표 → 번호 대신 id 가 보인다 */
+async function myAccountDisplays(): Promise<Map<string, string>> {
+  const all = await getAccounts()
+  return new Map(all.success ? all.data.map((a) => [a.id, a.number]) : [])
+}
+const fromBackendTransfer = (t: TransferOutRaw, displays: Map<string, string>): Transfer =>
+  toTransfer({
+    ...t,
+    from_account_display: displays.get(t.from_account_id) ?? t.from_account_id,
+    to_account_display: t.to_account_no,
+    my_display_name: t.my_display_name ?? '',
+    their_display_name: t.their_display_name ?? '',
+    balance_after: null,
+  })
+
 /** POST /transfers — 같은 idempotencyKey 로 다시 보내면 새로 보내지 않고 처음 결과를 돌려준다. 잔액 부족·한도 초과는 FAILED 결과로 온다 */
 export async function sendTransfer(
   b: { fromAccountId: string; toAccountNo: string; amount: number; stepUpChallengeId: string; myDisplayName: string; theirDisplayName: string },
@@ -785,12 +913,14 @@ export async function sendTransfer(
 
 /** GET /transfers — 내가 보낸 이체 결과, 최신이 먼저 */
 export async function getTransfers(): Promise<ApiResult<Transfer[]>> {
-  return map(await call<TransferRaw[]>('GET', '/transfers'), (ts) => ts.map(toTransfer))
+  const [r, displays] = await Promise.all([call<TransferOutRaw[]>('GET', '/transfers'), myAccountDisplays()])
+  return map(r, (ts) => ts.map((t) => fromBackendTransfer(t, displays)))
 }
 
 /** GET /transfers/{transferId} */
 export async function getTransfer(id: string): Promise<ApiResult<Transfer>> {
-  return map(await call<TransferRaw>('GET', `/transfers/${encodeURIComponent(id)}`), toTransfer)
+  const [r, displays] = await Promise.all([call<TransferOutRaw>('GET', `/transfers/${encodeURIComponent(id)}`), myAccountDisplays()])
+  return map(r, (t) => fromBackendTransfer(t, displays))
 }
 
 // ---- 챗봇 (Part 3 7장 POST /agent/chat) — 대화 맥락(context)은 서버가 준 것을 다음 요청에 그대로 돌려보낸다 ----

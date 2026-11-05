@@ -215,3 +215,24 @@ def test_post_from_unknown_origin_is_blocked(browser):
     assert r.json()["error"]["code"] == "ORIGIN_NOT_ALLOWED"
     assert browser.post("/auth/login", json=body, headers={"Origin": "http://localhost:5173"}).status_code == 200
     assert browser.post("/auth/login", json=body, headers={"Origin": "http://testserver"}).status_code == 200  # 같은 출처
+
+
+# --- 세션 만료 시각 헤더 (화면의 자동 로그아웃·「로그인 연장」 창용) ----------------------
+def test_login_and_protected_api_send_session_expires_header(browser):
+    from datetime import datetime, timedelta
+
+    r = login(browser, "user_001")
+    exp = datetime.fromisoformat(r.headers["x-session-expires-at"])
+    assert exp.utcoffset() == timedelta(hours=9)  # 한국 시각 +09:00
+    left = exp - datetime.now(exp.tzinfo)
+    assert timedelta(minutes=9) < left <= timedelta(minutes=10)  # 유휴 10분
+
+    r = browser.get("/users/me")
+    assert r.status_code == 200
+    assert "x-session-expires-at" in r.headers
+
+
+def test_no_session_expires_header_without_login(browser):
+    r = browser.get("/users/me")
+    assert r.status_code == 401
+    assert "x-session-expires-at" not in r.headers

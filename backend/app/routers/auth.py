@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from app.config import settings
-from app.deps import DB, is_session_alive
+from app.deps import DB, is_session_alive, set_session_expires_header
 from app.errors import ApiError
 from app.models import AuthAuditLog, AuthIdentity, AuthSession, LocalCredential, User
 from app.rules import SESSION_COOKIE, SESSION_MAX, now_kst
@@ -100,12 +100,14 @@ def login(body: LoginIn, request: Request, response: Response, db: DB):
             old.revoked_at = now
 
     token = new_session_token()
-    db.add(AuthSession(id=session_id_for(token), user_id=user.id, created_at=now, last_seen_at=now,
-                       expires_at=now + SESSION_MAX))
+    session = AuthSession(id=session_id_for(token), user_id=user.id, created_at=now, last_seen_at=now,
+                          expires_at=now + SESSION_MAX)
+    db.add(session)
     _audit(db, user.id, "LOGIN", "SUCCESS", request_id)
     db.commit()
 
     _set_session_cookie(response, token)
+    set_session_expires_header(response, session)
     return LoginOut(user_id=user.id, status=user.status)
 
 

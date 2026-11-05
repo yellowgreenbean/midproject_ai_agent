@@ -42,3 +42,9 @@ def test_other_origin_is_not_allowed(client):
     assert "access-control-allow-origin" not in r.headers
     r = client.get("/accounts", headers=as_user("user_001") | {"Origin": "http://evil.example.com"})
     assert "access-control-allow-origin" not in r.headers  # 브라우저가 응답을 화면에 넘겨주지 않음
+
+
+def test_session_expires_header_is_readable_by_frontend(client):
+    # 다른 포트의 화면 JS 는 expose 된 헤더만 읽을 수 있다 (frontend/src/api.ts 의 X-Session-Expires-At)
+    r = client.get("/accounts", headers=as_user("user_001") | {"Origin": ALLOWED})
+    assert "x-session-expires-at" in r.headers["access-control-expose-headers"].lower()

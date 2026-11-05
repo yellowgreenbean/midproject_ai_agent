@@ -9,6 +9,8 @@ import {
   getMyCards,
   getRecommendedProducts,
   logout,
+  NOT_IMPLEMENTED,
+  type ApiResult,
   type Account,
   type Card,
   type Product,
@@ -45,16 +47,22 @@ const won = (n: number) => `${n.toLocaleString('ko-KR')}원`
 
 type Home = { me: SessionUser | null; total: number; accounts: Account[]; cards: Card[]; products: Product[] }
 
+/** 서버에 아직 없는 기능(NOT_IMPLEMENTED)이면 빈 목록으로 */
+const orEmpty = <T,>(r: ApiResult<T[]>): ApiResult<T[]> => (!r.success && r.error.code === NOT_IMPLEMENTED ? { success: true, data: [] } : r)
+
 export default function HomePage() {
   const [home, setHome] = useState<Home | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     void (async () => {
-      const [me, prods] = await Promise.all([getMe(), getRecommendedProducts()])
+      const [me, prodsRes] = await Promise.all([getMe(), getRecommendedProducts()])
+      // 서버(backend/)에 아직 없는 기능(추천 상품·카드)은 빈 목록으로 두고 나머지를 보여 준다 — 다른 오류는 그대로 알린다
+      const prods = orEmpty(prodsRes)
       if (!prods.success) return setError(prods.error.message)
       if (!me.success) return setHome({ me: null, total: 0, accounts: [], cards: [], products: prods.data })
-      const [dash, cards] = await Promise.all([getAccountDashboard(), getMyCards()])
+      const [dash, cardsRes] = await Promise.all([getAccountDashboard(), getMyCards()])
+      const cards = orEmpty(cardsRes)
       if (!dash.success) return setError(dash.error.message)
       if (!cards.success) return setError(cards.error.message)
       setHome({ me: me.data, total: dash.data.totalBalance, accounts: dash.data.accounts, cards: cards.data, products: prods.data })

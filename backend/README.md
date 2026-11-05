@@ -57,9 +57,9 @@ backend/.venv/Scripts/python scripts/gen_models.py      # docs/sql 을 고치고
 ```bash
 py -3.13 -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt
-.venv\Scripts\python -m uvicorn app.main:app --reload
+.venv\Scripts\python -m uvicorn app.main:app --reload --port 8010
 ```
-http://localhost:8000/docs 에서 호출. 먼저 `POST /auth/login` 으로 로그인하면 브라우저에 쿠키가 저장되고, 그 뒤 호출은 그 회원으로 처리된다.
+http://localhost:8010/docs 에서 호출 (화면 `frontend/` 가 8010 을 부른다 — 아래 「화면 연결」). 먼저 `POST /auth/login` 으로 로그인하면 브라우저에 쿠키가 저장되고, 그 뒤 호출은 그 회원으로 처리된다.
 시드 회원의 아이디는 `users.username`(예: `minjun_kim` = user_001), 비밀번호는 모두 `.env.example` 의 `SEED_PASSWORD`.
 
 **로그인 (기획서 Part 1 AUTH-F05)** — `app/routers/auth.py`, `app/deps.py`, `app/security.py`
@@ -101,6 +101,23 @@ CODEF `res…` 빈 칸은 `""`, 우리가 만든 빈 칸은 `null`. 거래에는
 — 남의 것과 없는 것은 똑같이 404(존재 여부를 숨김, Part 2 ACCT-F02). 기획서 업무 규칙 값(기본 한도, 은행별 자릿수 등)은 `app/rules.py`.
 
 아직 없는 것: 본인 확인(`POST /auth/step-up`)과, 그것이 필요한 쓰기 API(이체 실행·예약 등록·계좌 개설/설정/해지 등). 회원가입·Google 로그인.
+
+## 5-1. 화면(frontend/) 연결
+```bash
+# 터미널 1: DB(1번) 를 띄운 뒤 서버
+cd backend && .venv\Scripts\python -m uvicorn app.main:app --reload --port 8010
+# 터미널 2: 화면
+cd frontend && npm ci && npm run dev        # http://localhost:5173
+```
+- 로그인: 시드 회원 아이디(예: `minjun_kim` = user_001) + `backend/.env.example` 의 `SEED_PASSWORD`.
+- 서버 주소는 `frontend/src/api.ts` 의 `API` — 기본 `http://localhost:8010`, 바꾸려면 `frontend/.env.local` 에 `VITE_API_URL=...`.
+- 쿠키 로그인이라 화면 주소가 `CORS_ORIGINS`(기본 5173·3000) 안에 있어야 한다. 서버는 로그인한 응답마다
+  `X-Session-Expires-At`(유휴 10분·최대 12시간 중 먼저 끝나는 시각)을 보내고, 화면은 그걸로 남은 시간·「로그인 연장」 창을 띄운다.
+- 모양 맞추기는 `frontend/src/api.ts` 한 곳에서 한다: 이 서버는 기획서 C-5 이름(`resAccount…`)으로, 성공 응답을 감싸지 않고 답하므로
+  `call()` 이 `{ success: true, data }` 로 감싸고 함수마다 화면 모양으로 바꾼다. 서버에 없는 주소는 `NOT_IMPLEMENTED`
+  「아직 서버에 없는 기능이에요.」로 보인다(홈의 추천 상품·카드 칸은 비워 두고 나머지를 보여 줌).
+- 지금 이어진 화면: 로그인·로그아웃, 홈(계좌 합계), 내 계좌·계좌 상세·잔액, 거래내역, 이체 결과 목록·상세, 이체 한도 보기,
+  자주 쓰는 계좌, 받는 계좌 확인, 내 정보 보기. 나머지(가입·상품·카드·알림·PIN·쓰기 기능 전부)는 서버 API 가 생기면 이어진다.
 
 ## 6. 테스트
 ```bash
