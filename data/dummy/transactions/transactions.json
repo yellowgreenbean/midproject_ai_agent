@@ -1,0 +1,1253 @@
+{
+  "result": {
+    "code": "CF-00000",
+    "message": "성공"
+  },
+  "data": [
+    {
+      "account_id": "acc_001",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0009",
+          "resAccountTrDate": "20261031",
+          "resAccountTrTime": "090001",
+          "resAccountIn": "0",
+          "resAccountOut": "100000",
+          "resAfterTranBalance": "1250000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "비상금 이체",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0008",
+          "resAccountTrDate": "20261031",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "0",
+          "resAccountOut": "300000",
+          "resAfterTranBalance": "1350000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "적금납입",
+          "resAccountDesc3": "자유적금 납입",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0007",
+          "resAccountTrDate": "20261027",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "0",
+          "resAccountOut": "600000",
+          "resAfterTranBalance": "1650000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "월세",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0006",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "1800000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "2250000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "(주)한빛테크",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0005",
+          "resAccountTrDate": "20261023",
+          "resAccountTrTime": "183310",
+          "resAccountIn": "0",
+          "resAccountOut": "6500",
+          "resAfterTranBalance": "450000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "온누리약국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0004",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "147300",
+          "resAfterTranBalance": "456500",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "할인카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0003",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "136400",
+          "resAfterTranBalance": "603800",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0002",
+          "resAccountTrDate": "20261009",
+          "resAccountTrTime": "124502",
+          "resAccountIn": "0",
+          "resAccountOut": "11000",
+          "resAfterTranBalance": "740200",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "김밥천국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0001",
+          "resAccountTrDate": "20261004",
+          "resAccountTrTime": "123015",
+          "resAccountIn": "0",
+          "resAccountOut": "3800",
+          "resAfterTranBalance": "751200",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "CU 편의점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_002",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0011",
+          "resAccountTrDate": "20261031",
+          "resAccountTrTime": "090001",
+          "resAccountIn": "100000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "874890",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체입금",
+          "resAccountDesc3": "생활비 계좌",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0010",
+          "resAccountTrDate": "20261021",
+          "resAccountTrTime": "151200",
+          "resAccountIn": "0",
+          "resAccountOut": "30000",
+          "resAfterTranBalance": "774890",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "용돈",
+          "resAccountDesc4": "모바일뱅킹",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_004",
+      "resTrHistoryList": []
+    },
+    {
+      "account_id": "acc_006",
+      "resTrHistoryList": []
+    },
+    {
+      "account_id": "acc_007",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0015",
+          "resAccountTrDate": "20261026",
+          "resAccountTrTime": "131000",
+          "resAccountIn": "0",
+          "resAccountOut": "12000",
+          "resAfterTranBalance": "530000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "한솥도시락",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0014",
+          "resAccountTrDate": "20261015",
+          "resAccountTrTime": "180000",
+          "resAccountIn": "300000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "542000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체입금",
+          "resAccountDesc3": "부모님 용돈",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0013",
+          "resAccountTrDate": "20261003",
+          "resAccountTrTime": "120500",
+          "resAccountIn": "0",
+          "resAccountOut": "5000",
+          "resAfterTranBalance": "242000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "GS25 편의점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_009",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0021",
+          "resAccountTrDate": "20261027",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "0",
+          "resAccountOut": "620000",
+          "resAfterTranBalance": "2260000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "월세",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0020",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "2760000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "2880000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "한울물류",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0019",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "100000",
+          "resAccountIn": "0",
+          "resAccountOut": "40000",
+          "resAfterTranBalance": "120000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "자동이체",
+          "resAccountDesc3": "통신요금",
+          "resAccountDesc4": "자동이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0018",
+          "resAccountTrDate": "20261019",
+          "resAccountTrTime": "085832",
+          "resAccountIn": "0",
+          "resAccountOut": "4200",
+          "resAfterTranBalance": "160000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "삼성약국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0017",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "200415",
+          "resAccountIn": "0",
+          "resAccountOut": "1900",
+          "resAfterTranBalance": "164200",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "CU 편의점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0016",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "58800",
+          "resAfterTranBalance": "166100",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛 쇼핑 신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_010",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0027",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "3570000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "5040000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "(주)누리소프트",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0026",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "100000",
+          "resAccountIn": "0",
+          "resAccountOut": "40000",
+          "resAfterTranBalance": "1470000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "자동이체",
+          "resAccountDesc3": "통신요금",
+          "resAccountDesc4": "자동이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0025",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "090732",
+          "resAccountIn": "0",
+          "resAccountOut": "11700",
+          "resAfterTranBalance": "1510000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "본죽",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0024",
+          "resAccountTrDate": "20261019",
+          "resAccountTrTime": "163331",
+          "resAccountIn": "0",
+          "resAccountOut": "4600",
+          "resAfterTranBalance": "1521700",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "CU 편의점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0023",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "109700",
+          "resAfterTranBalance": "1526300",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛 쇼핑 신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0022",
+          "resAccountTrDate": "20261012",
+          "resAccountTrTime": "161550",
+          "resAccountIn": "0",
+          "resAccountOut": "14800",
+          "resAfterTranBalance": "1636000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "삼성약국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_012",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0033",
+          "resAccountTrDate": "20261028",
+          "resAccountTrTime": "220510",
+          "resAccountIn": "0",
+          "resAccountOut": "6500",
+          "resAfterTranBalance": "2483500",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "GS25",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0032",
+          "resAccountTrDate": "20261027",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "0",
+          "resAccountOut": "440000",
+          "resAfterTranBalance": "2490000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "월세",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0031",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "2060000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "2930000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "(주)누리소프트",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0030",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "100000",
+          "resAccountIn": "0",
+          "resAccountOut": "60000",
+          "resAfterTranBalance": "870000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "자동이체",
+          "resAccountDesc3": "통신요금",
+          "resAccountDesc4": "자동이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0029",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "31200",
+          "resAfterTranBalance": "930000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0028",
+          "resAccountTrDate": "20261005",
+          "resAccountTrTime": "205535",
+          "resAccountIn": "0",
+          "resAccountOut": "11500",
+          "resAfterTranBalance": "961200",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "티머니 충전",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_014",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0038",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "1940000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "3210000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "(주)누리소프트",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0037",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "100000",
+          "resAccountIn": "0",
+          "resAccountOut": "50000",
+          "resAfterTranBalance": "1270000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "자동이체",
+          "resAccountDesc3": "통신요금",
+          "resAccountDesc4": "자동이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0036",
+          "resAccountTrDate": "20261016",
+          "resAccountTrTime": "160509",
+          "resAccountIn": "0",
+          "resAccountOut": "13200",
+          "resAfterTranBalance": "1320000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "티머니 충전",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0035",
+          "resAccountTrDate": "20261016",
+          "resAccountTrTime": "100754",
+          "resAccountIn": "0",
+          "resAccountOut": "10400",
+          "resAfterTranBalance": "1333200",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "본죽",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0034",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "25600",
+          "resAfterTranBalance": "1343600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_015",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0042",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "3460000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "4270000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "한울물류",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0041",
+          "resAccountTrDate": "20261021",
+          "resAccountTrTime": "185141",
+          "resAccountIn": "0",
+          "resAccountOut": "1300",
+          "resAfterTranBalance": "810000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "티머니 충전",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0040",
+          "resAccountTrDate": "20261016",
+          "resAccountTrTime": "132113",
+          "resAccountIn": "0",
+          "resAccountOut": "2800",
+          "resAfterTranBalance": "811300",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "CU 편의점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0039",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "16000",
+          "resAfterTranBalance": "814100",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛 쇼핑 신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_016",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0048",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "2530000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "3430000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "한울물류",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0047",
+          "resAccountTrDate": "20261017",
+          "resAccountTrTime": "075528",
+          "resAccountIn": "0",
+          "resAccountOut": "8300",
+          "resAfterTranBalance": "900000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "CU 편의점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0046",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "65300",
+          "resAfterTranBalance": "908300",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛 쇼핑 신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0045",
+          "resAccountTrDate": "20261011",
+          "resAccountTrTime": "225049",
+          "resAccountIn": "0",
+          "resAccountOut": "6500",
+          "resAfterTranBalance": "973600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "스타벅스 강남역점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0044",
+          "resAccountTrDate": "20261008",
+          "resAccountTrTime": "131702",
+          "resAccountIn": "0",
+          "resAccountOut": "6500",
+          "resAfterTranBalance": "980100",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "스타벅스 강남역점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0043",
+          "resAccountTrDate": "20261006",
+          "resAccountTrTime": "113039",
+          "resAccountIn": "0",
+          "resAccountOut": "1500",
+          "resAfterTranBalance": "986600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "CU 편의점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_018",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0052",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "2020000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "2740000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "세종병원",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0051",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "192126",
+          "resAccountIn": "0",
+          "resAccountOut": "3500",
+          "resAfterTranBalance": "720000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "세븐일레븐",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0050",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "146100",
+          "resAfterTranBalance": "723500",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛 쇼핑 신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0049",
+          "resAccountTrDate": "20261003",
+          "resAccountTrTime": "180121",
+          "resAccountIn": "0",
+          "resAccountOut": "6000",
+          "resAfterTranBalance": "869600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "GS25",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_019",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0057",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "3750000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "5060000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "세종병원",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0056",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "100000",
+          "resAccountIn": "0",
+          "resAccountOut": "50000",
+          "resAfterTranBalance": "1310000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "자동이체",
+          "resAccountDesc3": "통신요금",
+          "resAccountDesc4": "자동이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0055",
+          "resAccountTrDate": "20261017",
+          "resAccountTrTime": "131828",
+          "resAccountIn": "0",
+          "resAccountOut": "14000",
+          "resAfterTranBalance": "1360000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "본죽",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0054",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "71600",
+          "resAfterTranBalance": "1374000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0053",
+          "resAccountTrDate": "20261009",
+          "resAccountTrTime": "185101",
+          "resAccountIn": "0",
+          "resAccountOut": "11600",
+          "resAfterTranBalance": "1445600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "온누리약국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_021",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0062",
+          "resAccountTrDate": "20261027",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "0",
+          "resAccountOut": "590000",
+          "resAfterTranBalance": "5180000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "월세",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0061",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "4330000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "5770000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "대한상사",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0060",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "87300",
+          "resAfterTranBalance": "1440000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛 쇼핑 신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0059",
+          "resAccountTrDate": "20261010",
+          "resAccountTrTime": "132211",
+          "resAccountIn": "0",
+          "resAccountOut": "9100",
+          "resAfterTranBalance": "1527300",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "김밥천국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0058",
+          "resAccountTrDate": "20261009",
+          "resAccountTrTime": "182135",
+          "resAccountIn": "0",
+          "resAccountOut": "11700",
+          "resAfterTranBalance": "1536400",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "김밥천국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_022",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0069",
+          "resAccountTrDate": "20261027",
+          "resAccountTrTime": "213503",
+          "resAccountIn": "0",
+          "resAccountOut": "7300",
+          "resAfterTranBalance": "2992700",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "롯데리아",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0068",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "2300000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "3000000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "대한상사",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0067",
+          "resAccountTrDate": "20261024",
+          "resAccountTrTime": "094233",
+          "resAccountIn": "0",
+          "resAccountOut": "5900",
+          "resAfterTranBalance": "700000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "스타벅스 강남역점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0066",
+          "resAccountTrDate": "20261022",
+          "resAccountTrTime": "143116",
+          "resAccountIn": "0",
+          "resAccountOut": "7000",
+          "resAfterTranBalance": "705900",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "이디야커피 신촌점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0065",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "100000",
+          "resAccountIn": "0",
+          "resAccountOut": "60000",
+          "resAfterTranBalance": "712900",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "자동이체",
+          "resAccountDesc3": "통신요금",
+          "resAccountDesc4": "자동이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0064",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "46200",
+          "resAfterTranBalance": "772900",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0063",
+          "resAccountTrDate": "20261003",
+          "resAccountTrTime": "070208",
+          "resAccountIn": "0",
+          "resAccountOut": "13200",
+          "resAfterTranBalance": "819100",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "온누리약국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_023",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0076",
+          "resAccountTrDate": "20261027",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "0",
+          "resAccountOut": "410000",
+          "resAfterTranBalance": "4290000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "월세",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0075",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "3200000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "4700000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "(주)누리소프트",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0074",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "155607",
+          "resAccountIn": "0",
+          "resAccountOut": "10600",
+          "resAfterTranBalance": "1500000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "한솥도시락",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0073",
+          "resAccountTrDate": "20261016",
+          "resAccountTrTime": "071829",
+          "resAccountIn": "0",
+          "resAccountOut": "5400",
+          "resAfterTranBalance": "1510600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "CU 편의점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0072",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "101100",
+          "resAfterTranBalance": "1516000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛 쇼핑 신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0071",
+          "resAccountTrDate": "20261009",
+          "resAccountTrTime": "191358",
+          "resAccountIn": "0",
+          "resAccountOut": "6200",
+          "resAfterTranBalance": "1617100",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "투썸플레이스 홍대점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0070",
+          "resAccountTrDate": "20261003",
+          "resAccountTrTime": "114733",
+          "resAccountIn": "0",
+          "resAccountOut": "2400",
+          "resAfterTranBalance": "1623300",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "세븐일레븐",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_028",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0083",
+          "resAccountTrDate": "20261027",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "0",
+          "resAccountOut": "480000",
+          "resAfterTranBalance": "4153000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "월세",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0082",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "185027",
+          "resAccountIn": "0",
+          "resAccountOut": "7000",
+          "resAfterTranBalance": "4633000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "온누리약국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0081",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "3910000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "4640000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "세종병원",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0080",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "114155",
+          "resAccountIn": "0",
+          "resAccountOut": "5600",
+          "resAfterTranBalance": "730000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "투썸플레이스 홍대점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0079",
+          "resAccountTrDate": "20261020",
+          "resAccountTrTime": "100000",
+          "resAccountIn": "0",
+          "resAccountOut": "40000",
+          "resAfterTranBalance": "735600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "자동이체",
+          "resAccountDesc3": "통신요금",
+          "resAccountDesc4": "자동이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0078",
+          "resAccountTrDate": "20261018",
+          "resAccountTrTime": "134605",
+          "resAccountIn": "0",
+          "resAccountOut": "7000",
+          "resAfterTranBalance": "775600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "투썸플레이스 홍대점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0077",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "107600",
+          "resAfterTranBalance": "782600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        }
+      ]
+    },
+    {
+      "account_id": "acc_029",
+      "resTrHistoryList": [
+        {
+          "id": "tx_0090",
+          "resAccountTrDate": "20261027",
+          "resAccountTrTime": "212815",
+          "resAccountIn": "0",
+          "resAccountOut": "3400",
+          "resAfterTranBalance": "2296600",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "투썸플레이스 홍대점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0089",
+          "resAccountTrDate": "20261027",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "0",
+          "resAccountOut": "650000",
+          "resAfterTranBalance": "2300000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "월세",
+          "resAccountDesc4": "인터넷뱅킹",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0088",
+          "resAccountTrDate": "20261025",
+          "resAccountTrTime": "090000",
+          "resAccountIn": "2780000",
+          "resAccountOut": "0",
+          "resAfterTranBalance": "2950000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "급여",
+          "resAccountDesc3": "(주)한빛테크",
+          "resAccountDesc4": "급여이체",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0087",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "223731",
+          "resAccountIn": "0",
+          "resAccountOut": "3800",
+          "resAfterTranBalance": "170000",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "스타벅스 강남역점",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0086",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "165452",
+          "resAccountIn": "0",
+          "resAccountOut": "11500",
+          "resAfterTranBalance": "173800",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "티머니 충전",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0085",
+          "resAccountTrDate": "20261014",
+          "resAccountTrTime": "060000",
+          "resAccountIn": "0",
+          "resAccountOut": "30900",
+          "resAfterTranBalance": "185300",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "카드대금",
+          "resAccountDesc3": "한빛 쇼핑 신용카드 9월분",
+          "resAccountDesc4": "카드결제",
+          "tranDesc": ""
+        },
+        {
+          "id": "tx_0084",
+          "resAccountTrDate": "20261003",
+          "resAccountTrTime": "155715",
+          "resAccountIn": "0",
+          "resAccountOut": "9700",
+          "resAfterTranBalance": "216200",
+          "resAccountDesc1": "",
+          "resAccountDesc2": "체크카드",
+          "resAccountDesc3": "온누리약국",
+          "resAccountDesc4": "체크카드",
+          "tranDesc": ""
+        }
+      ]
+    }
+  ]
+}

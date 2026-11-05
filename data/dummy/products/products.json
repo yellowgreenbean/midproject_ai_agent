@@ -1,0 +1,1862 @@
+{
+  "meta": {
+    "term_rule": "term_min·term_max 는 term_unit 단위(MONTH=개월, DAY=일)이며 양 끝을 포함한다. '12개월 이상 24개월 미만' 은 12~23. 일 단위 상품은 product_rules 의 rules_json 에 term_days(일수가 정해진 상품) 또는 term_days_min·term_days_max(범위가 있는 상품)도 적었다.",
+    "rate_unit": "연 %, 세전, 문자열. bonus_rate 는 우대금리의 최대치."
+  },
+  "products": [
+    {
+      "id": "prod_003",
+      "bank": "두린은행",
+      "name": "두린플러스 예금",
+      "type": "TIME_DEPOSIT",
+      "description": "기간도 금액도 내맘대로 예금(만기 1~36개월 선택, 기간별 금리)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_004",
+      "bank": "두린은행",
+      "name": "두린 적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "실명의 개인 1인 1계좌 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_005",
+      "bank": "두린은행",
+      "name": "두린 369 정기예금",
+      "type": "TIME_DEPOSIT",
+      "description": "3·6·9개월 중 만기를 고르는 한정판매 정기예금(스마트폰 전용)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_006",
+      "bank": "두린은행",
+      "name": "두린 첫거래우대 정기예금",
+      "type": "TIME_DEPOSIT",
+      "description": "두린은행 첫 거래 고객을 우대하는 비대면 전용 정기예금(6~36개월)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_007",
+      "bank": "두린은행",
+      "name": "두린 SUPER 정기예금",
+      "type": "TIME_DEPOSIT",
+      "description": "만기일을 일·월 단위로 고르는 정기예금(만기 자동재예치 가능)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_008",
+      "bank": "두린은행",
+      "name": "두린 기업정기예금",
+      "type": "TIME_DEPOSIT",
+      "description": "법인·개인사업자 전용 비대면 정기예금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_009",
+      "bank": "두린은행",
+      "name": "ISA정기예금",
+      "type": "TIME_DEPOSIT",
+      "description": "신탁형 ISA를 취급하는 타 금융기관 제공용 정기예금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_010",
+      "bank": "두린은행",
+      "name": "CD plus예금",
+      "type": "TIME_DEPOSIT",
+      "description": "실물 CD 대신 통장을 주는 양도성예금증서형 예금(영업점 가입)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_011",
+      "bank": "두린은행",
+      "name": "정기예금",
+      "type": "TIME_DEPOSIT",
+      "description": "기본 정기예금(1~60개월)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_012",
+      "bank": "두린은행",
+      "name": "표지어음",
+      "type": "TIME_DEPOSIT",
+      "description": "은행이 할인해 보유한 어음을 나누거나 묶어 할인식으로 발행하는 약속어음(양도 가능, 영업점 가입)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_013",
+      "bank": "두린은행",
+      "name": "양도성예금증서(CD)",
+      "type": "TIME_DEPOSIT",
+      "description": "양도·양수가 자유로운 거치식 상품(영업점 가입)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_014",
+      "bank": "두린은행",
+      "name": "두루두루정기예금",
+      "type": "TIME_DEPOSIT",
+      "description": "회전식 정기예금(1·2·3·6·12개월 회전, 변동금리)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_015",
+      "bank": "두린은행",
+      "name": "두린 SUPER주거래 적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "급여·연금·공과금 이체 실적에 따라 우대금리를 주는 정액적립식 적금(1·2·3년)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_016",
+      "bank": "두린은행",
+      "name": "두린 SUPER주거래 자유적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "급여·연금·공과금 이체 실적에 따라 우대금리를 주는 자유적립식 적금(1·2·3년)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_017",
+      "bank": "두린은행",
+      "name": "두린금융 다함께 적금 2",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "두린금융 계열사 실적에 따라 우대금리를 주는 특판 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_018",
+      "bank": "두린은행",
+      "name": "두린 청년미래적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "정부 기여금과 비과세 혜택이 붙는 청년 자산형성 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_019",
+      "bank": "두린은행",
+      "name": "두린 사장님 성장 적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "매출 성장·성실 상환에 따라 우대금리를 주는 개인사업자 전용 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_020",
+      "bank": "두린은행",
+      "name": "두린 두근두근 행운적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "매달 행운카드를 열어 당첨되면 우대금리를 받는 6개월 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_021",
+      "bank": "두린은행",
+      "name": "삼성월렛머니 두린 적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "삼성월렛머니 이용 고객 전용 적금(갤럭시 단말기에서만 이용)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_022",
+      "bank": "두린은행",
+      "name": "Npay 두린 적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "Npay 두린 통장 가입 후 머니를 연결한 고객 전용 6개월 적금(우대금리 없음)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_023",
+      "bank": "두린은행",
+      "name": "두린모바일 적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "두린모바일 가입·통신비 자동이체 고객에게 우대금리를 주는 1년 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_024",
+      "bank": "두린은행",
+      "name": "N일 적금(31일)",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "31일 동안 감정을 기록하면 우대금리를 받는 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_025",
+      "bank": "두린은행",
+      "name": "N일 적금(100일)",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "100일 동안 감정을 기록하면 우대금리를 받는 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_026",
+      "bank": "두린은행",
+      "name": "N일 적금(200일)",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "200일 동안 감정을 기록하면 우대금리를 받는 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_027",
+      "bank": "두린은행",
+      "name": "두린 아이행복 적금2",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "경찰청 지문사전등록 고객에게 우대금리를 주는 어린이 자유적립식 적금",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_028",
+      "bank": "두린은행",
+      "name": "두린 (영업점명) 적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "영업점별 특판 적금(사전에 받은 인증번호가 있어야 가입)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_029",
+      "bank": "두린은행",
+      "name": "두린 (업체명 임직원) 적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "같은 회사 동료가 많을수록 금리가 오르는 임직원 전용 적금(영업점과 협의 후 인증번호로 가입)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_030",
+      "bank": "두린은행",
+      "name": "두린 장병내일준비적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "의무복무 장병의 전역 후 목돈 마련을 돕는 적금(가입기간 일 단위 지정)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_031",
+      "bank": "두린은행",
+      "name": "두린미소드림적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "미소금융대출·채무조정 성실상환자의 재산형성을 돕는 적금(영업점 가입)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    },
+    {
+      "id": "prod_032",
+      "bank": "두린은행",
+      "name": "두린희망드림적금",
+      "type": "INSTALLMENT_SAVINGS",
+      "description": "사회소외계층의 자산형성을 돕는 적금(영업점 가입)",
+      "status": "ON_SALE",
+      "source_url": null,
+      "verified_at": "20261104"
+    }
+  ],
+  "product_rates": [
+    {
+      "id": "rate_013",
+      "product_id": "prod_003",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "3.60",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_014",
+      "product_id": "prod_004",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "3.20",
+      "bonus_rate": "0.20",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_015",
+      "product_id": "prod_003",
+      "term_min": 1,
+      "term_max": 2,
+      "term_unit": "MONTH",
+      "base_rate": "2.70",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_016",
+      "product_id": "prod_003",
+      "term_min": 3,
+      "term_max": 5,
+      "term_unit": "MONTH",
+      "base_rate": "3.10",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_017",
+      "product_id": "prod_003",
+      "term_min": 6,
+      "term_max": 11,
+      "term_unit": "MONTH",
+      "base_rate": "3.40",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_018",
+      "product_id": "prod_003",
+      "term_min": 13,
+      "term_max": 23,
+      "term_unit": "MONTH",
+      "base_rate": "3.50",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_019",
+      "product_id": "prod_003",
+      "term_min": 24,
+      "term_max": 35,
+      "term_unit": "MONTH",
+      "base_rate": "3.00",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_020",
+      "product_id": "prod_003",
+      "term_min": 36,
+      "term_max": 36,
+      "term_unit": "MONTH",
+      "base_rate": "2.70",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_021",
+      "product_id": "prod_005",
+      "term_min": 3,
+      "term_max": 3,
+      "term_unit": "MONTH",
+      "base_rate": "3.40",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_022",
+      "product_id": "prod_005",
+      "term_min": 6,
+      "term_max": 6,
+      "term_unit": "MONTH",
+      "base_rate": "3.75",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_023",
+      "product_id": "prod_005",
+      "term_min": 9,
+      "term_max": 9,
+      "term_unit": "MONTH",
+      "base_rate": "3.80",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_024",
+      "product_id": "prod_006",
+      "term_min": 6,
+      "term_max": 11,
+      "term_unit": "MONTH",
+      "base_rate": "2.60",
+      "bonus_rate": "1.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_025",
+      "product_id": "prod_006",
+      "term_min": 12,
+      "term_max": 23,
+      "term_unit": "MONTH",
+      "base_rate": "2.80",
+      "bonus_rate": "1.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_026",
+      "product_id": "prod_006",
+      "term_min": 24,
+      "term_max": 35,
+      "term_unit": "MONTH",
+      "base_rate": "2.20",
+      "bonus_rate": "1.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_027",
+      "product_id": "prod_006",
+      "term_min": 36,
+      "term_max": 36,
+      "term_unit": "MONTH",
+      "base_rate": "2.20",
+      "bonus_rate": "1.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_028",
+      "product_id": "prod_007",
+      "term_min": 1,
+      "term_max": 2,
+      "term_unit": "MONTH",
+      "base_rate": "2.20",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_029",
+      "product_id": "prod_007",
+      "term_min": 3,
+      "term_max": 5,
+      "term_unit": "MONTH",
+      "base_rate": "2.30",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_030",
+      "product_id": "prod_007",
+      "term_min": 6,
+      "term_max": 11,
+      "term_unit": "MONTH",
+      "base_rate": "2.35",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_031",
+      "product_id": "prod_007",
+      "term_min": 12,
+      "term_max": 23,
+      "term_unit": "MONTH",
+      "base_rate": "2.45",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_032",
+      "product_id": "prod_007",
+      "term_min": 24,
+      "term_max": 35,
+      "term_unit": "MONTH",
+      "base_rate": "2.40",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_033",
+      "product_id": "prod_007",
+      "term_min": 36,
+      "term_max": 36,
+      "term_unit": "MONTH",
+      "base_rate": "2.40",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_034",
+      "product_id": "prod_008",
+      "term_min": 1,
+      "term_max": 1,
+      "term_unit": "MONTH",
+      "base_rate": "3.00",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_035",
+      "product_id": "prod_008",
+      "term_min": 2,
+      "term_max": 2,
+      "term_unit": "MONTH",
+      "base_rate": "3.27",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_036",
+      "product_id": "prod_008",
+      "term_min": 3,
+      "term_max": 3,
+      "term_unit": "MONTH",
+      "base_rate": "3.54",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_037",
+      "product_id": "prod_008",
+      "term_min": 4,
+      "term_max": 4,
+      "term_unit": "MONTH",
+      "base_rate": "3.64",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_038",
+      "product_id": "prod_008",
+      "term_min": 5,
+      "term_max": 5,
+      "term_unit": "MONTH",
+      "base_rate": "3.76",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_039",
+      "product_id": "prod_008",
+      "term_min": 6,
+      "term_max": 6,
+      "term_unit": "MONTH",
+      "base_rate": "3.87",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_040",
+      "product_id": "prod_008",
+      "term_min": 7,
+      "term_max": 7,
+      "term_unit": "MONTH",
+      "base_rate": "3.86",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_041",
+      "product_id": "prod_008",
+      "term_min": 8,
+      "term_max": 8,
+      "term_unit": "MONTH",
+      "base_rate": "3.86",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_042",
+      "product_id": "prod_008",
+      "term_min": 9,
+      "term_max": 9,
+      "term_unit": "MONTH",
+      "base_rate": "3.86",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_043",
+      "product_id": "prod_008",
+      "term_min": 10,
+      "term_max": 10,
+      "term_unit": "MONTH",
+      "base_rate": "3.87",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_044",
+      "product_id": "prod_008",
+      "term_min": 11,
+      "term_max": 11,
+      "term_unit": "MONTH",
+      "base_rate": "3.86",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_045",
+      "product_id": "prod_008",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "3.87",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_046",
+      "product_id": "prod_008",
+      "term_min": 13,
+      "term_max": 13,
+      "term_unit": "MONTH",
+      "base_rate": "3.86",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_047",
+      "product_id": "prod_008",
+      "term_min": 14,
+      "term_max": 14,
+      "term_unit": "MONTH",
+      "base_rate": "3.84",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_048",
+      "product_id": "prod_008",
+      "term_min": 15,
+      "term_max": 15,
+      "term_unit": "MONTH",
+      "base_rate": "3.83",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_049",
+      "product_id": "prod_008",
+      "term_min": 16,
+      "term_max": 16,
+      "term_unit": "MONTH",
+      "base_rate": "3.82",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_050",
+      "product_id": "prod_008",
+      "term_min": 17,
+      "term_max": 17,
+      "term_unit": "MONTH",
+      "base_rate": "3.80",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_051",
+      "product_id": "prod_008",
+      "term_min": 18,
+      "term_max": 18,
+      "term_unit": "MONTH",
+      "base_rate": "3.78",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_052",
+      "product_id": "prod_008",
+      "term_min": 19,
+      "term_max": 19,
+      "term_unit": "MONTH",
+      "base_rate": "3.77",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_053",
+      "product_id": "prod_008",
+      "term_min": 20,
+      "term_max": 20,
+      "term_unit": "MONTH",
+      "base_rate": "3.75",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_054",
+      "product_id": "prod_008",
+      "term_min": 21,
+      "term_max": 21,
+      "term_unit": "MONTH",
+      "base_rate": "3.74",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_055",
+      "product_id": "prod_008",
+      "term_min": 22,
+      "term_max": 22,
+      "term_unit": "MONTH",
+      "base_rate": "3.73",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_056",
+      "product_id": "prod_008",
+      "term_min": 23,
+      "term_max": 23,
+      "term_unit": "MONTH",
+      "base_rate": "3.71",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_057",
+      "product_id": "prod_008",
+      "term_min": 24,
+      "term_max": 24,
+      "term_unit": "MONTH",
+      "base_rate": "3.70",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_058",
+      "product_id": "prod_008",
+      "term_min": 25,
+      "term_max": 25,
+      "term_unit": "MONTH",
+      "base_rate": "3.69",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_059",
+      "product_id": "prod_008",
+      "term_min": 26,
+      "term_max": 26,
+      "term_unit": "MONTH",
+      "base_rate": "3.69",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_060",
+      "product_id": "prod_008",
+      "term_min": 27,
+      "term_max": 27,
+      "term_unit": "MONTH",
+      "base_rate": "3.68",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_061",
+      "product_id": "prod_008",
+      "term_min": 28,
+      "term_max": 28,
+      "term_unit": "MONTH",
+      "base_rate": "3.69",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_062",
+      "product_id": "prod_008",
+      "term_min": 29,
+      "term_max": 29,
+      "term_unit": "MONTH",
+      "base_rate": "3.68",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_063",
+      "product_id": "prod_008",
+      "term_min": 30,
+      "term_max": 30,
+      "term_unit": "MONTH",
+      "base_rate": "3.68",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_064",
+      "product_id": "prod_008",
+      "term_min": 31,
+      "term_max": 31,
+      "term_unit": "MONTH",
+      "base_rate": "3.67",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_065",
+      "product_id": "prod_008",
+      "term_min": 32,
+      "term_max": 32,
+      "term_unit": "MONTH",
+      "base_rate": "3.66",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_066",
+      "product_id": "prod_008",
+      "term_min": 33,
+      "term_max": 33,
+      "term_unit": "MONTH",
+      "base_rate": "3.67",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_067",
+      "product_id": "prod_008",
+      "term_min": 34,
+      "term_max": 34,
+      "term_unit": "MONTH",
+      "base_rate": "3.65",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_068",
+      "product_id": "prod_008",
+      "term_min": 35,
+      "term_max": 35,
+      "term_unit": "MONTH",
+      "base_rate": "3.66",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_069",
+      "product_id": "prod_008",
+      "term_min": 36,
+      "term_max": 36,
+      "term_unit": "MONTH",
+      "base_rate": "3.65",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_070",
+      "product_id": "prod_009",
+      "term_min": 3,
+      "term_max": 3,
+      "term_unit": "MONTH",
+      "base_rate": "2.73",
+      "bonus_rate": "0.00",
+      "effective_from": "20261101"
+    },
+    {
+      "id": "rate_071",
+      "product_id": "prod_009",
+      "term_min": 6,
+      "term_max": 6,
+      "term_unit": "MONTH",
+      "base_rate": "3.24",
+      "bonus_rate": "0.00",
+      "effective_from": "20261101"
+    },
+    {
+      "id": "rate_072",
+      "product_id": "prod_009",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "3.54",
+      "bonus_rate": "0.00",
+      "effective_from": "20261101"
+    },
+    {
+      "id": "rate_073",
+      "product_id": "prod_009",
+      "term_min": 24,
+      "term_max": 24,
+      "term_unit": "MONTH",
+      "base_rate": "3.20",
+      "bonus_rate": "0.00",
+      "effective_from": "20261101"
+    },
+    {
+      "id": "rate_074",
+      "product_id": "prod_009",
+      "term_min": 36,
+      "term_max": 36,
+      "term_unit": "MONTH",
+      "base_rate": "3.34",
+      "bonus_rate": "0.00",
+      "effective_from": "20261101"
+    },
+    {
+      "id": "rate_075",
+      "product_id": "prod_011",
+      "term_min": 1,
+      "term_max": 2,
+      "term_unit": "MONTH",
+      "base_rate": "2.05",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_076",
+      "product_id": "prod_011",
+      "term_min": 3,
+      "term_max": 5,
+      "term_unit": "MONTH",
+      "base_rate": "2.10",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_077",
+      "product_id": "prod_011",
+      "term_min": 6,
+      "term_max": 11,
+      "term_unit": "MONTH",
+      "base_rate": "2.15",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_078",
+      "product_id": "prod_011",
+      "term_min": 12,
+      "term_max": 23,
+      "term_unit": "MONTH",
+      "base_rate": "2.20",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_079",
+      "product_id": "prod_011",
+      "term_min": 24,
+      "term_max": 35,
+      "term_unit": "MONTH",
+      "base_rate": "2.30",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_080",
+      "product_id": "prod_011",
+      "term_min": 36,
+      "term_max": 36,
+      "term_unit": "MONTH",
+      "base_rate": "2.30",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_081",
+      "product_id": "prod_011",
+      "term_min": 37,
+      "term_max": 60,
+      "term_unit": "MONTH",
+      "base_rate": "2.40",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_082",
+      "product_id": "prod_012",
+      "term_min": 30,
+      "term_max": 59,
+      "term_unit": "DAY",
+      "base_rate": "1.95",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_083",
+      "product_id": "prod_012",
+      "term_min": 60,
+      "term_max": 90,
+      "term_unit": "DAY",
+      "base_rate": "2.05",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_084",
+      "product_id": "prod_012",
+      "term_min": 91,
+      "term_max": 119,
+      "term_unit": "DAY",
+      "base_rate": "2.05",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_085",
+      "product_id": "prod_012",
+      "term_min": 120,
+      "term_max": 149,
+      "term_unit": "DAY",
+      "base_rate": "2.05",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_086",
+      "product_id": "prod_012",
+      "term_min": 150,
+      "term_max": 179,
+      "term_unit": "DAY",
+      "base_rate": "2.05",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_087",
+      "product_id": "prod_012",
+      "term_min": 180,
+      "term_max": 269,
+      "term_unit": "DAY",
+      "base_rate": "2.15",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_088",
+      "product_id": "prod_012",
+      "term_min": 270,
+      "term_max": 364,
+      "term_unit": "DAY",
+      "base_rate": "2.15",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_089",
+      "product_id": "prod_012",
+      "term_min": 365,
+      "term_max": 365,
+      "term_unit": "DAY",
+      "base_rate": "2.20",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_090",
+      "product_id": "prod_013",
+      "term_min": 30,
+      "term_max": 59,
+      "term_unit": "DAY",
+      "base_rate": "1.95",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_091",
+      "product_id": "prod_013",
+      "term_min": 60,
+      "term_max": 90,
+      "term_unit": "DAY",
+      "base_rate": "2.05",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_092",
+      "product_id": "prod_013",
+      "term_min": 91,
+      "term_max": 179,
+      "term_unit": "DAY",
+      "base_rate": "2.05",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_093",
+      "product_id": "prod_013",
+      "term_min": 180,
+      "term_max": 269,
+      "term_unit": "DAY",
+      "base_rate": "2.15",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_094",
+      "product_id": "prod_013",
+      "term_min": 270,
+      "term_max": 364,
+      "term_unit": "DAY",
+      "base_rate": "2.15",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_095",
+      "product_id": "prod_013",
+      "term_min": 365,
+      "term_max": 729,
+      "term_unit": "DAY",
+      "base_rate": "2.20",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_096",
+      "product_id": "prod_013",
+      "term_min": 730,
+      "term_max": 1094,
+      "term_unit": "DAY",
+      "base_rate": "2.20",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_097",
+      "product_id": "prod_013",
+      "term_min": 1095,
+      "term_max": 1825,
+      "term_unit": "DAY",
+      "base_rate": "2.30",
+      "bonus_rate": "0.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_098",
+      "product_id": "prod_015",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "2.45",
+      "bonus_rate": "1.40",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_099",
+      "product_id": "prod_015",
+      "term_min": 24,
+      "term_max": 24,
+      "term_unit": "MONTH",
+      "base_rate": "2.40",
+      "bonus_rate": "1.40",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_100",
+      "product_id": "prod_015",
+      "term_min": 36,
+      "term_max": 36,
+      "term_unit": "MONTH",
+      "base_rate": "2.40",
+      "bonus_rate": "1.40",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_101",
+      "product_id": "prod_016",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "2.45",
+      "bonus_rate": "1.40",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_102",
+      "product_id": "prod_016",
+      "term_min": 24,
+      "term_max": 24,
+      "term_unit": "MONTH",
+      "base_rate": "2.40",
+      "bonus_rate": "1.40",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_103",
+      "product_id": "prod_016",
+      "term_min": 36,
+      "term_max": 36,
+      "term_unit": "MONTH",
+      "base_rate": "2.40",
+      "bonus_rate": "1.40",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_104",
+      "product_id": "prod_017",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "3.50",
+      "bonus_rate": "5.50",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_105",
+      "product_id": "prod_018",
+      "term_min": 36,
+      "term_max": 36,
+      "term_unit": "MONTH",
+      "base_rate": "5.00",
+      "bonus_rate": "3.00",
+      "effective_from": "20261007"
+    },
+    {
+      "id": "rate_106",
+      "product_id": "prod_019",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "2.00",
+      "bonus_rate": "4.00",
+      "effective_from": "20260416"
+    },
+    {
+      "id": "rate_107",
+      "product_id": "prod_020",
+      "term_min": 6,
+      "term_max": 6,
+      "term_unit": "MONTH",
+      "base_rate": "3.00",
+      "bonus_rate": "10.00",
+      "effective_from": "20261102"
+    },
+    {
+      "id": "rate_108",
+      "product_id": "prod_021",
+      "term_min": 6,
+      "term_max": 6,
+      "term_unit": "MONTH",
+      "base_rate": "2.75",
+      "bonus_rate": "5.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_109",
+      "product_id": "prod_021",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "2.75",
+      "bonus_rate": "5.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_110",
+      "product_id": "prod_022",
+      "term_min": 6,
+      "term_max": 6,
+      "term_unit": "MONTH",
+      "base_rate": "4.50",
+      "bonus_rate": "0.00",
+      "effective_from": "20250819"
+    },
+    {
+      "id": "rate_111",
+      "product_id": "prod_023",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "2.75",
+      "bonus_rate": "6.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_112",
+      "product_id": "prod_024",
+      "term_min": 31,
+      "term_max": 31,
+      "term_unit": "DAY",
+      "base_rate": "2.05",
+      "bonus_rate": "3.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_113",
+      "product_id": "prod_025",
+      "term_min": 100,
+      "term_max": 100,
+      "term_unit": "DAY",
+      "base_rate": "2.05",
+      "bonus_rate": "3.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_114",
+      "product_id": "prod_026",
+      "term_min": 200,
+      "term_max": 200,
+      "term_unit": "DAY",
+      "base_rate": "2.05",
+      "bonus_rate": "3.00",
+      "effective_from": "20261022"
+    },
+    {
+      "id": "rate_115",
+      "product_id": "prod_027",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "2.70",
+      "bonus_rate": "1.20",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_116",
+      "product_id": "prod_028",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "3.55",
+      "bonus_rate": "0.00",
+      "effective_from": "20241101"
+    },
+    {
+      "id": "rate_117",
+      "product_id": "prod_029",
+      "term_min": 12,
+      "term_max": 12,
+      "term_unit": "MONTH",
+      "base_rate": "2.60",
+      "bonus_rate": "1.50",
+      "effective_from": "20260803"
+    },
+    {
+      "id": "rate_118",
+      "product_id": "prod_030",
+      "term_min": 1,
+      "term_max": 5,
+      "term_unit": "MONTH",
+      "base_rate": "3.70",
+      "bonus_rate": "1.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_119",
+      "product_id": "prod_030",
+      "term_min": 6,
+      "term_max": 11,
+      "term_unit": "MONTH",
+      "base_rate": "4.00",
+      "bonus_rate": "1.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_120",
+      "product_id": "prod_030",
+      "term_min": 12,
+      "term_max": 14,
+      "term_unit": "MONTH",
+      "base_rate": "4.30",
+      "bonus_rate": "1.00",
+      "effective_from": "20261104"
+    },
+    {
+      "id": "rate_121",
+      "product_id": "prod_030",
+      "term_min": 15,
+      "term_max": 23,
+      "term_unit": "MONTH",
+      "base_rate": "5.00",
+      "bonus_rate": "1.00",
+      "effective_from": "20261104"
+    }
+  ],
+  "product_rules": [
+    {
+      "id": "rule_003",
+      "product_id": "prod_003",
+      "min_amount": "10000",
+      "max_amount": null,
+      "min_months": 1,
+      "max_months": 36,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "실명의 개인",
+        "interest_payment": "만기일시지급식",
+        "tax_free": "비과세종합저축 가입 가능(본인 한도 내)"
+      }
+    },
+    {
+      "id": "rule_004",
+      "product_id": "prod_004",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 12,
+      "max_per_user": 1,
+      "rules_json": {
+        "monthly_max": "500000",
+        "eligibility": "실명의 개인",
+        "bonus_condition": "최대 연 0.2%p: 두린통장/두린꿈통장에서 출금해 가입 0.1%p + 만기해지 시 두린 오픈뱅킹에 타행계좌 등록 0.1%p",
+        "interest_payment": "만기일시지급식",
+        "tax_free": "비과세종합저축 가입 가능(본인 한도 내)"
+      }
+    },
+    {
+      "id": "rule_005",
+      "product_id": "prod_005",
+      "min_amount": "1000000",
+      "max_amount": null,
+      "min_months": 3,
+      "max_months": 9,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "실명의 개인",
+        "selectable_terms_months": [
+          3,
+          6,
+          9
+        ]
+      }
+    },
+    {
+      "id": "rule_006",
+      "product_id": "prod_006",
+      "min_amount": "1000000",
+      "max_amount": "50000000",
+      "min_months": 6,
+      "max_months": 36,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 1계좌)",
+        "bonus_note": "우대조건 충족 시 최대 연 1.0%p(세부 조건 미확인)"
+      }
+    },
+    {
+      "id": "rule_007",
+      "product_id": "prod_007",
+      "min_amount": "1000000",
+      "max_amount": null,
+      "min_months": 1,
+      "max_months": 36,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "실명의 개인",
+        "term_note": "일·월 단위로 만기 선택"
+      }
+    },
+    {
+      "id": "rule_008",
+      "product_id": "prod_008",
+      "min_amount": "1000000",
+      "max_amount": "5000000000",
+      "min_months": 1,
+      "max_months": 36,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "사업자등록증을 소지한 개인사업자 및 법인(금융회사 등·기관투자가 제외)"
+      }
+    },
+    {
+      "id": "rule_009",
+      "product_id": "prod_009",
+      "min_amount": "10000",
+      "max_amount": null,
+      "min_months": 3,
+      "max_months": 36,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "ISA(개인종합자산관리계좌) 취급 타 금융기관",
+        "selectable_terms_months": [
+          3,
+          6,
+          12,
+          24,
+          36
+        ],
+        "channel": "영업점"
+      }
+    },
+    {
+      "id": "rule_010",
+      "product_id": "prod_010",
+      "min_amount": "5000000",
+      "max_amount": null,
+      "min_months": 1,
+      "max_months": 36,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "제한 없음",
+        "amount_unit": "10000",
+        "channel": "영업점"
+      }
+    },
+    {
+      "id": "rule_011",
+      "product_id": "prod_011",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 1,
+      "max_months": 60,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "제한 없음"
+      }
+    },
+    {
+      "id": "rule_012",
+      "product_id": "prod_012",
+      "min_amount": "10000000",
+      "max_amount": null,
+      "min_months": null,
+      "max_months": null,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "제한 없음",
+        "term_days_min": 30,
+        "term_days_max": 365,
+        "early_termination": "중도해지 불가",
+        "channel": "영업점"
+      }
+    },
+    {
+      "id": "rule_013",
+      "product_id": "prod_013",
+      "min_amount": "10000000",
+      "max_amount": null,
+      "min_months": null,
+      "max_months": null,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "제한 없음",
+        "term_days_min": 30,
+        "term_days_max": 1825,
+        "early_termination": "중도해지 불가",
+        "channel": "영업점"
+      }
+    },
+    {
+      "id": "rule_014",
+      "product_id": "prod_014",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": null,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "제한 없음",
+        "rotation_rates": {
+          "1개월": "1.90",
+          "2개월": "1.90",
+          "3개월": "1.95",
+          "6개월": "2.00",
+          "12개월": "2.25"
+        },
+        "term_note": "1년 이상 연 단위 가입",
+        "bonus_note": "1개월 회전: 5천만원 이상 시 0.1%p 우대"
+      }
+    },
+    {
+      "id": "rule_015",
+      "product_id": "prod_015",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 36,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "개인 및 개인사업자",
+        "monthly_max": "500000",
+        "selectable_terms_months": [
+          12,
+          24,
+          36
+        ],
+        "bonus_note": "최대우대이율 연 1.4%p"
+      }
+    },
+    {
+      "id": "rule_016",
+      "product_id": "prod_016",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 36,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "개인 및 개인사업자",
+        "monthly_max": "500000",
+        "selectable_terms_months": [
+          12,
+          24,
+          36
+        ],
+        "bonus_note": "최대우대이율 연 1.4%p"
+      }
+    },
+    {
+      "id": "rule_017",
+      "product_id": "prod_017",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 12,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 1계좌)",
+        "monthly_min": "1",
+        "monthly_max": "300000",
+        "bonus_note": "목록의 최고 9.00%에서 기본 3.50%를 뺀 값(세부 우대조건 미확인)"
+      }
+    },
+    {
+      "id": "rule_018",
+      "product_id": "prod_018",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 36,
+      "max_months": 36,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "가입요건을 모두 충족한 실명의 개인 거주자(1인 1계좌, 세부 요건 미확인)",
+        "monthly_max": "500000",
+        "monthly_unit": "1000",
+        "bonus_note": "우대조건 충족 시 최대 연 3.0%"
+      }
+    },
+    {
+      "id": "rule_019",
+      "product_id": "prod_019",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 12,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "사업자등록증을 보유한 개인사업자(1인 1계좌)",
+        "monthly_max": "1000000",
+        "bonus_note": "우대금리 최고 연 4.00%p"
+      }
+    },
+    {
+      "id": "rule_020",
+      "product_id": "prod_020",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 6,
+      "max_months": 6,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 1계좌)",
+        "monthly_min": "1",
+        "monthly_max": "500000",
+        "bonus_note": "행운카드 당첨 1장당 연 2.0%p, 5번 당첨 시 최대 연 10.0%p"
+      }
+    },
+    {
+      "id": "rule_021",
+      "product_id": "prod_021",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 6,
+      "max_months": 12,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 1계좌)",
+        "monthly_max": "300000",
+        "selectable_terms_months": [
+          6,
+          12
+        ],
+        "bonus_note": "목록의 최고 7.75%에서 기본 2.75%를 뺀 값(세부 우대조건 미확인)"
+      }
+    },
+    {
+      "id": "rule_022",
+      "product_id": "prod_022",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 6,
+      "max_months": 6,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "Npay 두린 통장을 가입한 17세 이상 실명의 개인(내국인, 1인 1계좌)",
+        "monthly_max": "300000"
+      }
+    },
+    {
+      "id": "rule_023",
+      "product_id": "prod_023",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 12,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 1계좌)",
+        "monthly_min": "1",
+        "monthly_max": "200000",
+        "bonus_note": "두린모바일 가입 연 4.0%p + 통신비 자동이체 연 2.0%p"
+      }
+    },
+    {
+      "id": "rule_024",
+      "product_id": "prod_024",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": null,
+      "max_months": null,
+      "max_per_user": 3,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 3계좌)",
+        "term_days": 31,
+        "daily_min": "1000",
+        "daily_max": "30000",
+        "bonus_note": "우대조건 충족 시 최대 연 3.0%(두린은행 예적금 미보유 가입, 또는 일정기간 이상 납입 후 감정스탬프 선택)"
+      }
+    },
+    {
+      "id": "rule_025",
+      "product_id": "prod_025",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": null,
+      "max_months": null,
+      "max_per_user": 3,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 3계좌)",
+        "term_days": 100,
+        "daily_min": "1000",
+        "daily_max": "30000",
+        "bonus_note": "우대조건 충족 시 최대 연 3.0%(두린은행 예적금 미보유 가입, 또는 일정기간 이상 납입 후 감정스탬프 선택)"
+      }
+    },
+    {
+      "id": "rule_026",
+      "product_id": "prod_026",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": null,
+      "max_months": null,
+      "max_per_user": 3,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 3계좌)",
+        "term_days": 200,
+        "daily_min": "1000",
+        "daily_max": "30000",
+        "bonus_note": "우대조건 충족 시 최대 연 3.0%(두린은행 예적금 미보유 가입, 또는 일정기간 이상 납입 후 감정스탬프 선택)"
+      }
+    },
+    {
+      "id": "rule_027",
+      "product_id": "prod_027",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 12,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 1계좌, 어린이 전용 여부 미확인)",
+        "monthly_max": "500000",
+        "bonus_note": "조건 충족 시 최대 연 1.20%p"
+      }
+    },
+    {
+      "id": "rule_028",
+      "product_id": "prod_028",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 12,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 1계좌), 인증번호 필요",
+        "monthly_max": "500000",
+        "variants": "1년 기본형 3.55% / 우대형 3.35%(최대 0.5%p 우대)"
+      }
+    },
+    {
+      "id": "rule_029",
+      "product_id": "prod_029",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 12,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "실명의 개인(1인 1계좌), 인증번호 필요",
+        "monthly_max": "500000",
+        "bonus_note": "가입자 수에 따라 최대 연 1.5%p"
+      }
+    },
+    {
+      "id": "rule_030",
+      "product_id": "prod_030",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 1,
+      "max_months": 24,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "현역병·상근예비역·의무경찰·해양의무경찰·의무소방대원·사회복무요원·대체복무요원",
+        "monthly_min": "0",
+        "monthly_max": "300000",
+        "bonus_note": "조건 충족 시 최대 연 1.0%p(계약기간 3개월 미만은 최대 0.4%p)"
+      }
+    },
+    {
+      "id": "rule_031",
+      "product_id": "prod_031",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 60,
+      "max_per_user": 1,
+      "rules_json": {
+        "eligibility": "서민금융진흥원 추천서를 발급받은 성실상환자(1인 1계좌)",
+        "monthly_min": "10000",
+        "monthly_max": "200000",
+        "term_note": "1년 이상 5년 이하 연 단위"
+      }
+    },
+    {
+      "id": "rule_032",
+      "product_id": "prod_032",
+      "min_amount": null,
+      "max_amount": null,
+      "min_months": 12,
+      "max_months": 12,
+      "max_per_user": null,
+      "rules_json": {
+        "eligibility": "기초생활수급자·만 65세 이상 차상위계층·소년소녀가장·결혼이민자·북한이탈주민·근로장려금수급자",
+        "monthly_max": "200000"
+      }
+    }
+  ]
+}
