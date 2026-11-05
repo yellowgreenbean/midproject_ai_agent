@@ -22,8 +22,8 @@ COMMENT ON TABLE account_balances IS '잔액';
 CREATE OR REPLACE VIEW account_balance_view AS
 SELECT
   account_id,
-  currency                                   AS resAccountCurrency,
-  balance                                    AS resAccountBalance,
+  currency                                   AS "resAccountCurrency",
+  balance                                    AS "resAccountBalance",
   to_char(updated_at, 'YYYYMMDDHH24MISS')    AS balance_as_of
 FROM account_balances;
 

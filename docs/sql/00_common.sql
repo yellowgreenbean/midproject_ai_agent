@@ -13,11 +13,11 @@
 --   06_card_usage.sql         6. 카드 — 이용·청구·분석·포인트
 --   07_notifications.sql      7. 알림
 --
--- 실행 방법 (DB toss_card 는 미리 있어야 한다 — PostgreSQL 은 파일 안에서 DB를 만들고 바로 들어갈 수 없음)
---   Docker: POSTGRES_DB=toss_card 로 띄우고 /docker-entrypoint-initdb.d 에 이 폴더를 붙이면
---           파일 이름 순서로 toss_card 안에서 실행된다 (파일마다 세션이 따로).
---   직접:   createdb -U postgres toss_card
---           for f in docs/sql/0*.sql; do psql -U postgres -d toss_card -v ON_ERROR_STOP=1 -f "$f"; done
+-- 실행 방법 (DB 는 미리 있어야 한다 — PostgreSQL 은 파일 안에서 DB를 만들고 바로 들어갈 수 없음. DB 이름은 상관없음)
+--   Docker: backend/docker-compose.yml — backend 폴더에서 docker compose up -d (DB midproject, 포트 5433)
+--           backend/db/init/02_schema.sh 가 이 폴더의 파일을 번호 순서로 midproject 안에서 실행한다.
+--   직접:   createdb -U postgres midproject
+--           for f in docs/sql/0*.sql; do psql -U postgres -d midproject -v ON_ERROR_STOP=1 -f "$f"; done
 --   파일마다 맨 위에 SET client_encoding = 'UTF8' 이 있으므로 Windows psql 에서 -f 로 실행해도 한글이 깨지지 않는다.
 --   PowerShell 5.1 에서 Get-Content ... | psql 로 넘기면 한글이 ? 로 깨지므로 쓰지 않는다.
 --
@@ -42,8 +42,10 @@
 --   - 칸/표 COMMENT        → 표 아래 COMMENT ON TABLE / COLUMN 문
 --   - KEY idx_... (...)    → 표 아래 CREATE INDEX 문,  UNIQUE KEY → CONSTRAINT uk_... UNIQUE
 --   - ON UPDATE CURRENT_TIMESTAMP → 아래 set_updated_at() 트리거
---   - 대소문자: 따옴표 없이 쓴 이름은 소문자로 저장된다 (resAccount → resaccount).
---     SQL 에서는 resAccount 로 써도 찾아지지만, 조회 결과의 칸 이름은 소문자로 나온다.
+--   - 대소문자: CODEF 이름(accounts 의 "resAccount" 등, 보기의 "resAccountBalance" 등)은 기획서 C-5
+--     "CODEF 이름 그대로"에 맞춰 따옴표로 감싸 대소문자를 그대로 저장한다.
+--     쿼리에서도 따옴표가 필요하다: SELECT "resAccount" FROM accounts;  (따옴표 없이 쓰면 resaccount 를 찾아 실패)
+--     나머지 이름은 모두 snake_case 소문자라 따옴표가 필요 없다.
 --   - 글자 비교: MySQL utf8mb4_0900_ai_ci 는 대소문자를 구분하지 않았지만 PostgreSQL 은 구분한다
 --     (username = 'Kim' 과 'kim' 이 다름, UNIQUE 도 다른 값으로 봄).
 -- =====================================================================

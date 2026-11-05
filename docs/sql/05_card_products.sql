@@ -113,6 +113,7 @@ CREATE TABLE terms (
   version          VARCHAR(10)   NOT NULL,
   title            VARCHAR(100)  NOT NULL,
   required         BOOLEAN       NOT NULL DEFAULT TRUE,
+  content_url      VARCHAR(255)  NOT NULL,
   effective_at     TIMESTAMP(0)  NOT NULL,
   card_product_id  VARCHAR(40)   NULL,
   PRIMARY KEY (id),
@@ -120,7 +121,9 @@ CREATE TABLE terms (
 );
 CREATE INDEX idx_terms_card_product ON terms (card_product_id);
 COMMENT ON TABLE terms IS '약관';
-COMMENT ON COLUMN terms.card_product_id IS '카드 약관이면';
+COMMENT ON COLUMN terms.required IS '필수 약관인지, 선택 약관은 FALSE (원본 schema.sql 이름 is_required)';
+COMMENT ON COLUMN terms.content_url IS '약관 본문 위치 (예: docs/terms/<약관>.md 경로나 URL). 동의 화면과 챗봇 RAG가 같은 본문을 읽음';
+COMMENT ON COLUMN terms.card_product_id IS '카드 상품 약관이면 그 카드 상품, 공통 약관은 NULL';
 
 -- 약관 동의 (회원 파트 1장)
 CREATE TABLE user_consents (
@@ -219,7 +222,7 @@ CREATE TABLE card_applications (
   CONSTRAINT fk_applications_user FOREIGN KEY (user_id) REFERENCES users (id),
   CONSTRAINT fk_applications_product FOREIGN KEY (card_product_id) REFERENCES card_products (id),
   CONSTRAINT fk_applications_promotion FOREIGN KEY (promotion_id) REFERENCES promotions (id),
-  CONSTRAINT fk_applications_recommendation FOREIGN KEY (recommendation_id) REFERENCES card_recommendations (id),
+  CONSTRAINT fk_applications_recommendation FOREIGN KEY (recommendation_id) REFERENCES card_recommendations (id) ON DELETE SET NULL,
   CONSTRAINT fk_applications_step_up FOREIGN KEY (step_up_challenge_id) REFERENCES step_up_challenges (id),
   CONSTRAINT fk_applications_account FOREIGN KEY (linked_account_id) REFERENCES accounts (id),
   CONSTRAINT ck_card_applications_status CHECK (status IN ('APPLIED', 'REVIEWING', 'APPROVED', 'REJECTED', 'SHIPPING', 'DELIVERED', 'ACTIVATED', 'CANCELED')),
@@ -231,7 +234,7 @@ COMMENT ON INDEX idx_applications_product_applied IS '발급 순위 집계용';
 CREATE TRIGGER trg_card_applications_updated_at BEFORE UPDATE ON card_applications
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 COMMENT ON TABLE card_applications IS '카드 발급 신청';
-COMMENT ON COLUMN card_applications.recommendation_id IS '추천으로 신청한 경우';
+COMMENT ON COLUMN card_applications.recommendation_id IS '추천으로 신청한 경우. 탈퇴로 추천 결과를 지우면 NULL (기획서 C-6)';
 COMMENT ON COLUMN card_applications.step_up_challenge_id IS '신청 때 본인 확인';
 COMMENT ON COLUMN card_applications.job_type IS '직장인/자영업/학생 등 (신용카드 심사용)';
 COMMENT ON COLUMN card_applications.linked_account_id IS '연결 계좌';
@@ -278,7 +281,7 @@ CREATE TABLE user_cards (
   nickname              VARCHAR(30)   NULL,
   card_number_masked    VARCHAR(25)   NOT NULL,
   last4                 CHAR(4)       NOT NULL,
-  expires_at            DATE          NOT NULL,
+  expires_at            DATE          NULL,
   linked_account_id     VARCHAR(40)   NULL,
   payment_day           SMALLINT      NULL,
   credit_limit          BIGINT        NULL,
@@ -286,7 +289,7 @@ CREATE TABLE user_cards (
   annual_fee_amount     INT           NOT NULL DEFAULT 0,
   next_annual_fee_date  DATE          NULL,
   last_used_at          TIMESTAMP(0)  NULL,
-  issued_at             TIMESTAMP(0)  NOT NULL,
+  issued_at             TIMESTAMP(0)  NULL,
   activated_at          TIMESTAMP(0)  NULL,
   terminated_at         TIMESTAMP(0)  NULL,
   created_at            TIMESTAMP(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -308,7 +311,8 @@ COMMENT ON COLUMN user_cards.application_id IS '토스 경유 발급인 경우 �
 COMMENT ON COLUMN user_cards.reissued_from_id IS '분실/만료 재발급 시 이전 카드';
 COMMENT ON COLUMN user_cards.org_card_id IS '마이데이터 카드사 측 card_id (동기화 upsert 키)';
 COMMENT ON COLUMN user_cards.card_number_masked IS '예: 5310-****-****-1234';
-COMMENT ON COLUMN user_cards.expires_at IS '유효기간 (해당 월 말일)';
+COMMENT ON COLUMN user_cards.expires_at IS '유효기간 (해당 월 말일). 더미 resValidPeriod 가 빈 값이면 NULL (기획서 C-2 #6)';
+COMMENT ON COLUMN user_cards.issued_at IS '발급 시각. 더미 resIssueDate 가 빈 값이면 NULL (기획서 C-2 #6)';
 COMMENT ON COLUMN user_cards.linked_account_id IS '체크카드 출금 계좌 / 신용카드 결제 계좌';
 COMMENT ON COLUMN user_cards.payment_day IS '결제일 1~31, 체크카드는 NULL';
 COMMENT ON COLUMN user_cards.credit_limit IS '신용카드만';

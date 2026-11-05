@@ -233,20 +233,21 @@ COMMENT ON COLUMN card_points.expiring_amount IS '소멸 예정 포인트';
 -- 포인트 현금화 (카드사 단위로 1건, 입금은 transactions 의 POINT_CASHOUT 으로 기록)
 CREATE TABLE point_cashouts (
   id             VARCHAR(40)   NOT NULL,
-  card_point_id  VARCHAR(40)   NOT NULL,
+  card_point_id  VARCHAR(40)   NULL,
   account_id     VARCHAR(40)   NOT NULL,
   amount         BIGINT        NOT NULL,
   status         VARCHAR(30)   NOT NULL DEFAULT 'REQUESTED',
   requested_at   TIMESTAMP(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   completed_at   TIMESTAMP(0)  NULL,
   PRIMARY KEY (id),
-  CONSTRAINT fk_cashouts_point FOREIGN KEY (card_point_id) REFERENCES card_points (id),
+  CONSTRAINT fk_cashouts_point FOREIGN KEY (card_point_id) REFERENCES card_points (id) ON DELETE SET NULL,
   CONSTRAINT fk_cashouts_account FOREIGN KEY (account_id) REFERENCES accounts (id),
   CONSTRAINT ck_point_cashouts_status CHECK (status IN ('REQUESTED', 'COMPLETED', 'FAILED'))
 );
 CREATE INDEX idx_cashouts_point ON point_cashouts (card_point_id);
 CREATE INDEX idx_cashouts_account ON point_cashouts (account_id);
 COMMENT ON TABLE point_cashouts IS '포인트 현금화';
+COMMENT ON COLUMN point_cashouts.card_point_id IS '현금화한 포인트. 탈퇴로 card_points 를 지우면 NULL (기록은 보존, 기획서 C-6)';
 COMMENT ON COLUMN point_cashouts.account_id IS '입금 계좌';
 
 -- 카드사별 마이데이터 연동 동의와 토큰

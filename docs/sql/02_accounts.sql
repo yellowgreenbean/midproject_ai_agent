@@ -8,30 +8,30 @@ SET client_encoding = 'UTF8';
 
 -- 계좌 (잔액은 account_balances 에 있음)
 CREATE TABLE accounts (
-  id                   VARCHAR(40)   NOT NULL,
-  user_id              VARCHAR(40)   NOT NULL,
-  resAccount           VARCHAR(20)   NOT NULL,
-  resAccountDisplay    VARCHAR(30)   NOT NULL,
-  resAccountName       VARCHAR(100)  NOT NULL,
-  account_type         VARCHAR(30)   NOT NULL,
-  lifecycle_status     VARCHAR(30)   NOT NULL DEFAULT 'ACTIVE',
-  resAccountNickName   VARCHAR(50)   NULL,
-  is_favorite          BOOLEAN       NOT NULL DEFAULT FALSE,
-  resAccountStartDate  CHAR(8)       NOT NULL,
-  closed_at            CHAR(8)       NULL,
-  version              INT           NOT NULL DEFAULT 0,
+  id                     VARCHAR(40)   NOT NULL,
+  user_id                VARCHAR(40)   NOT NULL,
+  "resAccount"           VARCHAR(20)   NOT NULL,
+  "resAccountDisplay"    VARCHAR(30)   NOT NULL,
+  "resAccountName"       VARCHAR(100)  NOT NULL,
+  account_type           VARCHAR(30)   NOT NULL,
+  lifecycle_status       VARCHAR(30)   NOT NULL DEFAULT 'ACTIVE',
+  "resAccountNickName"   VARCHAR(50)   NULL,
+  is_favorite            BOOLEAN       NOT NULL DEFAULT FALSE,
+  "resAccountStartDate"  CHAR(8)       NOT NULL,
+  closed_at              CHAR(8)       NULL,
+  version                INT           NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
-  CONSTRAINT uk_accounts_res_account UNIQUE (resAccount),
+  CONSTRAINT uk_accounts_res_account UNIQUE ("resAccount"),
   CONSTRAINT fk_accounts_user FOREIGN KEY (user_id) REFERENCES users (id),
   CONSTRAINT ck_accounts_account_type CHECK (account_type IN ('CHECKING', 'SAVINGS')),
   CONSTRAINT ck_accounts_lifecycle_status CHECK (lifecycle_status IN ('ACTIVE', 'SUSPENDED', 'CLOSED'))
 );
-CREATE INDEX idx_accounts_user ON accounts (user_id);
+CREATE INDEX idx_accounts_user_status ON accounts (user_id, lifecycle_status);
 COMMENT ON TABLE accounts IS '계좌';
-COMMENT ON COLUMN accounts.resAccount IS '계좌번호(숫자만)';
-COMMENT ON COLUMN accounts.resAccountDisplay IS '예: 110-00-000001';
-COMMENT ON COLUMN accounts.resAccountName IS '상품명';
-COMMENT ON COLUMN accounts.resAccountStartDate IS 'YYYYMMDD';
+COMMENT ON COLUMN accounts."resAccount" IS '계좌번호(숫자만)';
+COMMENT ON COLUMN accounts."resAccountDisplay" IS '예: 110-00-000001';
+COMMENT ON COLUMN accounts."resAccountName" IS '상품명';
+COMMENT ON COLUMN accounts."resAccountStartDate" IS 'YYYYMMDD';
 COMMENT ON COLUMN accounts.closed_at IS 'YYYYMMDD, 해지 전 NULL';
 COMMENT ON COLUMN accounts.version IS '낙관적 잠금';
 
