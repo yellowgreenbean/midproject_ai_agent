@@ -174,5 +174,5 @@ erDiagram
 
 - 흐름도 2번에 "이체 흐름 3~6단계"로 표시된 부분은 1번 이체 흐름의 금액 입력~비밀번호 입력을 그대로 쓴다는 뜻이라, 별도 테이블은 필요 없습니다.
 - `external_accounts`는 흐름도에만 이름이 나오고 기획서 15장에는 정의가 없습니다. 위 컬럼은 제안이므로 시드 데이터 담당과 확정이 필요합니다.
-- `accounts`의 전체 계좌번호·상태·비밀번호 해시 컬럼은 현재 `docs/schema.sql`에 없습니다(기획서 17장에 이미 체크 항목으로 있음).
+- `accounts`의 전체 계좌번호·상태·비밀번호 해시 컬럼은 옛 `docs/schema.sql`(지움)에 없었습니다. 지금 `docs/sql/02_accounts.sql`에는 전체 계좌번호(`resAccount`)·상태(`lifecycle_status`)가 있고, 비밀번호는 회원 PIN(`pin_credentials.pin_hash`)으로 둡니다(기획서 17장 체크 항목).
 - 예약 송금 상태 3번(PROCESSING)은 `scheduled_transfers.status`이고, 이체 결과 상태(`transfers.status`)와 값 집합이 다릅니다. 실행 한 번마다 `transfers` 한 건이 생겨 두 상태가 짝으로 움직입니다.

@@ -52,7 +52,7 @@
 
 SET client_encoding = 'UTF8';
 
--- 이 DB에 새로 접속하는 모든 세션(01~07 파일, seed.sql, 앱)의 기본 시간대
+-- 이 DB에 새로 접속하는 모든 세션(01~07 파일, load_dummy·seed_scenarios SQL, 앱)의 기본 시간대
 DO $$
 BEGIN
   EXECUTE format('ALTER DATABASE %I SET timezone TO %L', current_database(), 'Asia/Seoul');

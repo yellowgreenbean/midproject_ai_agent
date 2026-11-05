@@ -1,5 +1,5 @@
 # 더미 데이터(data/dummy) → 기획서 스키마(docs/sql) INSERT SQL 만들기 (읽기만 함, DB 에 직접 넣지 않음)
-# 변환 규칙은 docs/기획서.md Part 6 C-2 「더미 → 기획서 변환 규칙」 1~6 을 따른다. seed(generate_seed.py)와 별개.
+# 변환 규칙은 docs/기획서.md Part 6 C-2 「더미 → 기획서 변환 규칙」 1~6 을 따른다. 더미에 없는 기능의 시험용 행은 seed_scenarios.py 가 이 뒤에 덧붙인다.
 #
 # 실행: python3 scripts/load_dummy.py [더미 폴더] > dummy.sql
 #       docker exec -i midproject-postgres psql -U app -d midproject -v ON_ERROR_STOP=1 < dummy.sql
