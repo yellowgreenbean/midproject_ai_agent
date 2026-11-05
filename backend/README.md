@@ -62,6 +62,12 @@ py -3.13 -m venv .venv
 http://localhost:8000/docs 에서 호출. **로그인은 아직 없다** — 지금은 `X-User-Id: user_001` 헤더로 회원을 정한다(`app/deps.py`).
 회원 상태별 허용(기획서 Part 1 7.3): `ACTIVE`·`RESTRICTED` 조회 가능, `PENDING_VERIFICATION` 403, `WITHDRAWN`·없는 회원 401.
 
+**CORS** — 화면(프런트엔드)을 다른 포트로 띄워 이 API 를 부를 수 있게 허용한다(`app/main.py`).
+- 허용 주소: `http://localhost:5173`·`http://127.0.0.1:5173`(Vite), `http://localhost:3000`·`http://127.0.0.1:3000`(Next·CRA).
+  바꾸려면 `backend/.env` 에 `CORS_ORIGINS=주소1,주소2` (`.env.example` 참고).
+- 로그인 쿠키를 주고받도록 `allow_credentials=True` — 그래서 허용 주소를 `*` 로 둘 수 없다.
+  화면에서는 요청마다 쿠키를 같이 보내야 한다: `fetch(url, { credentials: "include" })` / axios `withCredentials: true`.
+
 ## 5. API (기획서 경로)
 | 기능 | 엔드포인트 | 기획서 | 위치 |
 |---|---|---|---|
