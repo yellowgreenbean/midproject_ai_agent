@@ -1,72 +1,73 @@
 -- 두린은행 계좌·거래·상품·카드 서비스 - 목 데이터
 -- scripts/generate_seed.py 로 생성 (users=300, seed=42, 기준 시각 2026-11-03 09:00)
--- docs/schema.sql 실행 후 이 파일을 실행하세요. 다시 실행하면 기존 데이터를 지우고 새로 넣습니다.
+-- PostgreSQL: docs/sql/0*.sql 로 스키마를 만든 뒤 toss_card DB에서 실행하세요.
+--   psql -U postgres -d toss_card -v ON_ERROR_STOP=1 -f docs/seed.sql
+-- 다시 실행하면 기존 데이터를 지우고 새로 넣습니다. 전체가 한 트랜잭션이라 중간에 실패하면 아무것도 바뀌지 않습니다.
 
-SET NAMES utf8mb4;
-USE toss_card;
-SET time_zone = '+09:00';
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE notifications;
-TRUNCATE TABLE mydata_sync_logs;
-TRUNCATE TABLE mydata_consents;
-TRUNCATE TABLE point_cashouts;
-TRUNCATE TABLE card_points;
-TRUNCATE TABLE card_issuance_rankings;
-TRUNCATE TABLE daily_card_spending;
-TRUNCATE TABLE spending_forecasts;
-TRUNCATE TABLE recurring_payments;
-TRUNCATE TABLE card_bill_items;
-TRUNCATE TABLE card_bills;
-TRUNCATE TABLE billing_cycle_rules;
-TRUNCATE TABLE card_transactions;
-TRUNCATE TABLE merchants;
-TRUNCATE TABLE card_terminations;
-TRUNCATE TABLE card_management_logs;
-TRUNCATE TABLE user_card_status_histories;
-TRUNCATE TABLE user_card_settings;
-TRUNCATE TABLE user_cards;
-TRUNCATE TABLE application_term_agreements;
-TRUNCATE TABLE application_status_histories;
-TRUNCATE TABLE card_applications;
-TRUNCATE TABLE card_recommendation_details;
-TRUNCATE TABLE card_recommendations;
-TRUNCATE TABLE promotions;
-TRUNCATE TABLE user_consents;
-TRUNCATE TABLE terms;
-TRUNCATE TABLE card_benefits;
-TRUNCATE TABLE card_performance_tiers;
-TRUNCATE TABLE card_products;
-TRUNCATE TABLE categories;
-TRUNCATE TABLE card_companies;
-TRUNCATE TABLE subscription_payments;
-TRUNCATE TABLE subscriptions;
-TRUNCATE TABLE product_documents;
-TRUNCATE TABLE product_rules;
-TRUNCATE TABLE product_rates;
-TRUNCATE TABLE products;
-TRUNCATE TABLE external_accounts;
-TRUNCATE TABLE transfer_limits;
-TRUNCATE TABLE favorite_accounts;
-TRUNCATE TABLE transactions;
-TRUNCATE TABLE transfers;
-TRUNCATE TABLE scheduled_transfers;
-TRUNCATE TABLE account_balances;
-TRUNCATE TABLE document_issuance_logs;
-TRUNCATE TABLE account_inactivity;
-TRUNCATE TABLE notification_preferences;
-TRUNCATE TABLE account_activity_logs;
-TRUNCATE TABLE accounts;
-TRUNCATE TABLE withdrawal_checks;
-TRUNCATE TABLE step_up_challenges;
-TRUNCATE TABLE auth_audit_logs;
-TRUNCATE TABLE pin_credentials;
-TRUNCATE TABLE sessions;
-TRUNCATE TABLE password_reset_tokens;
-TRUNCATE TABLE email_verifications;
-TRUNCATE TABLE local_credentials;
-TRUNCATE TABLE auth_identities;
-TRUNCATE TABLE users;
-SET FOREIGN_KEY_CHECKS = 1;
+SET client_encoding = 'UTF8';
+SET timezone = 'Asia/Seoul';
+BEGIN;
+TRUNCATE TABLE
+  notifications,
+  mydata_sync_logs,
+  mydata_consents,
+  point_cashouts,
+  card_points,
+  card_issuance_rankings,
+  daily_card_spending,
+  spending_forecasts,
+  recurring_payments,
+  card_bill_items,
+  card_bills,
+  billing_cycle_rules,
+  card_transactions,
+  merchants,
+  card_terminations,
+  card_management_logs,
+  user_card_status_histories,
+  user_card_settings,
+  user_cards,
+  application_term_agreements,
+  application_status_histories,
+  card_applications,
+  card_recommendation_details,
+  card_recommendations,
+  promotions,
+  user_consents,
+  terms,
+  card_benefits,
+  card_performance_tiers,
+  card_products,
+  categories,
+  card_companies,
+  subscription_payments,
+  subscriptions,
+  product_documents,
+  product_rules,
+  product_rates,
+  products,
+  external_accounts,
+  transfer_limits,
+  favorite_accounts,
+  transactions,
+  transfers,
+  scheduled_transfers,
+  account_balances,
+  document_issuance_logs,
+  account_inactivity,
+  notification_preferences,
+  account_activity_logs,
+  accounts,
+  withdrawal_checks,
+  step_up_challenges,
+  auth_audit_logs,
+  pin_credentials,
+  sessions,
+  password_reset_tokens,
+  email_verifications,
+  local_credentials,
+  auth_identities,
+  users;
 
 -- users: 300건
 INSERT INTO users (id, username, name, email, email_verified_at, birth_date, gender, payday, status, created_at, withdrawn_at) VALUES
@@ -197509,3 +197510,5 @@ INSERT INTO notifications (id, user_id, account_id, user_card_id, event_id, type
 ('ntf_1062', 'user_286', NULL, 'card_0804', 'card_0804:20261103', 'UNUSED_CARD', '60일 넘게 안 쓴 카드가 있어요', '신한 SOL Travel Check(3781)를 오래 안 쓰셨어요.', 'SENT', NULL, '2026-11-03 08:30:00'),
 ('ntf_1063', 'user_123', NULL, 'card_0573', 'ctx_54543', 'TRANSACTION', '결제 알림', '이디야커피 5,090원 결제 (신한 SOL Travel Check(2723))', 'SENT', NULL, '2026-11-03 08:42:06'),
 ('ntf_1064', 'user_120', NULL, 'card_0569', 'ctx_54544', 'TRANSACTION', '결제 알림', 'GS25 2,980원 결제 (BC 바로 Plus(9911))', 'SENT', NULL, '2026-11-03 08:52:55');
+
+COMMIT;

@@ -1,6 +1,6 @@
 """두린은행 계좌·거래·상품·카드 서비스 - 목(mock) 데이터 생성기
 
-docs/schema.sql 로 만든 DB에 넣을 INSERT 문(docs/seed.sql)을 만듭니다.
+docs/sql/0*.sql 로 만든 PostgreSQL DB(toss_card)에 넣을 INSERT 문(docs/seed.sql)을 만듭니다.
 
     py scripts/generate_seed.py                 # 회원 300명, seed 42
     py scripts/generate_seed.py --users 100     # 회원 수 조절
@@ -36,7 +36,8 @@ HOLIDAYS = {date(2026, 5, 5), date(2026, 5, 24), date(2026, 5, 25), date(2026, 6
             date(2026, 8, 15), date(2026, 8, 17), date(2026, 9, 24), date(2026, 9, 25), date(2026, 9, 26),
             date(2026, 10, 3), date(2026, 10, 5), date(2026, 10, 9)}
 
-# INSERT 순서 = FK 의존 순서 (docs/schema.sql 과 같은 순서, card_applications 보다 추천이 먼저)
+# INSERT 순서 = FK 의존 순서 (docs/sql/01~07 과 같은 순서, card_applications 보다 추천이 먼저)
+# PostgreSQL 은 FK 검사를 끌 수 없으므로 이 순서가 틀리면 seed.sql 실행이 실패함
 TABLE_ORDER = [
     # 1. 회원·인증
     "users", "auth_identities", "local_credentials", "email_verifications", "password_reset_tokens",
@@ -450,7 +451,8 @@ def sql_value(v):
         return f"'{v:%Y-%m-%d %H:%M:%S}'"
     if isinstance(v, date):
         return f"'{v:%Y-%m-%d}'"
-    return "'" + str(v).replace("\\", "\\\\").replace("'", "''") + "'"
+    # PostgreSQL 기본(standard_conforming_strings = on)은 \ 를 특수 문자로 보지 않으므로 ' 만 두 번 씀
+    return "'" + str(v).replace("'", "''") + "'"
 
 
 # ---------------------------------------------------------------------------
@@ -2019,15 +2021,16 @@ class SeedBuilder:
         lines = [
             "-- 두린은행 계좌·거래·상품·카드 서비스 - 목 데이터",
             f"-- scripts/generate_seed.py 로 생성 (users={self.n_users}, seed={self.seed}, 기준 시각 {NOW:%Y-%m-%d %H:%M})",
-            "-- docs/schema.sql 실행 후 이 파일을 실행하세요. 다시 실행하면 기존 데이터를 지우고 새로 넣습니다.",
+            "-- PostgreSQL: docs/sql/0*.sql 로 스키마를 만든 뒤 toss_card DB에서 실행하세요.",
+            "--   psql -U postgres -d toss_card -v ON_ERROR_STOP=1 -f docs/seed.sql",
+            "-- 다시 실행하면 기존 데이터를 지우고 새로 넣습니다. 전체가 한 트랜잭션이라 중간에 실패하면 아무것도 바뀌지 않습니다.",
             "",
-            "SET NAMES utf8mb4;",
-            "USE toss_card;",
-            "SET time_zone = '+09:00';",
-            "SET FOREIGN_KEY_CHECKS = 0;",
+            "SET client_encoding = 'UTF8';",
+            "SET timezone = 'Asia/Seoul';",
+            "BEGIN;",
+            # FK로 서로 묶인 표는 한 문장에서 함께 비워야 함 (FK 검사는 켜 둔 채, INSERT 는 FK 순서)
+            "TRUNCATE TABLE\n  " + ",\n  ".join(reversed(TABLE_ORDER)) + ";",
         ]
-        lines += [f"TRUNCATE TABLE {t};" for t in reversed(TABLE_ORDER)]
-        lines.append("SET FOREIGN_KEY_CHECKS = 1;")
         for table in TABLE_ORDER:
             rows = self.rows[table]
             if not rows:
@@ -2037,6 +2040,7 @@ class SeedBuilder:
             for i in range(0, len(rows), 500):
                 values = ",\n".join("(" + ", ".join(sql_value(r[c]) for c in cols) + ")" for r in rows[i:i + 500])
                 lines.append(f"INSERT INTO {table} ({', '.join(cols)}) VALUES\n{values};")
+        lines.append("\nCOMMIT;")
         Path(path).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
