@@ -1,12 +1,12 @@
 # 테이블 관계도 (ERD)
 
-2026-11-04 · 기준: `docs/회원_계좌기능_기획서.md`(6.3·8.4 컬럼 사전), `docs/거래_카드기능_기획서.md`(파트 A·B, 이름 규칙 C-5), `docs/은행_상품_기획안.md`(6장). 카드 테이블의 칸은 팀 브랜치 `docs/schema.sql`을 C-5 규칙으로 바꾼 이름입니다.
+2026-11-04 · 기준: `docs/기획서.md` — Part 1 6.3·Part 2 8.4(컬럼 사전), Part 3 6장, Part 4·5(카드·거래), Part 6 C-5(이름 규칙). 카드 테이블의 칸은 팀 브랜치 `docs/schema.sql`을 C-5 규칙으로 바꾼 이름입니다.
 
 **읽는 법**
 
 - 테이블이 약 60개라 한 장에 그리지 않고 **파트별 그림 6장 + 전체 연결 그림 1장**으로 나눴습니다. 다른 파트 테이블은 그림 안에서 칸 없이 이름만 나옵니다.
 - `PK` = 그 테이블의 고유 번호, `FK` = 다른 테이블을 가리키는 칸. 선 끝 모양: `||` 꼭 1개, `o|` 0 또는 1개, `o{` 0개 이상.
-- ID는 문자열(`user_001` 등), 금액은 원 단위 정수, 시각은 `+09:00`, 우리가 만든 빈 칸은 `null`입니다(C-5). 카드 테이블과 일부 거래 테이블(`scheduled_transfers`)은 주요 칸만 적었습니다. 전체 칸은 각 기획서에 있습니다.
+- ID는 문자열(`user_001` 등), 금액은 원 단위 정수, 시각은 `+09:00`, 우리가 만든 빈 칸은 `null`입니다(C-5). 카드 테이블과 일부 거래 테이블(`scheduled_transfers`)은 주요 칸만 적었습니다. 전체 칸은 `docs/기획서.md`의 각 Part에 있습니다.
 - 그림에는 **실제 참조(FK)만** 그렸습니다. "카드 대금 → 거래 원장 기록"처럼 API로 이어지는 연결은 맨 아래 표에 있습니다.
 
 ---
@@ -39,7 +39,7 @@ erDiagram
 
 ---
 
-## 1. 회원·인증 (회원·계좌 기획서 6장)
+## 1. 회원·인증 (기획서 Part 1 6장)
 
 ```mermaid
 erDiagram
@@ -164,7 +164,7 @@ erDiagram
 
 ---
 
-## 2. 계좌 (회원·계좌 기획서 8장)
+## 2. 계좌 (기획서 Part 2 8장)
 
 ```mermaid
 erDiagram
@@ -248,7 +248,7 @@ erDiagram
 
 ---
 
-## 3. 거래 (거래·카드 기획서 파트 B 15장)
+## 3. 거래 (기획서 Part 5 15장)
 
 ```mermaid
 erDiagram
@@ -349,7 +349,7 @@ erDiagram
 
 ---
 
-## 4. 예금·적금 상품 (상품 기획안 6장)
+## 4. 예금·적금 상품 (기획서 Part 3 6장)
 
 ```mermaid
 erDiagram
@@ -422,7 +422,7 @@ erDiagram
 
 ---
 
-## 5. 카드 — 상품·발급·보유 (파트 A 1-2·1-3·1-7)
+## 5. 카드 — 상품·발급·보유 (기획서 Part 4 1-2·1-3·1-7)
 
 ```mermaid
 erDiagram
@@ -581,7 +581,7 @@ erDiagram
 
 ---
 
-## 6. 카드 — 이용·청구·분석·포인트 (파트 A 1-1·1-4~1-6)
+## 6. 카드 — 이용·청구·분석·포인트 (기획서 Part 4 1-1·1-4~1-6)
 
 ```mermaid
 erDiagram
@@ -743,10 +743,10 @@ erDiagram
 
 | 어디서 | 어디로 | 무엇을 | 근거 |
 |---|---|---|---|
-| 카드 대금 결제·체크카드 결제 (`card_bills`, `card_transactions`) | `transactions` | `CARD_PAYMENT` 출금 기록 | 거래·카드 기획서 3장·1-7 |
+| 카드 대금 결제·체크카드 결제 (`card_bills`, `card_transactions`) | `transactions` | `CARD_PAYMENT` 출금 기록 | Part 5 3장·Part 4 1-7 |
 | 포인트 현금화 (`point_cashouts`) | `transactions` | `POINT_CASHOUT` 입금 기록 | 1-1-7 |
-| 예금·적금 가입·납입 (`subscriptions`, `subscription_payments`) | `transactions` | `SUBSCRIPTION_PAYMENT` 출금 기록 | 상품 기획안 PROD-F08 |
+| 예금·적금 가입·납입 (`subscriptions`, `subscription_payments`) | `transactions` | `SUBSCRIPTION_PAYMENT` 출금 기록 | Part 3 PROD-F08 |
 | 중도 해지·만기 (`subscriptions`) | `transactions` | `SUBSCRIPTION_PAYOUT` 입금 기록 | PROD-F10·F11 |
-| `transactions` | `notifications` | 거래 확정 이벤트 → 입출금 알림 (`event_id`) | 회원·계좌 기획서 10장 |
+| `transactions` | `notifications` | 거래 확정 이벤트 → 입출금 알림 (`event_id`) | Part 2 10장 |
 | 회원 탈퇴 점검 (`withdrawal_checks`) | 계좌·거래·카드·상품 | 남은 잔액(`account-readiness`), 처리중·예약 이체(`transfer-blockers`), 해지 안 된 카드(`card-blockers`), 진행 중 예금·적금(`subscription-blockers`) — 모두 `/internal/users/{userId}/…` | AUTH-F09 |
 | 계좌 해지 점검 (`accounts`) | 거래·카드·상품 | 처리중·예약 이체, 연결된 카드(`linked-cards`), 이 계좌가 출금 계좌인 계약 — 모두 `/internal/accounts/{accountId}/…` | ACCT-F05 |
