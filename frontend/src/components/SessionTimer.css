@@ -1,0 +1,56 @@
+/* 「로그인 연장」 창 — 버튼 모양은 SignupPage.css 의 btn-primary · btn-secondary */
+.session-dialog {
+  width: min(calc(100% - 2 * var(--space-4)), 400px);
+  padding: var(--space-6);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-sans);
+}
+.session-dialog::backdrop { background: var(--color-overlay); }
+.session-dialog h2 { margin: 0 0 var(--space-2); font-size: var(--text-xl); }
+.session-dialog p { margin: 0 0 var(--space-6); color: var(--color-text-sub); font-size: var(--text-md); line-height: 1.6; }
+.session-count { color: var(--color-danger); font-variant-numeric: tabular-nums; }
+.session-actions { display: flex; flex-direction: column; gap: var(--space-2); }
+.session-actions .btn-secondary { width: 100%; }
+
+/* 오른쪽 위 남은 시간 + 연장 (SessionBadge). 휴대폰 폭에선 머리 줄 아래 한 줄로 (.topbar 는 HomePage.css 에서 줄바꿈 허용) */
+/* 알약 버튼 하나: [시계 남은시간 | 연장] — 어디를 눌러도 연장 */
+.session-badge {
+  order: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  margin-left: auto; /* 휴대폰: 아래 줄 오른쪽 끝 */
+  padding: 0 var(--space-1) 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-sub);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.session-badge-time { font-variant-numeric: tabular-nums; }
+.session-badge-act {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+}
+.session-badge:hover:not(:disabled) { border-color: var(--color-primary); }
+.session-badge:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.session-badge:disabled { cursor: wait; opacity: 0.7; }
+.session-badge.is-urgent { border-color: var(--color-danger); color: var(--color-danger); font-weight: var(--weight-bold); }
+.session-badge.is-urgent .session-badge-act { background: var(--color-danger); color: var(--color-on-primary); }
+@media (min-width: 768px) {
+  .session-badge { order: 0; margin-left: 0; }
+}

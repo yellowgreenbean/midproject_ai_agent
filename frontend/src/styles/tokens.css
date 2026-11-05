@@ -1,0 +1,61 @@
+/* 디자인 토큰 — 색·간격·글꼴·둥글기는 여기서만 정한다 (docs/design/main-home.webp 에서 뽑음) */
+:root {
+  --color-primary: #1f6bff;
+  --color-primary-strong: #1556d6;
+  --color-primary-soft: #eaf1ff;
+  --color-bg: #f5f8ff;
+  --color-surface: #ffffff;
+  --color-border: #e3e9f3;
+  --color-border-strong: #c9d4e5;
+  --color-text: #111827;
+  --color-text-sub: #4b5563;
+  --color-text-muted: #8a94a6;
+  --color-success: #12a150;
+  --color-success-soft: #e9f7ef;
+  --color-deposit: #24408e; /* 정기예금 — 금고 아이콘의 남색 */
+  --color-deposit-soft: #eef2fb;
+  --color-installment: #13804a; /* 적금 — 새싹 아이콘의 초록 */
+  --color-installment-soft: #ecf7f0;
+  --color-savings-soft: #e8f7f5; /* 저축예금 — 민트 통장 */
+  --color-warning: #c2410c; /* 일시정지 같은 주의 상태 */
+  --color-warning-soft: #fff1e6;
+  --color-danger: #e5484d;
+  --color-danger-soft: #fdeeee;
+  --color-on-primary: #ffffff;
+  --color-disabled: #c7d3ea;
+  --color-overlay: rgba(17, 24, 39, 0.45); /* 창 뒤를 어둡게 (로그인 연장 창) */
+  --gradient-brand: linear-gradient(160deg, #eef4ff 0%, #dce8ff 55%, #f7faff 100%);
+  --shadow-card: 0 8px 28px rgba(31, 107, 255, 0.08);
+  --shadow-pop: 0 24px 60px rgba(17, 24, 39, 0.22); /* 떠 있는 창 (챗봇) */
+  --shadow-focus: 0 0 0 3px rgba(31, 107, 255, 0.22);
+  --icon-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%234b5563' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --weight-medium: 500;
+  --weight-bold: 700;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  --radius-xs: 5px; /* 작은 카드 썸네일 */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  --control-height: 52px;
+  --form-max-width: 520px;
+  --brand-panel-width: 440px;
+}

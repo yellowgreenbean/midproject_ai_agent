@@ -1,0 +1,88 @@
+/* 카드 화면 (CardsPage · CardDetailPage · CardBillPage · CardApplyPage) — 기본 모양은 ProductPages.css · AccountPages.css 를 같이 쓴다 */
+
+/* 카드 목록 한 줄 — 카드 앞면 · 이름 · 낼 돈/쓴 돈 */
+.card-row-art { grid-row: span 2; width: 72px; aspect-ratio: 1.586; object-fit: cover; border-radius: var(--radius-xs); box-shadow: var(--shadow-card); }
+.card-row-amount { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-1); grid-column: 2; }
+.card-row-amount strong { font-size: var(--text-lg); letter-spacing: -0.02em; white-space: nowrap; }
+.card-row-amount small { color: var(--color-text-muted); font-size: var(--text-xs); white-space: nowrap; }
+.acct-card.is-terminated .card-row-art,
+.acct-card.is-suspended .card-row-art,
+.acct-card.is-lost .card-row-art,
+.acct-card.is-expired .card-row-art { filter: grayscale(0.8); opacity: 0.7; }
+
+/* 결제 캘린더 — 결제일별 한 판 */
+.card-calendar { display: grid; gap: var(--space-3); }
+.card-day-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4) var(--space-4) var(--space-2);
+  font-size: var(--text-md);
+}
+.card-day-head small { margin-left: var(--space-1); color: var(--color-primary); font-size: var(--text-xs); font-weight: var(--weight-bold); }
+.card-day-head strong { font-size: var(--text-lg); white-space: nowrap; }
+.card-day .rows li:first-child { border-top: 1px solid var(--color-border); }
+.card-bill-amount { display: flex; flex: none; flex-direction: column; align-items: flex-end; gap: var(--space-1); }
+.card-bill-amount strong { white-space: nowrap; }
+.card-bill-status { padding: 0 var(--space-2); border-radius: var(--radius-full); background: var(--color-bg); color: var(--color-text-sub); font-size: var(--text-xs); font-weight: var(--weight-bold); white-space: nowrap; }
+.card-bill-status.is-confirmed { background: var(--color-primary-soft); color: var(--color-primary); }
+.card-bill-status.is-overdue { background: var(--color-danger-soft); color: var(--color-danger); }
+.card-bill-status.is-paid { color: var(--color-success); }
+.card-warn { color: var(--color-warning); font-weight: var(--weight-medium); }
+.card-day .row-main small { white-space: normal; } /* 이용 기간·계좌번호가 휴대폰 폭에서 줄바꿈되게 */
+.card-bill-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+.card-bill-item > strong { flex: none; white-space: nowrap; }
+
+/* 상세 맨 위 — 카드 앞면을 크게 */
+.card-hero.is-check { background: var(--color-primary-soft); }
+.card-hero.is-credit { background: var(--color-deposit-soft); }
+.card-hero-art { width: 120px; aspect-ratio: 1.586; object-fit: cover; border-radius: var(--radius-sm); box-shadow: var(--shadow-card); }
+.card-hero .pc-tag { color: var(--color-primary); }
+.card-hero.is-credit .pc-tag { color: var(--color-deposit); }
+
+/* 이용 내역 — 분류별 합계 칩(누르면 거르기) */
+.card-cats { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
+.card-cats-total { flex: 1 1 100%; margin: 0; color: var(--color-text-sub); font-size: var(--text-sm); }
+.card-cats-total strong { color: var(--color-text); font-size: var(--text-md); }
+.card-cats .prod-chip { height: 34px; padding: 0 var(--space-3); }
+.acct-tx-row.is-canceled .acct-tx-amount strong { color: var(--color-text-muted); text-decoration: line-through; }
+.card-canceled { color: var(--color-danger); }
+
+.card-benefits li { padding: var(--space-3) var(--space-4); }
+.card-reasons { display: grid; gap: 0; margin: 0; padding: 0; border: 0; min-width: 0; }
+.btn-primary.is-danger { background: var(--color-danger); }
+.btn-primary.is-danger:hover:not(:disabled) { background: var(--color-danger); filter: brightness(0.92); }
+
+/* 신청 · 배송 조회 */
+.card-app { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); }
+.card-app-head { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.card-app-actions { display: flex; flex-direction: column; gap: var(--space-2); }
+.card-steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
+.card-steps li {
+  padding-top: var(--space-2);
+  border-top: 4px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.card-steps li.is-done { border-color: var(--color-primary); color: var(--color-text-sub); }
+.card-steps li.is-now { border-color: var(--color-primary); color: var(--color-primary); font-weight: var(--weight-bold); }
+
+/* 카드 고르기 — 계좌 개설의 큰 카드 고르기와 같은 모양 */
+.card-type-art { width: 120px; aspect-ratio: 1.586; object-fit: cover; border-radius: var(--radius-sm); box-shadow: var(--shadow-card); }
+.card-type.is-on { background: var(--color-primary-soft); }
+.card-type.is-held { cursor: not-allowed; opacity: 0.6; }
+.card-done-art { width: 180px; aspect-ratio: 1.586; object-fit: cover; border-radius: var(--radius-md); box-shadow: var(--shadow-card); }
+.card-done { background: var(--color-primary-soft); }
+.card-done .card-steps { width: 100%; max-width: 480px; margin-top: var(--space-4); }
+
+@media (min-width: 768px) {
+  .card-row-art { grid-row: auto; width: 112px; }
+  .card-row-amount { grid-column: auto; align-items: flex-end; }
+  .card-row-amount strong { font-size: var(--text-xl); }
+  .card-hero-art { width: 200px; }
+  .card-steps li { font-size: var(--text-sm); }
+}

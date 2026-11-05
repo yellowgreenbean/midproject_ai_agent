@@ -1,0 +1,225 @@
+/* 송금 · 이체 결과 — 공통 부품은 ProductPages.css(prod-*)와 HomePage.css(rows)를 그대로 쓴다 */
+.trf-row { display: flex; gap: var(--space-2); }
+.trf-row .input { flex: 1; min-width: 0; }
+
+/* 재확인 화면의 큰 금액 — 경고가 있으면 빨갛게 (금액 오입력 방지, Part 5 4장) */
+.trf-big {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+}
+.trf-big small { color: var(--color-text-sub); font-size: var(--text-sm); font-weight: normal; }
+.trf-big.is-warn { color: var(--color-danger); }
+
+.trf-status { align-self: flex-start; margin: 0; font-size: var(--text-sm); font-weight: var(--weight-bold); }
+.trf-status.is-success { color: var(--color-success); }
+.trf-status.is-failed { color: var(--color-danger); }
+.trf-status.is-pending { color: var(--color-text-sub); }
+.trf-item-side { display: flex; flex-direction: column; align-items: flex-end; flex: none; }
+/* 간편 송금 — 받는 계좌 고르기 (추천 · 자주 · 내 계좌) */
+.trf-picks { display: flex; flex-direction: column; gap: var(--space-2); }
+.trf-pick-list { list-style: none; margin: 0; padding: 0; }
+.trf-pick-list li { display: flex; align-items: center; gap: var(--space-2); }
+.trf-pick-list li + li { border-top: 1px solid var(--color-border); }
+.trf-pick {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+button.trf-pick { flex-direction: row; align-items: center; gap: var(--space-3); }
+.trf-pick small { max-width: 100%; overflow: hidden; color: var(--color-text-sub); font-size: var(--text-xs); text-overflow: ellipsis; white-space: nowrap; }
+.trf-pick:focus-visible,
+.trf-star:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.trf-star { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border: 0; border-radius: var(--radius-full); background: none; color: var(--color-text-sub); cursor: pointer; }
+.trf-star.is-on { color: var(--color-primary); }
+.trf-star.is-on svg { fill: currentColor; }
+.trf-tabs-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.trf-edit { flex: none; height: 40px; padding: 0 var(--space-2); border: 0; background: none; color: var(--color-primary); font: inherit; font-size: var(--text-sm); font-weight: var(--weight-medium); cursor: pointer; }
+.trf-edit:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.trf-nick { height: 40px; }
+.trf-up svg { transform: rotate(-90deg); }
+.trf-down svg { transform: rotate(90deg); }
+.trf-star:disabled { opacity: 0.3; cursor: default; }
+
+/* ── 송금 3단계: 누구에게 → 얼마 → 보낼까요 (한 화면에 질문 하나) ── */
+.trf-step { display: flex; flex-direction: column; gap: var(--space-4); width: 100%; max-width: 560px; margin: 0 auto; }
+.trf-steps { display: flex; gap: var(--space-1); margin: 0; }
+.trf-steps span { width: 28px; height: 4px; border-radius: var(--radius-full); background: var(--color-border); }
+.trf-steps span.is-on { background: var(--color-primary); }
+.trf-q { margin: 0; font-size: var(--text-2xl); font-weight: var(--weight-bold); letter-spacing: -0.02em; line-height: 1.35; }
+
+/* 1단계 — 보내는 계좌 · 받는 계좌 */
+.trf-from,
+.trf-to { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-5); }
+.trf-from-bal { margin: 0; color: var(--color-text-sub); font-size: var(--text-sm); }
+.trf-from-bal strong { color: var(--color-text); }
+/* 받는 분 계좌 — 은행 줄 + 큰 번호 칸(안에 지우기·확인) */
+.trf-to .field-label { margin: 0; }
+.trf-bank { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-bg); }
+.trf-bank img { flex: none; }
+.trf-to-box { position: relative; display: flex; align-items: center; }
+.trf-to-input { height: 64px; padding-right: 120px; font-size: var(--text-md); font-weight: var(--weight-bold); font-variant-numeric: tabular-nums; }
+.trf-to-input::placeholder { font-size: var(--text-md); font-weight: normal; letter-spacing: 0; }
+.trf-verify {
+  position: absolute;
+  right: var(--space-2);
+  height: 48px;
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+.trf-verify:disabled { background: var(--color-disabled); cursor: not-allowed; }
+.trf-verify:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.trf-clear {
+  position: absolute;
+  right: 96px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  color: var(--color-text-sub);
+  font: inherit;
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+}
+.trf-clear:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.trf-pick-panel { padding: var(--space-4) var(--space-5); }
+.trf-empty { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-8) var(--space-4); color: var(--color-text-muted); font-size: var(--text-sm); text-align: center; }
+.trf-empty p { margin: 0; }
+.trf-empty-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: var(--radius-full); background: var(--color-primary-soft); color: var(--color-primary); }
+/* 이름 첫 글자 동그라미 */
+.trf-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: var(--weight-bold);
+}
+.trf-avatar.tone-mine { background: var(--color-savings-soft); color: var(--color-installment); }
+.trf-avatar.tone-0 { background: var(--color-primary-soft); color: var(--color-primary); }
+.trf-avatar.tone-1 { background: var(--color-warning-soft); color: var(--color-warning); }
+.trf-avatar.tone-2 { background: var(--color-installment-soft); color: var(--color-installment); }
+.trf-avatar.tone-3 { background: var(--color-deposit-soft); color: var(--color-deposit); }
+.trf-avatar.tone-4 { background: var(--color-danger-soft); color: var(--color-danger); }
+
+/* 바깥 틀 — 휴대폰은 위아래, PC(1024px~)는 왼쪽 진행 · 오른쪽 영수증 */
+.trf-layout { display: flex; flex-direction: column; gap: var(--space-5); }
+
+/* 보내는 계좌 — 통장 그림 카드 중 고르기 (카드 전체가 라디오) */
+.trf-from-list { display: grid; gap: var(--space-2); margin: 0; padding: 0; border: 0; min-width: 0; }
+.trf-from-list legend { margin-bottom: var(--space-2); padding: 0; }
+.trf-from-card { position: relative; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border: 2px solid transparent; cursor: pointer; }
+.trf-from-card.is-on { border-color: var(--color-primary); background: var(--color-primary-soft); }
+.trf-from-card:has(input:focus-visible) { box-shadow: var(--shadow-focus); }
+.trf-from-card input { position: absolute; opacity: 0; pointer-events: none; }
+.trf-from-art { flex: none; width: 56px; height: 56px; object-fit: contain; }
+.trf-from-bal { flex: none; font-size: var(--text-md); white-space: nowrap; }
+
+/* 영수증 — 보내는 내용 */
+.trf-receipt { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-5); background: var(--gradient-brand); }
+.trf-receipt-title { margin: 0; font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--color-text-sub); }
+.trf-receipt-from { display: flex; align-items: center; gap: var(--space-3); }
+.trf-receipt-from img { flex: none; width: 72px; height: 72px; object-fit: contain; }
+.trf-receipt-dl { display: flex; flex-direction: column; gap: var(--space-2); margin: 0; padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-surface); }
+.trf-receipt-dl > div { display: flex; justify-content: space-between; gap: var(--space-3); font-size: var(--text-sm); }
+.trf-receipt-dl dt { color: var(--color-text-muted); }
+.trf-receipt-dl dd { margin: 0; min-width: 0; font-weight: var(--weight-medium); text-align: right; overflow-wrap: anywhere; }
+.trf-receipt-dl > .is-total { margin-top: var(--space-1); padding-top: var(--space-3); border-top: 1px dashed var(--color-border-strong); font-size: var(--text-md); }
+.trf-receipt-dl > .is-total dd { font-weight: var(--weight-bold); }
+.trf-receipt-dl dd.is-over { color: var(--color-danger); }
+
+/* 숫자 키패드 (토스처럼) — 누르면 금액 끝에 붙는다 */
+.trf-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-1); margin-top: var(--space-2); }
+.trf-keypad button {
+  height: 52px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+.trf-keypad button:hover { background: var(--color-bg); }
+.trf-keypad button:active { background: var(--color-primary-soft); }
+.trf-keypad button:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.trf-keypad button svg { transform: rotate(180deg); }
+.trf-pick-list li > .trf-avatar { margin-right: var(--space-1); }
+
+/* 2단계 — 받는 분 줄 · 큰 금액 · 빠른 금액 버튼 */
+.trf-who-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); }
+.trf-who { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+.trf-amount { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-6) var(--space-5); }
+.trf-amount-box { display: flex; align-items: baseline; gap: var(--space-2); padding-bottom: var(--space-2); border-bottom: 2px solid var(--color-border); }
+.trf-amount-box:focus-within { border-color: var(--color-primary); }
+.trf-amount-box.is-error { border-color: var(--color-danger); }
+.trf-amount-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.trf-amount-input::placeholder { color: var(--color-disabled); }
+.trf-amount-unit { color: var(--color-text-sub); font-size: var(--text-xl); font-weight: var(--weight-bold); }
+.trf-amount-ko { margin: 0; min-height: 1.4em; color: var(--color-text-sub); font-size: var(--text-sm); }
+.trf-quick { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.trf-quick .prod-chip { height: 36px; padding: 0 var(--space-3); }
+.trf-more summary { display: flex; align-items: center; gap: var(--space-1); padding: var(--space-4) var(--space-5); color: var(--color-text-sub); font-size: var(--text-sm); font-weight: var(--weight-medium); list-style: none; cursor: pointer; }
+.trf-more summary::-webkit-details-marker { display: none; }
+.trf-more summary > svg { margin-left: auto; transform: rotate(90deg); transition: transform 0.15s ease; }
+.trf-more[open] summary > svg { transform: rotate(-90deg); }
+.trf-more-body { display: flex; flex-direction: column; gap: var(--space-3); padding: 0 var(--space-5) var(--space-5); }
+
+/* 3단계 — 「○○님께 ○원 보낼까요?」 */
+.trf-confirm { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); padding: var(--space-8) var(--space-5) var(--space-5); text-align: center; }
+.trf-confirm > .trf-avatar { width: 56px; height: 56px; font-size: var(--text-xl); }
+.trf-confirm .trf-big { display: inline; font-size: var(--text-2xl); }
+.trf-confirm-info { width: 100%; padding: 0; text-align: left; }
+.trf-auth { padding: var(--space-5); }
+.trf-actions { display: grid; grid-template-columns: auto 1fr; gap: var(--space-2); }
+.trf-actions .btn-secondary { height: 56px; }
+@media (prefers-reduced-motion: reduce) {
+  .trf-more summary > svg { transition: none; }
+}
+@media (min-width: 768px) {
+  .trf-confirm-info { grid-template-columns: 1fr 1fr; }
+  .trf-to-input { padding-right: 128px; font-size: var(--text-xl); letter-spacing: 0.04em; }
+}
+@media (min-width: 1024px) {
+  .trf-layout { flex-direction: row; align-items: flex-start; justify-content: center; gap: var(--space-6); }
+  .trf-layout .trf-step { flex: 1; margin: 0; }
+  .trf-receipt { position: sticky; top: var(--space-6); flex: none; width: 320px; margin-top: var(--space-6); }
+}

@@ -1,0 +1,95 @@
+@import './styles/tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* 가운데 카드 한 장 화면 (가입 완료 · 준비 중) */
+.signup-done {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+}
+.done-card {
+  width: 100%;
+  max-width: var(--form-max-width);
+  text-align: center;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-10) var(--space-6);
+}
+.done-card h1 { font-size: var(--text-xl); margin: var(--space-4) 0 var(--space-2); }
+.done-card p { color: var(--color-text-sub); margin: 0; }
+.done-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: var(--text-2xl);
+}
+.done-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: var(--space-6) 0 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  text-align: left;
+  font-size: var(--text-sm);
+}
+.done-info dt { color: var(--color-text-muted); }
+.done-info dd { margin: 0; font-weight: var(--weight-medium); overflow-wrap: anywhere; }
+
+.done-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  margin-top: var(--space-6);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: var(--weight-bold);
+  text-decoration: none;
+}
+.done-action:hover { background: var(--color-primary-strong); }
+.done-action:focus-visible { outline: none; box-shadow: var(--shadow-focus); }

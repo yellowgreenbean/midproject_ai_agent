@@ -1,0 +1,28 @@
+/* 로그인 — 가운데 카드 한 장 (입력칸·버튼 모양은 SignupPage.css 를 같이 쓴다) */
+.login-card { display: flex; flex-direction: column; gap: var(--space-2); }
+.login-brand { align-self: center; margin-bottom: var(--space-2); }
+.login-card h1 { margin-top: 0; }
+.login-notice {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+  font-size: var(--text-sm);
+}
+.login-fields { display: flex; flex-direction: column; gap: var(--space-2); margin: var(--space-6) 0 var(--space-2); text-align: left; }
+.login-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+}
+.login-links a { color: var(--color-text-sub); text-decoration: none; }
+.login-links a:hover { color: var(--color-primary); }
+.login-links a:focus-visible { outline: none; box-shadow: var(--shadow-focus); border-radius: var(--radius-sm); }
+.login-links a:last-child { color: var(--color-primary); font-weight: var(--weight-bold); }
+/* 아이디 찾기 결과 — 가린 아이디 목록 */
+.login-found { padding: 0; list-style: none; }
+.login-found li { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-bg); }
+.login-found small { color: var(--color-text-muted); font-size: var(--text-xs); }

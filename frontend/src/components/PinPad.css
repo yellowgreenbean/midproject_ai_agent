@@ -1,0 +1,27 @@
+/* 6자리 키패드 — 동그라미 6개 + 섞인 숫자 3×4 */
+.pin { display: flex; flex-direction: column; gap: var(--space-3); }
+.pin-dots { position: relative; display: flex; justify-content: center; gap: var(--space-3); padding: var(--space-3) 0; }
+.pin-dots span { width: 14px; height: 14px; border-radius: var(--radius-full); background: var(--color-border-strong); transition: background 0.1s ease; }
+.pin-dots span.is-on { background: var(--color-primary); }
+/* 진짜 입력칸은 동그라미 위에 투명하게 — 눌러서 키보드로 칠 수 있고, 화면 읽기 프로그램은 비밀번호 칸으로 읽는다 */
+.pin-input { position: absolute; inset: 0; width: 100%; border: 0; border-radius: var(--radius-md); background: transparent; color: transparent; caret-color: transparent; font-size: var(--text-md); }
+.pin-input:focus { outline: none; box-shadow: var(--shadow-focus); }
+.pin-input[aria-invalid='true'] + * { color: var(--color-danger); }
+.pin-keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
+.pin-keys button {
+  min-height: var(--control-height);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+.pin-keys button.pin-key-sub { color: var(--color-text-sub); font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.pin-keys button:active { background: var(--color-primary-soft); }
+.pin-keys button:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+@media (prefers-reduced-motion: reduce) {
+  .pin-dots span { transition: none; }
+}
