@@ -1,11 +1,18 @@
-"""API 응답 모양. 칸 이름은 ERD 1.md 와 같다."""
+"""API 응답 모양 — 기획서 Part 6 C-5 「이름·형식 규칙」을 따른다.
 
-from datetime import datetime, timedelta, timezone
-from typing import Annotated
+- 이름: snake_case, 단 계좌·CODEF 에서 온 칸은 CODEF 이름 그대로(resAccount ...)
+- 금액: DB 는 원 단위 정수, API 응답은 문자열   → Money          "amount": "50000"
+- 시각: ISO 8601 한국 시간                      → KstDatetime    "2026-11-03T13:24:00+09:00"
+- 빈 값: 우리가 만든 칸은 null, CODEF 의 res… 칸은 빈 문자열 ""  → CodefStr
+- 날짜 문자열(YYYYMMDD 등)은 DB 값 그대로
+"""
 
-from pydantic import BaseModel, ConfigDict, PlainSerializer
+from datetime import datetime
+from typing import Annotated, Literal
 
-KST = timezone(timedelta(hours=9))
+from pydantic import BaseModel, ConfigDict, PlainSerializer, computed_field
+
+from app.rules import INCOMING_TYPES, KST
 
 
 def _to_kst_iso(v: datetime) -> str:
@@ -16,60 +23,62 @@ def _to_kst_iso(v: datetime) -> str:
 
 
 KstDatetime = Annotated[datetime, PlainSerializer(_to_kst_iso, return_type=str)]
+Money = Annotated[int, PlainSerializer(str, return_type=str)]
+CodefStr = Annotated[str | None, PlainSerializer(lambda v: v or "", return_type=str)]
 
 
 class ORM(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# --- 계좌 (Part 2) ---------------------------------------------------------------
+class BalanceOut(ORM):
+    """account_balance_view 한 행 (Part 2 9.2)."""
+
+    account_id: str
+    resAccountCurrency: str
+    resAccountBalance: Money
+    balance_as_of: str  # YYYYMMDDHHmmss
+
+
 class AccountOut(ORM):
+    """accounts + account_balance_view (목록·상세 공통, Part 2 8.4)."""
+
     id: str
-    user_id: str
     resAccount: str
     resAccountDisplay: str
     resAccountName: str
+    resAccountNickName: CodefStr
     account_type: str
     lifecycle_status: str
-    resAccountNickName: str | None
     is_favorite: bool
-    resAccountStartDate: str
-    closed_at: str | None
+    resAccountStartDate: str  # YYYYMMDD
+    closed_at: str | None  # YYYYMMDD, 해지 전 null
     version: int
-
-
-class AccountWithBalanceOut(AccountOut):
-    """accounts JOIN account_balances 결과."""
-
-    currency: str
-    balance: int
-
-
-class AccountBalanceViewOut(ORM):
-    account_id: str
     resAccountCurrency: str
-    resAccountBalance: int
+    resAccountBalance: Money
     balance_as_of: str
 
 
-class TransferLimitOut(ORM):
-    account_id: str
-    per_transfer_limit: int
-    daily_limit: int
-    updated_at: KstDatetime
-
-
+# --- 거래 (Part 5) ---------------------------------------------------------------
 class TransactionOut(ORM):
     id: str
     account_id: str
     type: str
-    amount: int
-    fee: int
-    balance_after: int
+    amount: Money  # 항상 양수, +/− 는 direction
+    fee: Money
+    balance_after: Money
     transfer_id: str | None
     counterpart_bank: str | None
     counterpart_account_no: str | None
     display_name: str | None
     created_at: KstDatetime
+
+    @computed_field
+    @property
+    def direction(self) -> Literal["IN", "OUT"]:
+        """내역의 +/− (Part 5 3장 「내역 표시」)."""
+        return "IN" if self.type in INCOMING_TYPES else "OUT"
 
 
 class TransactionPage(BaseModel):
@@ -79,13 +88,12 @@ class TransactionPage(BaseModel):
 
 class TransferOut(ORM):
     id: str
-    user_id: str
     from_account_id: str
     to_bank: str
     to_account_no: str
     to_holder_name: str
-    amount: int
-    fee: int
+    amount: Money
+    fee: Money
     my_display_name: str | None
     their_display_name: str | None
     status: str
@@ -100,12 +108,13 @@ class TransferOut(ORM):
 
 class ScheduledTransferOut(ORM):
     id: str
-    user_id: str
     from_account_id: str
     to_bank: str
     to_account_no: str
     to_holder_name: str
-    amount: int
+    amount: Money
+    my_display_name: str | None
+    their_display_name: str | None
     type: str
     execute_at: KstDatetime | None
     day_of_month: int | None
@@ -115,11 +124,23 @@ class ScheduledTransferOut(ORM):
     status: str
     step_up_challenge_id: str | None
     created_at: KstDatetime
+    updated_at: KstDatetime
+
+
+class TransferLimitOut(BaseModel):
+    """이체 한도와 오늘 남은 한도 (Part 5 16장 GET /accounts/{accountId}/transfer-limits)."""
+
+    account_id: str
+    per_transfer_limit: Money
+    daily_limit: Money
+    used_today: Money
+    remaining_today: Money
+    is_default: bool  # transfer_limits 행이 없어 기획서 기본값(Part 5 4장)을 쓴 경우 true
+    updated_at: KstDatetime | None
 
 
 class FavoriteAccountOut(ORM):
     id: str
-    user_id: str
     bank: str
     account_no: str
     holder_name: str
@@ -127,7 +148,11 @@ class FavoriteAccountOut(ORM):
     sort_order: int
 
 
-class ExternalAccountLookupOut(ORM):
+class TransferTargetOut(BaseModel):
+    """이체 대상 계좌 확인 결과 (Part 5 16장 GET /transfer-targets/verify)."""
+
     bank: str
     account_no: str
     holder_name: str
+    account_status: str  # 두린은행 계좌는 lifecycle_status, 가상 타행은 늘 ACTIVE
+    is_mine: bool  # 내 계좌로 옮기기인지 (RESTRICTED 회원은 이것만 허용 — Part 5 4장)
