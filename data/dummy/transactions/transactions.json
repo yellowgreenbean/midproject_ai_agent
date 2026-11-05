@@ -28,7 +28,7 @@
           "resAccountOut": "300000",
           "resAfterTranBalance": "1350000",
           "resAccountDesc1": "",
-          "resAccountDesc2": "이체",
+          "resAccountDesc2": "적금납입",
           "resAccountDesc3": "자유적금 납입",
           "resAccountDesc4": "인터넷뱅킹",
           "tranDesc": ""
@@ -150,9 +150,9 @@
           "resAccountOut": "30000",
           "resAfterTranBalance": "774890",
           "resAccountDesc1": "",
-          "resAccountDesc2": "출금",
-          "resAccountDesc3": "ATM 출금",
-          "resAccountDesc4": "강남지점",
+          "resAccountDesc2": "이체",
+          "resAccountDesc3": "용돈",
+          "resAccountDesc4": "모바일뱅킹",
           "tranDesc": ""
         }
       ]

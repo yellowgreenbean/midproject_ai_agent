@@ -111,6 +111,7 @@ erDiagram
         string version
         string title
         bool required
+        string content_url "본문 위치(고친 md 경로·URL)"
         datetime effective_at
         string card_product_id FK "카드 약관이면"
     }

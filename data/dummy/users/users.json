@@ -5,12 +5,12 @@
       "username": "minjun_kim",
       "name": "김민준",
       "email": "minjun.kim@example.com",
-      "email_verified_at": "2026-01-05T09:00:00+09:00",
+      "email_verified_at": "2021-02-20T10:10:00+09:00",
       "birth_date": "1988-01-01",
       "gender": "M",
       "payday": 25,
       "status": "ACTIVE",
-      "created_at": "2026-01-05T08:50:00+09:00",
+      "created_at": "2021-02-20T10:00:00+09:00",
       "withdrawn_at": null
     },
     {
