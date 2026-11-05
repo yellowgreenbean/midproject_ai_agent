@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1960" height="1510" viewBox="0 0 1960 1510">
+<rect width="1960" height="1510" fill="#ffffff"/>
+<g transform="translate(0,0)">
+<rect width="1720" height="600" fill="#ffffff"/>
+<text x="30" y="40" font-size="22" font-weight="700" fill="#1d2523">1. 이체</text>
+<rect x="10.0" y="75.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="110" y="115.25" font-size="15" text-anchor="middle" fill="#1d2523">로그인</text>
+<polyline points="210,110 250,110" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="250,110 240.0,115.0 240.0,105.0" fill="#33403c"/>
+<g transform="translate(240,0)">
+<rect x="10.0" y="75.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="110" y="115.25" font-size="15" text-anchor="middle" fill="#1d2523">출금 계좌 선택</text>
+<rect x="250.0" y="75.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="350" y="105.25" font-size="15" text-anchor="middle" fill="#1d2523">받는 계좌 입력</text>
+<text x="350" y="125.25" font-size="15" text-anchor="middle" fill="#1d2523">상태·예금주 조회</text>
+<rect x="490.0" y="75.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="590" y="115.25" font-size="15" text-anchor="middle" fill="#1d2523">금액 입력</text>
+<rect x="730.0" y="75.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="830" y="105.25" font-size="15" text-anchor="middle" fill="#1d2523">표시 이름</text>
+<text x="830" y="125.25" font-size="15" text-anchor="middle" fill="#1d2523">(선택)</text>
+<rect x="970.0" y="75.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="1070" y="105.25" font-size="15" text-anchor="middle" fill="#1d2523">재확인</text>
+<text x="1070" y="125.25" font-size="15" text-anchor="middle" fill="#1d2523">보내기 / 예약하기</text>
+<rect x="1210.0" y="75.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="1310" y="115.25" font-size="15" text-anchor="middle" fill="#1d2523">비밀번호 입력</text>
+<polyline points="210,110 250,110" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="250,110 240.0,115.0 240.0,105.0" fill="#33403c"/>
+<polyline points="450,110 490,110" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="490,110 480.0,115.0 480.0,105.0" fill="#33403c"/>
+<polyline points="690,110 730,110" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="730,110 720.0,115.0 720.0,105.0" fill="#33403c"/>
+<polyline points="930,110 970,110" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="970,110 960.0,115.0 960.0,105.0" fill="#33403c"/>
+<polyline points="1170,110 1210,110" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="1210,110 1200.0,115.0 1200.0,105.0" fill="#33403c"/>
+<text x="1070" y="174.55" font-size="13" text-anchor="middle" fill="#5b6764">예약하기 선택 시 예약 송금 흐름</text>
+<polygon points="1310,230.0 1450.0,290 1310,350.0 1170.0,290" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="1310" y="295.25" font-size="15" text-anchor="middle" fill="#1d2523">서버 재검증·처리</text>
+<polyline points="1310,145 1310,230" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="1310,230 1305.0,220.0 1315.0,220.0" fill="#33403c"/>
+<rect x="1210.0" y="465.0" width="200" height="70" rx="10" fill="#e3f4e8" stroke="#2f855a" stroke-width="2"/>
+<text x="1310" y="505.25" font-size="15" text-anchor="middle" fill="#1d2523">완료 화면</text>
+<polyline points="1310,350 1310,465" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="1310,465 1305.0,455.0 1315.0,455.0" fill="#33403c"/>
+<text x="1325" y="412.55" font-size="13" text-anchor="start" fill="#33403c">SUCCESS</text>
+<rect x="730.0" y="255.0" width="200" height="70" rx="10" fill="#fbe6e6" stroke="#c53030" stroke-width="2"/>
+<text x="830" y="295.25" font-size="15" text-anchor="middle" fill="#1d2523">실패 화면</text>
+<polyline points="1170,290 930,290" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="930,290 940.0,285.0 940.0,295.0" fill="#33403c"/>
+<text x="1050" y="276.55" font-size="13" text-anchor="middle" fill="#33403c">FAILED</text>
+<polyline points="730,290 590,290 590,145" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="590,145 595.0,155.0 585.0,155.0" fill="#33403c"/>
+<text x="660" y="276.55" font-size="13" text-anchor="middle" fill="#33403c">다시 보내기</text></g></g>
+<line x1="30" y1="615.0" x2="1930" y2="615.0" stroke="#d9dfdc" stroke-width="2"/>
+<g transform="translate(0,630)">
+<rect width="1860" height="420" fill="#ffffff"/>
+<text x="30" y="40" font-size="22" font-weight="700" fill="#1d2523">2. 타행 이체</text>
+<rect x="10.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="110" y="205.25" font-size="15" text-anchor="middle" fill="#1d2523">로그인</text>
+<polyline points="210,200 250,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="250,200 240.0,205.0 240.0,195.0" fill="#33403c"/>
+<g transform="translate(240,0)">
+<rect x="10.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="110" y="195.25" font-size="15" text-anchor="middle" fill="#1d2523">받는 은행 선택</text>
+<text x="110" y="215.25" font-size="15" text-anchor="middle" fill="#1d2523">계좌번호 자릿수 검증</text>
+<rect x="250.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="350" y="195.25" font-size="15" text-anchor="middle" fill="#1d2523">예금주 조회</text>
+<text x="350" y="215.25" font-size="15" text-anchor="middle" fill="#1d2523">external_accounts</text>
+<rect x="490.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="590" y="195.25" font-size="15" text-anchor="middle" fill="#1d2523">이체 흐름</text>
+<text x="590" y="215.25" font-size="15" text-anchor="middle" fill="#1d2523">3~6단계</text>
+<rect x="730.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="830" y="195.25" font-size="15" text-anchor="middle" fill="#1d2523">출금 원장 1건</text>
+<text x="830" y="215.25" font-size="15" text-anchor="middle" fill="#1d2523">(입금 기록 없음)</text>
+<polyline points="210,200 250,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="250,200 240.0,205.0 240.0,195.0" fill="#33403c"/>
+<polyline points="450,200 490,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="490,200 480.0,205.0 480.0,195.0" fill="#33403c"/>
+<polyline points="690,200 730,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="730,200 720.0,205.0 720.0,195.0" fill="#33403c"/>
+<polygon points="1110,140.0 1250.0,200 1110,260.0 970.0,200" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="1110" y="205.25" font-size="15" text-anchor="middle" fill="#1d2523">시뮬레이션 결과</text>
+<polyline points="930,200 970,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="970,200 960.0,205.0 960.0,195.0" fill="#33403c"/>
+<rect x="1380.0" y="25.0" width="200" height="70" rx="10" fill="#e3f4e8" stroke="#2f855a" stroke-width="2"/>
+<text x="1480" y="65.25" font-size="15" text-anchor="middle" fill="#1d2523">SUCCESS</text>
+<polyline points="1110,140 1110,60 1380,60" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="1380,60 1370.0,65.0 1370.0,55.0" fill="#33403c"/>
+<text x="1245" y="48.55" font-size="13" text-anchor="middle" fill="#33403c">기본</text>
+<rect x="1380.0" y="165.0" width="200" height="70" rx="10" fill="#e3f4e8" stroke="#2f855a" stroke-width="2"/>
+<text x="1480" y="205.25" font-size="15" text-anchor="middle" fill="#1d2523">PENDING 후 SUCCESS</text>
+<polyline points="1250,200 1380,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="1380,200 1370.0,205.0 1370.0,195.0" fill="#33403c"/>
+<text x="1315" y="186.55" font-size="13" text-anchor="middle" fill="#33403c">테스트 계좌</text>
+<rect x="1380.0" y="305.0" width="200" height="70" rx="10" fill="#fbe6e6" stroke="#c53030" stroke-width="2"/>
+<text x="1480" y="345.25" font-size="15" text-anchor="middle" fill="#1d2523">FAILED</text>
+<polyline points="1110,260 1110,340 1380,340" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="1380,340 1370.0,345.0 1370.0,335.0" fill="#33403c"/>
+<text x="1245" y="326.55" font-size="13" text-anchor="middle" fill="#33403c">테스트 계좌</text></g></g>
+<line x1="30" y1="1065.0" x2="1930" y2="1065.0" stroke="#d9dfdc" stroke-width="2"/>
+<g transform="translate(0,1080)">
+<rect width="1960" height="430" fill="#ffffff"/>
+<text x="30" y="40" font-size="22" font-weight="700" fill="#1d2523">3. 예약 송금</text>
+<rect x="10.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="110" y="205.25" font-size="15" text-anchor="middle" fill="#1d2523">로그인</text>
+<polyline points="210,200 250,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="250,200 240.0,205.0 240.0,195.0" fill="#33403c"/>
+<g transform="translate(240,0)">
+<rect x="10.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="110" y="195.25" font-size="15" text-anchor="middle" fill="#1d2523">재확인 화면에서</text>
+<text x="110" y="215.25" font-size="15" text-anchor="middle" fill="#1d2523">예약하기</text>
+<rect x="250.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="350" y="195.25" font-size="15" text-anchor="middle" fill="#1d2523">날짜·시각 선택</text>
+<text x="350" y="215.25" font-size="15" text-anchor="middle" fill="#1d2523">10분 후 ~ 1년 이내</text>
+<rect x="490.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="590" y="195.25" font-size="15" text-anchor="middle" fill="#1d2523">SCHEDULED</text>
+<text x="590" y="215.25" font-size="15" text-anchor="middle" fill="#1d2523">예약됨</text>
+<rect x="850.0" y="165.0" width="200" height="70" rx="10" fill="#e8f3f0" stroke="#0f6b5c" stroke-width="2"/>
+<text x="950" y="205.25" font-size="15" text-anchor="middle" fill="#1d2523">PROCESSING</text>
+<polyline points="210,200 250,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="250,200 240.0,205.0 240.0,195.0" fill="#33403c"/>
+<polyline points="450,200 490,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="490,200 480.0,205.0 480.0,195.0" fill="#33403c"/>
+<polyline points="690,200 850,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="850,200 840.0,205.0 840.0,195.0" fill="#33403c"/>
+<text x="770" y="154.55" font-size="13" text-anchor="middle" fill="#33403c">실행 시각</text>
+<text x="770" y="174.55" font-size="13" text-anchor="middle" fill="#33403c">배치 1분마다</text>
+<rect x="490.0" y="320.0" width="200" height="70" rx="10" fill="#fbe6e6" stroke="#c53030" stroke-width="2"/>
+<text x="590" y="360.25" font-size="15" text-anchor="middle" fill="#1d2523">CANCELED</text>
+<polyline points="590,235 590,320" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="590,320 585.0,310.0 595.0,310.0" fill="#33403c"/>
+<text x="605" y="282.55" font-size="13" text-anchor="start" fill="#33403c">실행 10분 전까지</text>
+<polygon points="1230,140.0 1370.0,200 1230,260.0 1090.0,200" fill="#fff4dc" stroke="#b7791f" stroke-width="2"/>
+<text x="1230" y="195.25" font-size="15" text-anchor="middle" fill="#1d2523">잔액·계좌 상태·한도</text>
+<text x="1230" y="215.25" font-size="15" text-anchor="middle" fill="#1d2523">재검증</text>
+<polyline points="1050,200 1090,200" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="1090,200 1080.0,205.0 1080.0,195.0" fill="#33403c"/>
+<rect x="1480.0" y="25.0" width="200" height="70" rx="10" fill="#e3f4e8" stroke="#2f855a" stroke-width="2"/>
+<text x="1580" y="65.25" font-size="15" text-anchor="middle" fill="#1d2523">SUCCESS + 알림</text>
+<polyline points="1230,140 1230,60 1480,60" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="1480,60 1470.0,65.0 1470.0,55.0" fill="#33403c"/>
+<text x="1355" y="48.55" font-size="13" text-anchor="middle" fill="#33403c">통과</text>
+<rect x="1480.0" y="305.0" width="200" height="70" rx="10" fill="#fbe6e6" stroke="#c53030" stroke-width="2"/>
+<text x="1580" y="345.25" font-size="15" text-anchor="middle" fill="#1d2523">FAILED + 사유 알림</text>
+<polyline points="1230,260 1230,340 1480,340" fill="none" stroke="#33403c" stroke-width="2" />
+<polygon points="1480,340 1470.0,345.0 1470.0,335.0" fill="#33403c"/>
+<text x="1355" y="326.55" font-size="13" text-anchor="middle" fill="#33403c">실패</text></g></g></svg>

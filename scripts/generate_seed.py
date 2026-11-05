@@ -1,4 +1,4 @@
-"""토스 카드 서비스 클론 - 목(mock) 데이터 생성기
+"""두린은행 계좌·거래·상품·카드 서비스 - 목(mock) 데이터 생성기
 
 docs/schema.sql 로 만든 DB에 넣을 INSERT 문(docs/seed.sql)을 만듭니다.
 
@@ -6,8 +6,11 @@ docs/schema.sql 로 만든 DB에 넣을 INSERT 문(docs/seed.sql)을 만듭니�
     py scripts/generate_seed.py --users 100     # 회원 수 조절
     py scripts/generate_seed.py --seed 7        # 다른 데이터 (같은 seed면 항상 같은 결과)
 
-- 기준 시각(NOW)은 2026-11-03 09:00, 카드 이용 내역은 2026-05-01부터 만듭니다.
-- 카드 상품명과 혜택은 실제 상품을 참고한 가상 데이터입니다.
+- 기준 시각(NOW)은 2026-11-03 09:00, 카드 이용 내역·계좌 거래는 2026-05-01부터 만듭니다.
+- 카드 상품명과 혜택, 예금·적금 상품은 실제 상품을 참고한 가상 데이터입니다.
+- ID는 문자열(user_001, tx_0001 ...), 금액은 원 단위 정수, 시각은 +09:00 입니다 (ERD 이름 규칙 C-5).
+- 계좌 잔액(account_balances)은 거래 원장(transactions)을 시간순으로 쌓은 결과와 맞춥니다.
+- 비밀번호·PIN·토큰은 실제 값이 아닌 가짜 해시입니다.
 - 표준 라이브러리만 사용합니다 (Python 3.8+).
 """
 import argparse
@@ -33,18 +36,57 @@ HOLIDAYS = {date(2026, 5, 5), date(2026, 5, 24), date(2026, 5, 25), date(2026, 6
             date(2026, 8, 15), date(2026, 8, 17), date(2026, 9, 24), date(2026, 9, 25), date(2026, 9, 26),
             date(2026, 10, 3), date(2026, 10, 5), date(2026, 10, 9)}
 
-# INSERT 순서 = FK 의존 순서 (card_applications.recommendation_id 때문에 추천이 신청보다 먼저)
+# INSERT 순서 = FK 의존 순서 (docs/schema.sql 과 같은 순서, card_applications 보다 추천이 먼저)
 TABLE_ORDER = [
-    "users", "accounts", "identity_verifications", "card_companies", "categories", "card_products",
-    "card_performance_tiers", "card_benefits", "terms", "promotions",
-    "card_recommendations", "card_recommendation_details",
+    # 1. 회원·인증
+    "users", "auth_identities", "local_credentials", "email_verifications", "password_reset_tokens",
+    "sessions", "pin_credentials", "auth_audit_logs", "step_up_challenges", "withdrawal_checks",
+    # 2. 계좌
+    "accounts", "account_activity_logs", "notification_preferences", "account_inactivity",
+    "document_issuance_logs",
+    # 3. 거래
+    "account_balances", "scheduled_transfers", "transfers", "transactions", "favorite_accounts",
+    "transfer_limits", "external_accounts",
+    # 4. 예금·적금 상품
+    "products", "product_rates", "product_rules", "product_documents", "subscriptions", "subscription_payments",
+    # 5. 카드 — 상품·발급·보유
+    "card_companies", "categories", "card_products", "card_performance_tiers", "card_benefits",
+    "terms", "user_consents", "promotions", "card_recommendations", "card_recommendation_details",
     "card_applications", "application_status_histories", "application_term_agreements",
     "user_cards", "user_card_settings", "user_card_status_histories", "card_management_logs",
-    "card_terminations", "merchants", "card_transactions", "billing_cycle_rules", "card_bills",
-    "card_bill_items", "recurring_payments", "spending_forecasts", "daily_card_spending",
-    "card_issuance_rankings", "card_points", "point_cashouts", "notifications",
-    "mydata_consents", "mydata_sync_logs",
+    "card_terminations",
+    # 6. 카드 — 이용·청구·분석·포인트
+    "merchants", "card_transactions", "billing_cycle_rules", "card_bills", "card_bill_items",
+    "recurring_payments", "spending_forecasts", "daily_card_spending", "card_issuance_rankings",
+    "card_points", "point_cashouts", "mydata_consents", "mydata_sync_logs",
+    # 7. 알림
+    "notifications",
 ]
+
+# 문자열 ID 접두어 (ERD 예: user_001, prod_001, sub_001 은 3자리, 나머지는 4자리부터)
+ID_PREFIX = {
+    "users": ("user", 3), "auth_identities": ("aid", 4), "email_verifications": ("ev", 4),
+    "password_reset_tokens": ("prt", 4), "sessions": ("ses", 4), "auth_audit_logs": ("aal", 4),
+    "step_up_challenges": ("stp", 4), "withdrawal_checks": ("wdc", 4),
+    "accounts": ("acc", 4), "account_activity_logs": ("acl", 4), "document_issuance_logs": ("doc", 4),
+    "scheduled_transfers": ("sch", 4), "transfers": ("trf", 4), "transactions": ("tx", 4),
+    "favorite_accounts": ("fav", 4), "external_accounts": ("ext", 4),
+    "products": ("prod", 3), "product_rates": ("rate", 4), "product_rules": ("rule", 4),
+    "product_documents": ("pdoc", 4), "subscriptions": ("sub", 3), "subscription_payments": ("spay", 4),
+    "card_companies": ("cco", 3), "categories": ("cat", 3), "card_products": ("cprod", 3),
+    "card_performance_tiers": ("tier", 3), "card_benefits": ("ben", 3), "terms": ("term", 3),
+    "user_consents": ("ucon", 4), "promotions": ("promo", 3), "card_recommendations": ("rec", 4),
+    "card_applications": ("app", 4), "application_status_histories": ("apph", 4), "user_cards": ("card", 4),
+    "user_card_status_histories": ("cardh", 4), "card_management_logs": ("cml", 4),
+    "card_terminations": ("cterm", 4), "merchants": ("mer", 3), "card_transactions": ("ctx", 4),
+    "card_bills": ("bill", 4), "card_bill_items": ("bitem", 4), "recurring_payments": ("rcp", 4),
+    "spending_forecasts": ("fcst", 4), "card_issuance_rankings": ("rank", 4), "card_points": ("cpt", 4),
+    "point_cashouts": ("pco", 4), "mydata_consents": ("mdc", 4), "mydata_sync_logs": ("mds", 4),
+    "notifications": ("ntf", 4),
+}
+BANK_NAME = "두린은행"
+STEP_UP_ACTIONS = {"APPLICATION": "CARD_APPLICATION", "TERMINATION": "CARD_TERMINATION",
+                   "CARD_MANAGEMENT": "CARD_MANAGEMENT"}
 
 # ---------------------------------------------------------------------------
 # 기준 데이터
@@ -264,7 +306,32 @@ STREETS = ["강남구 테헤란로", "마포구 월드컵북로", "송파구 올
 BANKS = ["국민은행", "신한은행", "우리은행", "하나은행", "카카오뱅크", "NH농협은행"]
 JOBS = ["직장인", "자영업", "프리랜서", "공무원"]
 PAYDAYS = [10, 15, 20, 21, 25, 25, 25, 31]
-REJECT_REASONS = ["신용평점 기준 미달", "소득 확인 불가", "단기간 다수 카드 신청"]
+REJECT_REASONS = ["NO_INCOME", "DUPLICATE"]   # AGE 는 신청 단계에서 이미 걸러짐
+EMPLOYERS = ["(주)한빛소프트", "(주)새솔물산", "누리식품(주)", "(주)온다랩", "바른회계법인", "(주)다온건설",
+             "서울특별시청", "(주)미르전자"]
+TRANSFER_FAILURES = ["RECIPIENT_ACCOUNT_SUSPENDED", "BANK_MAINTENANCE", "DAILY_LIMIT_EXCEEDED"]
+AUTO_TRANSFER_PURPOSES = ["월세", "관리비", "부모님 용돈", "모임 회비", "보험료"]
+
+# 예금·적금 상품 (상품 기획안 6장). 금리는 연 % 문자열
+BANK_PRODUCTS = [
+    dict(name="두린 정기예금", type="TIME_DEPOSIT", status="ON_SALE",
+         description="목돈을 한 번에 맡기고 만기에 이자와 함께 돌려받는 예금",
+         rates=[(1, 5, "2.80", None), (6, 11, "3.10", "0.20"), (12, 23, "3.30", "0.20"), (24, 36, "3.00", None)],
+         rule=dict(min_amount=1_000_000, max_amount=100_000_000, min_months=1, max_months=36, max_per_user=3)),
+    dict(name="두린 자유적금", type="INSTALLMENT_SAVINGS", status="ON_SALE",
+         description="매달 정한 날 자동으로 모으는 적금",
+         rates=[(6, 11, "3.20", "0.30"), (12, 23, "3.50", "0.50"), (24, 36, "3.40", "0.30")],
+         rule=dict(min_amount=10_000, max_amount=1_000_000, min_months=6, max_months=36, max_per_user=2)),
+    dict(name="두린 청년도약적금", type="INSTALLMENT_SAVINGS", status="ON_SALE",
+         description="만 19~34세 청년 전용 고금리 적금",
+         rates=[(12, 12, "4.50", "1.00"), (24, 24, "4.80", "1.00")],
+         rule=dict(min_amount=10_000, max_amount=500_000, min_months=12, max_months=24, max_per_user=1,
+                   rules_json='{"age_min": 19, "age_max": 34}')),
+    dict(name="두린 회전정기예금", type="TIME_DEPOSIT", status="STOPPED",
+         description="1년마다 금리가 바뀌는 회전식 예금 (판매 중지)",
+         rates=[(12, 36, "2.90", None)],
+         rule=dict(min_amount=3_000_000, max_amount=50_000_000, min_months=12, max_months=36, max_per_user=1)),
+]
 NICKNAMES = ["생활비 카드", "주유 전용", "구독 결제용", "회사 점심", "여행용"]
 SYNC_ERRORS = ["카드사 API 응답 시간 초과", "토큰 만료 (401)", "요청 한도 초과 (429)"]
 APP_MEMO = {"APPLIED": "신청 접수", "REVIEWING": "카드사 심사 중", "APPROVED": "발급 승인",
@@ -351,6 +418,14 @@ def sha(text):
     return hashlib.sha256(text.encode()).hexdigest()
 
 
+def ymd(d):
+    return f"{d:%Y%m%d}"
+
+
+def ymdhms(dt):
+    return f"{dt:%Y%m%d%H%M%S}"
+
+
 def describe(b, cat_name):
     value = f"{b['value']:g}%" if b["vtype"] == "PERCENT" else f"건당 {b['value']:,}원"
     text = f"{cat_name} {value} {BENEFIT_WORD[b['btype']]}"
@@ -400,12 +475,19 @@ class SeedBuilder:
         self.bills = {}
         self.termination_requests = []
         self.consents = {}              # (user id, company code) -> row
+        self.user_by_id = {}
+        self.signup_terms = []
+        self.ledger = defaultdict(list)  # account id -> [거래 원장 행] (잔액 계산 전)
 
     # --- 공통 유틸 -----------------------------------------------------------
 
-    def add(self, table, pk, **cols):
+    def next_id(self, table):
         self.seq[table] += 1
-        row = {pk: self.seq[table]}
+        prefix, width = ID_PREFIX[table]
+        return f"{prefix}_{self.seq[table]:0{width}d}"
+
+    def add(self, table, **cols):
+        row = {"id": self.next_id(table)}
         row.update(cols)
         self.rows[table].append(row)
         return row
@@ -452,83 +534,100 @@ class SeedBuilder:
     def card_name(card):
         return f"{card['prod']['name']}({card['row']['last4']})"
 
-    def verify(self, u, purpose, at):
-        """본인인증 기록. 가끔 한 번 실패한 뒤 성공. 성공한 verification_id 를 돌려줌."""
+    def login(self, u, at):
+        """로그인 세션 1건 + 인증 기록. 가끔 비밀번호를 한 번 틀린 뒤 성공. session id 를 돌려줌."""
         rng = self.rng
-        method = rng.choices(["PASS", "CERT", "MYDATA"], weights=[6, 3, 1])[0]
+        request_id = "req-" + sha(f"{self.seed}-{u['id']}-{at}")[:16]
         if rng.random() < 0.03:
-            self.add("identity_verifications", "verification_id", user_id=u["id"], purpose=purpose, method=method,
-                     ci=sha(f"mismatch-{self.seed}-{rng.random()}"), result="FAILED",
-                     verified_at=at - timedelta(minutes=3))
-        row = self.add("identity_verifications", "verification_id", user_id=u["id"], purpose=purpose,
-                       method=method, ci=u["ci"], result="SUCCESS", verified_at=at - timedelta(minutes=1))
-        return row["verification_id"]
+            self.add("auth_audit_logs", user_id=u["id"], event_type="LOGIN",
+                     occurred_at=at - timedelta(seconds=40), outcome="FAILED_PASSWORD", request_id=request_id + "f")
+        row = self.add("sessions", user_id=u["id"], created_at=at,
+                       last_seen_at=min(at + timedelta(minutes=rng.randint(1, 25)), NOW),
+                       expires_at=at + timedelta(minutes=30),
+                       revoked_at=min(at + timedelta(minutes=rng.randint(5, 29)), NOW) if rng.random() < 0.3 else None)
+        self.add("auth_audit_logs", user_id=u["id"], event_type="LOGIN", occurred_at=at, outcome="SUCCESS",
+                 request_id=request_id)
+        return row["id"]
+
+    def step_up(self, u, action, at):
+        """본인 확인 (PIN·비밀번호 재확인). 가끔 한 번은 시간 초과로 버려짐. 사용한 challenge id 를 돌려줌."""
+        rng = self.rng
+        action = STEP_UP_ACTIONS.get(action, action)
+        session = self.login(u, at - timedelta(minutes=rng.randint(2, 15)))
+        if rng.random() < 0.03:
+            self.add("step_up_challenges", user_id=u["id"], action=action, session_id=session,
+                     expires_at=at - timedelta(minutes=1), consumed_at=None)
+        row = self.add("step_up_challenges", user_id=u["id"], action=action, session_id=session,
+                       expires_at=at + timedelta(minutes=4), consumed_at=at - timedelta(seconds=30))
+        return row["id"]
 
     # --- 1. 기준 데이터 -------------------------------------------------------
 
     def build_reference(self):
         rng = self.rng
         for code, name, bin_, point_name in COMPANIES:
-            row = self.add("card_companies", "company_id", code=code, name=name,
+            row = self.add("card_companies", code=code, name=name,
                            logo_url=f"https://static.example.com/companies/{code.lower()}.png", customer_center=None)
-            self.company[code] = dict(id=row["company_id"], bin=bin_, point_name=point_name)
+            self.company[code] = dict(id=row["id"], bin=bin_, point_name=point_name)
             if code == "TOSSBANK":   # 토스뱅크는 체크카드만 있어서 결제일 규칙이 없음
                 continue
             for pd in PAYMENT_DAYS:
                 rule = default_cycle_rule(pd)
                 self.rules[(code, pd)] = rule
-                self.put("billing_cycle_rules", company_id=row["company_id"], payment_day=pd,
+                self.put("billing_cycle_rules", card_company_id=row["id"], payment_day=pd,
                          start_month_offset=rule[0], start_day=rule[1], end_month_offset=rule[2], end_day=rule[3])
         for code, name, parent in CATEGORIES:
-            row = self.add("categories", "category_id",
-                           parent_id=self.category[parent]["category_id"] if parent else None, code=code, name=name)
+            row = self.add("categories", parent_id=self.category[parent]["id"] if parent else None, code=code, name=name)
             self.category[code] = row
 
         for p in PRODUCTS:
             released = date.fromisoformat(p["released"])
-            row = self.add("card_products", "product_id", company_id=self.company[p["company"]]["id"], name=p["name"],
+            row = self.add("card_products", card_company_id=self.company[p["company"]]["id"], name=p["name"],
                            card_type=p["type"], brand=p["brand"], annual_fee_domestic=p["fee"][0],
                            annual_fee_overseas=p["fee"][1], min_age=p["min_age"], image_url=None,
                            summary=p["summary"], is_active=p.get("active", True), released_at=released,
                            created_at=datetime.combine(released, time(10)))
-            pid = row["product_id"]
+            pid = row["id"]
             row["image_url"] = f"https://static.example.com/cards/{pid}.png"
             meta = dict(id=pid, company=p["company"], name=p["name"], type=p["type"], brand=p["brand"],
                         fee=p["fee"][0], fee_overseas=p["fee"][1], min_age=p["min_age"], pop=p["pop"],
                         active=p.get("active", True), tiers=[], tier_ids={}, benefits=[])
             for level, min_spend in enumerate(p["tiers"], 1):
                 max_spend = p["tiers"][level] if level < len(p["tiers"]) else None
-                t = self.add("card_performance_tiers", "tier_id", product_id=pid, tier_level=level,
+                t = self.add("card_performance_tiers", card_product_id=pid, tier_level=level,
                              min_spend=min_spend, max_spend=max_spend)
                 meta["tiers"].append((level, min_spend))
-                meta["tier_ids"][level] = t["tier_id"]
+                meta["tier_ids"][level] = t["id"]
             for b in p["benefits"]:
                 assert b["tier"] is None or b["tier"] in meta["tier_ids"], (p["name"], b)
-                br = self.add("card_benefits", "benefit_id", product_id=pid,
+                br = self.add("card_benefits", card_product_id=pid,
                               tier_id=meta["tier_ids"][b["tier"]] if b["tier"] else None,
-                              category_id=self.category[b["cat"]]["category_id"], benefit_type=b["btype"],
+                              category_id=self.category[b["cat"]]["id"], benefit_type=b["btype"],
                               value_type=b["vtype"], benefit_value=float(b["value"]),
                               min_payment_amount=b["min_pay"], monthly_limit_amount=b["amt"],
                               monthly_limit_count=b["cnt"], is_instant=b["instant"],
                               description=describe(b, self.category[b["cat"]]["name"]))
-                meta["benefits"].append(dict(b, id=br["benefit_id"]))
+                meta["benefits"].append(dict(b, id=br["id"]))
             self.products.append(meta)
         product_by_name = {p["name"]: p for p in self.products}
 
+        for title, required in [("서비스 이용약관", True), ("개인정보 수집·이용 동의", True),
+                                ("전자금융거래 기본약관", True), ("마케팅 정보 수신 동의", False)]:
+            self.signup_terms.append(self.add_term(None, title, required))
         for title, required in [("개인(신용)정보 수집·이용 동의", True), ("개인(신용)정보 조회 동의", True),
                                 ("카드 상품 마케팅 정보 수신 동의", False)]:
             self.common_terms.append(self.add_term(None, title, required))
         for p in self.products:
-            p["term_id"] = self.add_term(p["id"], f"{p['name']} 상품설명서", True)["term_id"]
+            p["term_id"] = self.add_term(p["id"], f"{p['name']} 상품설명서", True)["id"]
 
         for name, title, reward, min_spend, start, end in PROMOTIONS:
             prod = product_by_name[name]
-            row = self.add("promotions", "promotion_id", product_id=prod["id"], title=title, reward_amount=reward,
+            row = self.add("promotions", card_product_id=prod["id"], title=title, reward_amount=reward,
                            min_spend_condition=min_spend,
                            condition_desc=f"발급 후 다음 달 말일까지 {min_spend:,}원 이상 쓰면 {reward:,}원 지급",
                            starts_at=datetime.fromisoformat(start),
                            ends_at=datetime.combine(date.fromisoformat(end), time(23, 59, 59)))
-            self.promotions.append(dict(id=row["promotion_id"], product=prod["id"],
+            self.promotions.append(dict(id=row["id"], product=prod["id"],
                                         start=row["starts_at"], end=row["ends_at"]))
 
         business_nos = set()
@@ -538,21 +637,53 @@ class SeedBuilder:
                 if bno not in business_nos:
                     business_nos.add(bno)
                     break
-            row = self.add("merchants", "merchant_id", category_id=self.category[cat]["category_id"], name=name,
+            row = self.add("merchants", category_id=self.category[cat]["id"], name=name,
                            business_no=bno)
-            self.merchant[name] = dict(id=row["merchant_id"], name=name, cat=cat, lo=lo, hi=hi, kind=kind,
+            self.merchant[name] = dict(id=row["id"], name=name, cat=cat, lo=lo, hi=hi, kind=kind,
                                        ccy=MERCHANT_CURRENCY.get(name))
         self.var_merchants = defaultdict(list)
         for m in self.merchant.values():
             if m["kind"] == "var":
                 self.var_merchants[m["cat"]].append(m)
         self.big_merchants = [m for m in self.merchant.values() if m["kind"] == "big"]
+        self.build_bank_reference()
 
-    def add_term(self, product_id, title, required):
-        row = self.add("terms", "term_id", product_id=product_id, title=title, version="1.0", is_required=required,
-                       content_url=None, effective_at=date(2025, 1, 1))
-        row["content_url"] = f"https://static.example.com/terms/{row['term_id']}.pdf"
-        return row
+    def build_bank_reference(self):
+        """예금·적금 상품과 가상 타행 계좌(예금주 조회용 시드)."""
+        rng = self.rng
+        self.bank_products = []
+        for p in BANK_PRODUCTS:
+            row = self.add("products", bank=BANK_NAME, name=p["name"], type=p["type"], description=p["description"],
+                           status=p["status"], source_url=None, verified_at="20261020")
+            row["source_url"] = f"https://static.example.com/products/{row['id']}.html"
+            for lo, hi, base, bonus in p["rates"]:
+                self.add("product_rates", product_id=row["id"], term_min=lo, term_max=hi, term_unit="MONTH",
+                         base_rate=base, bonus_rate=bonus, effective_from="20260701")
+            rule = p["rule"]
+            self.add("product_rules", product_id=row["id"], min_amount=rule["min_amount"],
+                     max_amount=rule["max_amount"], min_months=rule["min_months"], max_months=rule["max_months"],
+                     max_per_user=rule["max_per_user"], rules_json=rule.get("rules_json"))
+            for title in ("상품설명서", "상품 약관"):
+                d = self.add("product_documents", product_id=row["id"], title=f"{p['name']} {title}",
+                             source_url=None, version_date="20260701")
+                d["source_url"] = f"https://static.example.com/products/{d['id']}.pdf"
+            self.bank_products.append(dict(p, id=row["id"]))
+
+        self.external = []
+        seen = set()
+        while len(self.external) < 40:
+            bank = rng.choice(BANKS)
+            no = f"{rng.randint(100, 999)}{rng.randint(10 ** 8, 10 ** 9 - 1)}"
+            if (bank, no) in seen:
+                continue
+            seen.add((bank, no))
+            holder = rng.choice(SURNAMES) + rng.choice(GIVEN_NAMES)
+            row = self.add("external_accounts", bank=bank, account_no=no, holder_name=holder)
+            self.external.append(row)
+
+    def add_term(self, card_product_id, title, required):
+        return self.add("terms", version="1.0", title=title, required=required,
+                        effective_at=datetime(2025, 1, 1), card_product_id=card_product_id)
 
     def promotion_for(self, prod, at):
         for promo in self.promotions:
@@ -564,7 +695,6 @@ class SeedBuilder:
 
     def build_users(self):
         rng = self.rng
-        phones = set()
         for _ in range(self.n_users):
             youth = rng.random() < 0.08
             if youth:
@@ -574,64 +704,112 @@ class SeedBuilder:
                 lo, hi = rng.choices([(20, 29), (30, 39), (40, 49), (50, 65)], weights=[38, 32, 18, 12])[0]
                 birth = date(TODAY.year - rng.randint(lo, hi), rng.randint(1, 12), rng.randint(1, 28))
                 created = self.rdt(date(2020, 1, 1), date(2025, 11, 1))
+            # 마이데이터 동의 시각은 users 칸이 아니라 카드사별 mydata_consents 로 남김 (계산용 메타데이터)
             mydata = None if youth or rng.random() < 0.15 else self.rdt(created, datetime(2026, 4, 30))
-            while True:
-                phone = f"010-{rng.randint(2000, 9999)}-{rng.randint(1000, 9999)}"
-                if phone not in phones:
-                    phones.add(phone)
-                    break
-            uid = self.seq["users"] + 1
-            ci = sha(f"ci-{self.seed}-{uid}")
-            row = self.add("users", "user_id", name=rng.choice(SURNAMES) + rng.choice(GIVEN_NAMES), birth_date=birth,
-                           gender=rng.choice("MF"), phone=phone,
-                           email=f"user{uid:04d}@example.com" if rng.random() < 0.6 else None, ci=ci,
-                           mydata_agreed_at=mydata,
+            n = self.seq["users"] + 1
+            email = f"user{n:04d}@example.com" if rng.random() < 0.6 else None
+            row = self.add("users", username=f"user{n:04d}", name=rng.choice(SURNAMES) + rng.choice(GIVEN_NAMES),
+                           email=email,
+                           email_verified_at=created - timedelta(minutes=rng.randint(1, 5)) if email else None,
+                           birth_date=birth, gender=rng.choice("MF"),
                            payday=rng.choice(PAYDAYS) if not youth and rng.random() < 0.75 else None,
-                           created_at=created, updated_at=mydata or created)
-            u = dict(id=uid, birth=birth, youth=youth, created=created, mydata=mydata, ci=ci, cards=[], toss=None,
-                     gender=row["gender"], payday=row["payday"])
-            toss_primary = rng.random() < 0.55
-            u["primary"] = self.add_account(u, "토스뱅크" if toss_primary else rng.choice(BANKS), True, created)
-            if toss_primary:
-                u["toss"] = u["primary"]
+                           status="ACTIVE", created_at=created, withdrawn_at=None)
+            u = dict(id=row["id"], name=row["name"], birth=birth, youth=youth, created=created, mydata=mydata,
+                     cards=[], gender=row["gender"], payday=row["payday"], accounts=[])
+            self.user_by_id[u["id"]] = u
+            self.build_auth(u, email)
+            u["primary"] = self.add_account(u, "CHECKING", created, primary=True)
             if rng.random() < 0.3:
-                self.add_account(u, rng.choice(BANKS), False, created)
+                self.add_account(u, "SAVINGS", self.rdt(created, NOW - timedelta(days=200)))
             self.users.append(u)
 
-    def add_account(self, u, bank, primary, created):
+    def build_auth(self, u, email):
+        """가입 때 생기는 인증 데이터: 로그인 수단, 비밀번호, 이메일 인증, 약관 동의, PIN."""
         rng = self.rng
-        row = self.add("accounts", "account_id", user_id=u["id"], bank_name=bank,
-                       account_number_masked=f"{rng.randint(100, 999)}-****-{rng.randint(1000, 9999)}",
-                       balance=round10(min(rng.lognormvariate(13.5, 1.1), 80_000_000)),
-                       is_primary=primary, created_at=created)
-        self.accounts[row["account_id"]] = row
-        return row["account_id"]
+        created = u["created"]
+        if email:
+            self.add("email_verifications", email=email, purpose="SIGNUP",
+                     challenge_digest=sha(f"email-{self.seed}-{u['id']}"),
+                     expires_at=created + timedelta(minutes=5), attempt_count=rng.choice([1, 1, 1, 2]),
+                     used_at=created - timedelta(minutes=1))
+        self.add("auth_identities", user_id=u["id"], provider="LOCAL", provider_subject=u["id"], linked_at=created)
+        if email and rng.random() < 0.25:
+            self.add("auth_identities", user_id=u["id"], provider="GOOGLE",
+                     provider_subject=str(10 ** 20 + int(sha(f"google-{self.seed}-{u['id']}")[:12], 16)),
+                     linked_at=self.rdt(created, NOW - timedelta(days=1)))
+        pw_updated = self.rdt(created, NOW - timedelta(days=1)) if rng.random() < 0.2 else created
+        locked = rng.random() < 0.01
+        self.put("local_credentials", user_id=u["id"],
+                 password_hash="$2b$12$" + sha(f"pw-{self.seed}-{u['id']}")[:53],   # 가짜 bcrypt 형식
+                 password_updated_at=pw_updated, failed_attempts=5 if locked else rng.choice([0, 0, 0, 1]),
+                 locked_until=NOW + timedelta(minutes=20) if locked else None)
+        if pw_updated != created:
+            self.add("password_reset_tokens", user_id=u["id"], token_digest=sha(f"reset-{self.seed}-{u['id']}"),
+                     expires_at=pw_updated + timedelta(minutes=25), used_at=pw_updated)
+        for term in self.signup_terms:
+            self.add("user_consents", user_id=u["id"], terms_id=term["id"], version=term["version"],
+                     agreed=True if term["required"] else rng.random() < 0.5, recorded_at=created)
+        if rng.random() < 0.65:
+            enabled = created + timedelta(minutes=rng.randint(2, 30))
+            self.put("pin_credentials", user_id=u["id"], pin_hash="$2b$12$" + sha(f"pin-{self.seed}-{u['id']}")[:53],
+                     enabled_at=enabled,
+                     changed_at=self.rdt(enabled, NOW - timedelta(days=1)) if rng.random() < 0.1 else None,
+                     failed_attempts=rng.choice([0, 0, 0, 0, 1]), locked_until=None)
+        self.login(u, created + timedelta(minutes=1))
 
-    def ensure_toss_account(self, u, at):
-        if u["toss"] is None:
-            u["toss"] = self.add_account(u, "토스뱅크", False, at)
-        return u["toss"]
+    def add_account(self, u, account_type, created, primary=False):
+        """두린은행 계좌. 잔액은 거래 원장을 다 만든 뒤(build_ledger) account_balances 에 넣음."""
+        rng = self.rng
+        number = f"110{self.seq['accounts'] + 1:08d}"
+        name = "두린 입출금통장" if account_type == "CHECKING" else "두린 저축예금"
+        nickname = rng.choice(["생활비", "월급통장", "비상금", "여행자금"]) if rng.random() < 0.15 else None
+        row = self.add("accounts", user_id=u["id"], resAccount=number,
+                       resAccountDisplay=f"{number[:3]}-{number[3:5]}-{number[5:]}", resAccountName=name,
+                       account_type=account_type, lifecycle_status="ACTIVE", resAccountNickName=nickname,
+                       is_favorite=primary, resAccountStartDate=ymd(created), closed_at=None, version=0)
+        self.accounts[row["id"]] = dict(row=row, user=u, created=created, type=account_type)
+        u["accounts"].append(row["id"])
+        self.add("account_activity_logs", account_id=row["id"], actor_id=u["id"], action="OPEN",
+                 occurred_at=created, metadata=f'{{"account_type": "{account_type}"}}')
+        if nickname:
+            self.add("account_activity_logs", account_id=row["id"], actor_id=u["id"], action="NICKNAME_CHANGE",
+                     occurred_at=created + timedelta(hours=1), metadata=f'{{"after": "{nickname}"}}')
+        alerts = rng.random() < 0.9
+        self.accounts[row["id"]]["prefs"] = self.put(
+            "notification_preferences", user_id=u["id"], account_id=row["id"], enabled=alerts,
+            deposit_enabled=alerts, withdrawal_enabled=alerts,
+            minimum_amount=rng.choice([0, 0, 0, 10000, 50000]), channel="PUSH")
+        if account_type == "CHECKING":
+            self.put("transfer_limits", account_id=row["id"], per_transfer_limit=rng.choice([5_000_000, 10_000_000]),
+                     daily_limit=rng.choice([10_000_000, 30_000_000]), updated_at=created)
+        if rng.random() < 0.05:
+            issued = self.rdt(max(created, datetime(2026, 1, 1)), NOW)
+            self.add("document_issuance_logs", account_id=row["id"],
+                     document_type=rng.choice(["BALANCE_CERTIFICATE", "ACCOUNT_CERTIFICATE"]),
+                     requested_by=u["id"], issued_at=issued, status="ISSUED")
+        return row["id"]
 
     # --- 3. 카드 / 발급 신청 -------------------------------------------------
 
     def create_card(self, u, prod, source, issued, activated, application_id=None, account=None,
-                    payment_day=None, reissued_from=None, nickname=None, annual_fee=None):
+                    payment_day=None, reissued_from=None, nickname=None, annual_fee=None, credit_limit=None):
         rng = self.rng
         last4 = f"{rng.randint(0, 9999):04d}"
         if annual_fee is None:   # 국내전용/해외겸용 중 하나
             overseas = prod["brand"] != "LOCAL" and rng.random() < 0.7
             annual_fee = prod["fee_overseas"] if overseas else prod["fee"]
-        row = self.add("user_cards", "user_card_id", user_id=u["id"], product_id=prod["id"],
+        row = self.add("user_cards", user_id=u["id"], card_product_id=prod["id"],
                        application_id=application_id, reissued_from_id=reissued_from, source=source,
                        org_card_id=None, nickname=nickname,
                        card_number_masked=f"{self.company[prod['company']]['bin']}-****-****-{last4}", last4=last4,
                        expires_at=month_end(add_months(issued.date(), 60)), linked_account_id=account,
-                       payment_day=payment_day, status="ACTIVE", annual_fee_amount=annual_fee,
+                       payment_day=payment_day, credit_limit=credit_limit if prod["type"] == "CREDIT" else None,
+                       status="ACTIVE", annual_fee_amount=annual_fee,
                        next_annual_fee_date=None, last_used_at=None, issued_at=issued, activated_at=activated,
                        terminated_at=None,
                        created_at=issued if source == "TOSS_ISSUED" else max(issued, u["mydata"] or issued))
         credit = prod["type"] == "CREDIT"
-        card = dict(id=row["user_card_id"], row=row, user=u, prod=prod, credit=credit, pd=payment_day,
+        card = dict(id=row["id"], row=row, user=u, prod=prod, credit=credit, pd=payment_day,
                     rule=self.rules[(prod["company"], payment_day)] if credit else None,
                     start=activated, end=None, settings=None, account=account, source=source)
         self.cards[card["id"]] = card
@@ -644,11 +822,11 @@ class SeedBuilder:
         self.add_card_history(card, "ACTIVE", status, reason, at)
 
     def add_card_history(self, card, from_status, to_status, reason, at):
-        self.add("user_card_status_histories", "history_id", user_card_id=card["id"], from_status=from_status,
+        self.add("user_card_status_histories", user_card_id=card["id"], from_status=from_status,
                  to_status=to_status, reason=reason, changed_at=at)
 
     def log_management(self, card, action, before, after, at, result="SUCCESS"):
-        self.add("card_management_logs", "log_id", user_card_id=card["id"], action_type=action,
+        self.add("card_management_logs", user_card_id=card["id"], action_type=action,
                  before_value=before, after_value=after, result=result, requested_at=at)
 
     def create_settings(self, card, copy_from=None):
@@ -681,7 +859,7 @@ class SeedBuilder:
         card["settings"] = self.put("user_card_settings", user_card_id=card["id"], **values, updated_at=at)
         if rng.random() < 0.1 and card["start"] < NOW - timedelta(days=1):   # 비밀번호 변경 (값은 저장 안 함)
             at = self.rdt(card["start"], NOW)
-            self.verify(card["user"], "CARD_MANAGEMENT", at)
+            self.step_up(card["user"], "CARD_MANAGEMENT", at)
             if rng.random() < 0.05:
                 self.log_management(card, "PIN_CHANGE", None, None, at - timedelta(seconds=30), "FAILED")
             self.log_management(card, "PIN_CHANGE", None, None, at)
@@ -689,7 +867,8 @@ class SeedBuilder:
     def reissue(self, card, issued, activated):
         new = self.create_card(card["user"], card["prod"], card["source"], issued, activated,
                                account=card["account"], payment_day=card["pd"], reissued_from=card["id"],
-                               nickname=card["row"]["nickname"], annual_fee=card["row"]["annual_fee_amount"])
+                               nickname=card["row"]["nickname"], annual_fee=card["row"]["annual_fee_amount"],
+                               credit_limit=card["row"]["credit_limit"])
         if card["settings"]:
             self.create_settings(new, copy_from=card["settings"])
         if new["source"] == "TOSS_ISSUED":
@@ -710,7 +889,8 @@ class SeedBuilder:
                 issued = self.rdt(lo, hi)
                 card = self.create_card(u, prod, "MYDATA", issued, issued,
                                         payment_day=rng.choice(PAYMENT_DAYS) if prod["type"] == "CREDIT" else None,
-                                        nickname=rng.choice(NICKNAMES) if rng.random() < 0.1 else None)
+                                        nickname=rng.choice(NICKNAMES) if rng.random() < 0.1 else None,
+                                        credit_limit=rng.choice([3, 5, 8, 10, 15]) * 1_000_000)
                 expires = card["row"]["expires_at"]
                 if expires < TODAY:   # 유효기간 만료 → 갱신 발급
                     end = datetime.combine(expires + timedelta(days=1), time())
@@ -771,37 +951,40 @@ class SeedBuilder:
         rng = self.rng
         credit = prod["type"] == "CREDIT"
         promo = self.promotion_for(prod, applied)
-        account = self.ensure_toss_account(u, applied) if prod["company"] == "TOSSBANK" else u["primary"]
+        account = u["primary"]   # 결제·출금 계좌는 두린은행 입출금 계좌
         steps = [s for s in self.app_timeline(applied, credit) if s[1] <= NOW]
         at = dict(steps)
         status = steps[-1][0]
-        row = self.add("card_applications", "application_id", user_id=u["id"], product_id=prod["id"],
+        income = rng.randrange(28, 121) * 1_000_000 if credit else None
+        row = self.add("card_applications", user_id=u["id"], card_product_id=prod["id"],
                        promotion_id=promo["id"] if promo else None, recommendation_id=None,
-                       verification_id=self.verify(u, "APPLICATION", applied), status=status,
-                       job_type=rng.choice(JOBS) if credit else None,
-                       annual_income=rng.randrange(28, 121) * 1_000_000 if credit else None,
+                       step_up_challenge_id=self.step_up(u, "APPLICATION", applied), status=status,
+                       job_type=rng.choice(JOBS) if credit else None, annual_income=income,
                        linked_account_id=account, payment_day=rng.choice(PAYMENT_DAYS) if credit else None,
+                       approved_credit_limit=min(income // 4 // 1_000_000 * 1_000_000, 20_000_000)
+                       if credit and "APPROVED" in at else None,
                        delivery_address=f"서울시 {rng.choice(STREETS)} {rng.randint(1, 300)}, "
                                         f"{rng.randint(101, 120)}동 {rng.randint(1, 25)}0{rng.randint(1, 4)}호",
                        tracking_no=str(rng.randint(10 ** 11, 10 ** 12 - 1)) if "SHIPPING" in at else None,
                        reject_reason=rng.choice(REJECT_REASONS) if status == "REJECTED" else None,
                        applied_at=applied, decided_at=at.get("APPROVED") or at.get("REJECTED"),
                        updated_at=steps[-1][1])
-        aid = row["application_id"]
+        aid = row["id"]
         prev = None
         for st, t in steps:
-            self.add("application_status_histories", "history_id", application_id=aid, from_status=prev,
+            self.add("application_status_histories", application_id=aid, from_status=prev,
                      to_status=st, memo=APP_MEMO[st], changed_at=t)
             prev = st
         for term in self.common_terms:
-            self.put("application_term_agreements", application_id=aid, term_id=term["term_id"],
-                     agreed=True if term["is_required"] else rng.random() < 0.6, agreed_at=applied)
-        self.put("application_term_agreements", application_id=aid, term_id=prod["term_id"], agreed=True,
+            self.put("application_term_agreements", application_id=aid, terms_id=term["id"],
+                     agreed=True if term["required"] else rng.random() < 0.6, agreed_at=applied)
+        self.put("application_term_agreements", application_id=aid, terms_id=prod["term_id"], agreed=True,
                  agreed_at=applied)
         self.apps.append(dict(id=aid, user=u, prod=prod, status=status, applied=applied, row=row))
         if status == "ACTIVATED":
             card = self.create_card(u, prod, "TOSS_ISSUED", at["APPROVED"], at["ACTIVATED"], application_id=aid,
-                                    account=account, payment_day=row["payment_day"])
+                                    account=account, payment_day=row["payment_day"],
+                                    credit_limit=row["approved_credit_limit"])
             self.add_card_history(card, None, "ACTIVE", "카드 등록 완료", at["ACTIVATED"])
             self.create_settings(card)
 
@@ -818,13 +1001,13 @@ class SeedBuilder:
             if r < 0.02 and lo < NOW - timedelta(days=6):
                 at = self.rdt(lo, NOW - timedelta(days=6))
                 if toss:
-                    self.verify(card["user"], "CARD_MANAGEMENT", at)
+                    self.step_up(card["user"], "CARD_MANAGEMENT", at)
                 self.close_card(card, "LOST", at, "분실 신고")
                 self.reissue(card, at + timedelta(days=1), at + timedelta(days=4 if toss else 1))
             elif r < 0.04:
                 at = self.rdt(max(lo, NOW - timedelta(days=40)), NOW - timedelta(days=1))
                 if toss:
-                    self.verify(card["user"], "CARD_MANAGEMENT", at)
+                    self.step_up(card["user"], "CARD_MANAGEMENT", at)
                 self.close_card(card, "SUSPENDED", at, "고객 요청 일시정지")
             elif r < 0.09 and lo + timedelta(days=20) < NOW - timedelta(days=3):
                 at = self.rdt(lo + timedelta(days=20), NOW - timedelta(days=3))
@@ -839,7 +1022,7 @@ class SeedBuilder:
             if i < 2:
                 self.termination_requests.append((card, "REQUESTED", NOW - timedelta(hours=rng.uniform(1, 20)), None))
             else:
-                self.termination_requests.append((card, "WITHDRAWN", NOW - timedelta(days=20), None))
+                self.termination_requests.append((card, "CANCELED", NOW - timedelta(days=20), None))
 
     # --- 4. 이용 내역 -------------------------------------------------------
 
@@ -905,7 +1088,7 @@ class SeedBuilder:
             else:
                 detected, created = "USER", pays[0][0] + timedelta(hours=2)
             amounts = [a for _, a in pays]
-            row = self.add("recurring_payments", "recurring_id", user_id=u["id"], user_card_id=cid,
+            row = self.add("recurring_payments", user_id=u["id"], user_card_id=cid,
                            merchant_id=merchant["id"], pay_cycle="MONTHLY",
                            expected_amount=round10(sum(amounts) / len(amounts)) if variable else amounts[-1],
                            expected_day=day, last_paid_at=pays[-1][0].date(), detected_by=detected,
@@ -1076,7 +1259,7 @@ class SeedBuilder:
                 tx["benefit"], tx["benefit_amount"] = b, v
 
         for i, tx in enumerate(self.txs):
-            row = self.add("card_transactions", "transaction_id", user_card_id=tx["card"]["id"],
+            row = self.add("card_transactions", user_card_id=tx["card"]["id"],
                            merchant_id=tx["merchant"]["id"], approval_no=f"{(i * 7919 + 13579) % 10 ** 8:08d}",
                            transacted_at=tx["dt"], amount=tx["amount"], installment_months=tx["inst"],
                            is_overseas=tx["ccy"] is not None, currency=tx["ccy"] or "KRW", foreign_amount=tx["fx"],
@@ -1084,7 +1267,7 @@ class SeedBuilder:
                            applied_benefit_id=tx["benefit"]["id"] if tx["benefit"] else None,
                            benefit_amount=tx["benefit_amount"], is_performance_counted=tx["counted"],
                            created_at=tx["dt"])
-            tx["id"] = row["transaction_id"]
+            tx["id"] = row["id"]
 
     def build_daily_spending(self):
         """카드별 일별 집계 (어제까지, 거래가 있는 날만)."""
@@ -1141,14 +1324,14 @@ class SeedBuilder:
                 status = "CONFIRMED"
             else:
                 status = "SCHEDULED"
-            row = self.add("card_bills", "bill_id", user_card_id=cid, billing_ym=f"{p:%Y%m}", usage_start=s,
+            row = self.add("card_bills", user_card_id=cid, billing_ym=f"{p:%Y%m}", usage_start=s,
                            usage_end=e, payment_date=p, total_amount=total,
                            paid_amount=total if status == "PAID" else 0, status=status,
                            confirmed_at=datetime.combine(e + timedelta(days=1), time(6)) if status != "SCHEDULED" else None,
                            paid_at=datetime.combine(p, time(7)) if status == "PAID" else None)
             self.bills[(cid, p)] = dict(row=row, items=entries)
             for tx, seq, principal, fee in entries:
-                self.add("card_bill_items", "bill_item_id", bill_id=row["bill_id"], transaction_id=tx["id"],
+                self.add("card_bill_items", bill_id=row["id"], card_transaction_id=tx["id"],
                          installment_seq=seq, principal_amount=principal, fee_amount=fee)
 
     def build_terminations(self):
@@ -1172,8 +1355,8 @@ class SeedBuilder:
             anniv = anniversary_after(card["row"]["issued_at"].date(), requested.date())
             refund = round10(card["row"]["annual_fee_amount"] * (anniv - requested.date()).days / 365)
             reason = rng.choice(list(TERMINATION_REASONS))
-            self.add("card_terminations", "termination_id", user_card_id=card["id"],
-                     verification_id=self.verify(card["user"], "TERMINATION", requested), status=status,
+            self.add("card_terminations", user_card_id=card["id"],
+                     step_up_challenge_id=self.step_up(card["user"], "TERMINATION", requested), status=status,
                      reason_code=reason, reason_detail=TERMINATION_REASONS[reason], unpaid_amount=unpaid,
                      remaining_installment_amount=remaining, linked_recurring_count=recurring,
                      forfeited_points=points, refunded_annual_fee=refund, requested_at=requested,
@@ -1200,7 +1383,7 @@ class SeedBuilder:
             for p, base in targets:
                 if base < usage_period(p, rule)[0]:
                     continue
-                for model in ("LINEAR", "FIXED_SPLIT"):
+                for model in ("LINEAR", "MOVING_AVG"):
                     self.add_forecast(card, p, base, model, rec_by_card[card["id"]], floor)
 
     def add_forecast(self, card, p, base, model, recurring, floor):
@@ -1235,7 +1418,7 @@ class SeedBuilder:
                                   if seq == 1 and not tx["recurring"] and tx["dt"].date() <= base)
                 hist_days = elapsed
             variable = round10(hist_amount / hist_days * remaining_days)
-        self.add("spending_forecasts", "forecast_id", user_card_id=card["id"], billing_ym=f"{p:%Y%m}",
+        self.add("spending_forecasts", user_card_id=card["id"], billing_ym=f"{p:%Y%m}",
                  base_date=base, spent_to_date=spent, confirmed_installment=confirmed, fixed_expected=fixed,
                  variable_expected=variable, predicted_total=spent + confirmed + fixed + variable,
                  model_type=model, created_at=datetime.combine(base + timedelta(days=1), time(3)))
@@ -1276,19 +1459,19 @@ class SeedBuilder:
                 recs = {}
                 for rank, (net, monthly, prod, benefit) in enumerate([r for r in results if r[0] > 0][:5], 1):
                     top = max(benefit, key=benefit.get)
-                    row = self.add("card_recommendations", "recommendation_id", user_id=u["id"],
-                                   product_id=prod["id"], analysis_start=a_start, analysis_end=a_end,
+                    row = self.add("card_recommendations", user_id=u["id"],
+                                   card_product_id=prod["id"], analysis_start=a_start, analysis_end=a_end,
                                    expected_monthly_benefit=monthly, annual_fee=prod["fee"], net_annual_benefit=net,
                                    rank_no=rank,
                                    reason=f"최근 3개월 {self.category[top]['name']}에 월평균 "
                                           f"{round10(spend[top] / 3):,}원 썼어요",
                                    created_at=created)
-                    recs[prod["id"]] = row["recommendation_id"]
+                    recs[prod["id"]] = row["id"]
                     top_cats = sorted(benefit, key=lambda c: (-benefit[c], c))[:5]   # 혜택이 큰 카테고리 5개
                     for cat in top_cats:
                         if round10(benefit[cat] / 3):
-                            self.put("card_recommendation_details", recommendation_id=row["recommendation_id"],
-                                     category_id=self.category[cat]["category_id"],
+                            self.put("card_recommendation_details", recommendation_id=row["id"],
+                                     category_id=self.category[cat]["id"],
                                      spend_amount=round10(spend[cat] / 3), benefit_amount=round10(benefit[cat] / 3))
                 batches_by_user[u["id"]].append((created, recs))
 
@@ -1326,8 +1509,8 @@ class SeedBuilder:
                     if i > 0:
                         prev = prev_order.get(seg, [])
                         for rank, pid in enumerate(order[:10], 1):
-                            self.add("card_issuance_rankings", "ranking_id", period_type=ptype, period_start=start,
-                                     segment_age=seg[0], segment_gender=seg[1], card_type=seg[2], product_id=pid,
+                            self.add("card_issuance_rankings", period_type=ptype, period_start=start,
+                                     segment_age=seg[0], segment_gender=seg[1], card_type=seg[2], card_product_id=pid,
                                      rank_no=rank, issue_count=counts[pid],
                                      prev_rank_no=prev.index(pid) + 1 if pid in prev else None,
                                      created_at=datetime.combine(end, time(4)))
@@ -1349,7 +1532,7 @@ class SeedBuilder:
                 revoked_at = NOW - timedelta(days=rng.randint(1, 5), hours=rng.randint(0, 12)) \
                     if rng.random() < 0.03 else None
                 key = sha(f"token-{self.seed}-{u['id']}-{code}")
-                row = self.add("mydata_consents", "consent_id", user_id=u["id"], company_id=self.company[code]["id"],
+                row = self.add("mydata_consents", user_id=u["id"], card_company_id=self.company[code]["id"],
                                access_token_enc=f"enc:v1:{key}{key[::-1]}",
                                refresh_token_enc=f"enc:v1:{sha(key)}",
                                scope="card.list card.approval card.bill card.point",
@@ -1370,7 +1553,7 @@ class SeedBuilder:
                         fetched = {"CARDS": len(cards),
                                    "APPROVALS": sum(tx_count[(c["id"], day - timedelta(days=1))] for c in cards),
                                    "BILLS": sum(1 for c in cards if c["credit"]), "POINTS": 1}[api]
-                        self.add("mydata_sync_logs", "sync_id", consent_id=row["consent_id"], api_type=api,
+                        self.add("mydata_sync_logs", mydata_consent_id=row["id"], api_type=api,
                                  started_at=started, finished_at=finished, result="FAILED" if failed else "SUCCESS",
                                  fetched_count=0 if failed else fetched,
                                  error_message=rng.choice(SYNC_ERRORS) if failed else None)
@@ -1387,7 +1570,7 @@ class SeedBuilder:
                 earned[(tx["card"]["user"]["id"], tx["card"]["prod"]["company"])] += tx["benefit_amount"]
         self.point_rows = []
         for (uid, code), consent in sorted(self.consents.items()):
-            u = self.users[uid - 1]
+            u = self.user_by_id[uid]
             base = rng.randint(500, 30000) if rng.random() < 0.65 else 0
             cashout = None
             if base >= 3000 and rng.random() < 0.2:
@@ -1398,14 +1581,14 @@ class SeedBuilder:
                     base -= amount
             balance = base + earned[(uid, code)]
             expiring = min(balance, rng.randint(100, 5000)) if balance and rng.random() < 0.3 else 0
-            row = self.add("card_points", "card_point_id", user_id=uid, company_id=self.company[code]["id"],
+            row = self.add("card_points", user_id=uid, card_company_id=self.company[code]["id"],
                            point_name=self.company[code]["point_name"], balance=balance, expiring_amount=expiring,
                            expiring_date=TODAY + timedelta(days=rng.randint(1, 60)) if expiring else None,
                            synced_at=consent["last_synced_at"] or consent["consented_at"])
             self.point_rows.append((u, row))
             if cashout:
                 amount, status, requested = cashout
-                self.add("point_cashouts", "cashout_id", card_point_id=row["card_point_id"],
+                self.add("point_cashouts", card_point_id=row["id"],
                          account_id=u["primary"], amount=amount, status=status, requested_at=requested,
                          completed_at=requested + timedelta(minutes=2) if status == "COMPLETED" else None)
 
@@ -1420,35 +1603,328 @@ class SeedBuilder:
                 card["row"]["next_annual_fee_date"] = anniversary_after(card["row"]["issued_at"].date(), TODAY,
                                                                         inclusive=True)
 
-    def build_notifications(self):
+    # --- 8. 계좌 거래 (이체 / 예약·자동이체 / 예금·적금 / 원장) -----------------
+
+    def ledger_add(self, account_id, dt, ttype, amount, display_name, transfer_id=None, bank=None, account_no=None,
+                   source=None):
+        """거래 원장에 넣을 성공 거래 1건. 잔액(balance_after)은 build_ledger 에서 시간순으로 계산."""
+        self.ledger[account_id].append(dict(dt=dt, type=ttype, amount=amount, display_name=display_name,
+                                            transfer_id=transfer_id, bank=bank, account_no=account_no,
+                                            source=source))
+
+    def other_bank_account(self):
+        return self.rng.choice(BANKS), f"{self.rng.randint(100, 999)}{self.rng.randint(10 ** 8, 10 ** 9 - 1)}"
+
+    def build_income(self):
+        """급여(월급일) / 용돈 입금. 다른 은행에서 들어온 돈이라 transfers 행은 없음."""
         rng = self.rng
-        notes = []
+        for u in self.users:
+            if u["youth"]:
+                amount, who, day = rng.randrange(5, 21) * 10000, "엄마", rng.randint(1, 28)
+            elif u["payday"]:
+                amount, who, day = rng.randrange(220, 601) * 10000, rng.choice(EMPLOYERS), u["payday"]
+            else:
+                amount, who, day = rng.randrange(150, 401) * 10000, rng.choice(EMPLOYERS), rng.choice([10, 25])
+            bank, no = self.other_bank_account()
+            m = TX_START.replace(day=1)
+            while m <= TODAY:
+                at = datetime.combine(day_of(m, day), time(9, rng.randint(0, 30)))
+                m = add_months(m, 1)
+                if TX_START <= at.date() and at < NOW:
+                    self.ledger_add(u["primary"], at, "TRANSFER_IN", amount, who, bank=bank, account_no=no)
+
+    def build_card_payments(self):
+        """카드값 출금: 신용카드는 결제일에 청구서 금액, 체크카드는 승인 즉시. 포인트 현금화는 입금."""
+        for (cid, p), bill in sorted(self.bills.items()):
+            card, row = self.cards[cid], bill["row"]
+            if card["account"] and row["status"] == "PAID" and row["paid_amount"]:
+                company = next(n for c, n, *_ in COMPANIES if c == card["prod"]["company"])
+                self.ledger_add(card["account"], datetime.combine(p, time(7)), "CARD_PAYMENT", row["paid_amount"],
+                                f"{company} 결제대금")
+        for tx in self.txs:
+            card = tx["card"]
+            if not card["credit"] and card["account"] and tx["status"] != "CANCELED":
+                self.ledger_add(card["account"], tx["dt"], "CARD_PAYMENT", tx["net"], tx["merchant"]["name"],
+                                source="card_tx")
+        for row in self.rows["point_cashouts"]:
+            if row["status"] == "COMPLETED":
+                point = next(r for _, r in self.point_rows if r["id"] == row["card_point_id"])
+                self.ledger_add(row["account_id"], row["completed_at"], "POINT_CASHOUT", row["amount"],
+                                point["point_name"] or "카드 포인트")
+
+    def add_transfer(self, u, at, target, amount, channel="APP", scheduled=None, step_up=None, key=None,
+                     my_name=None):
+        """이체 1건. target = dict(bank, account_no, holder, account_id(우리 은행이면)).
+        성공하면 출금(및 우리 은행 계좌면 입금) 원장을 함께 남김."""
+        rng = self.rng
+        failed = rng.random() < 0.04
+        if amount >= 1_000_000 and step_up is None and channel == "APP":
+            step_up = self.step_up(u, "TRANSFER", at)
+        my_name = my_name or target["holder"]
+        row = self.add("transfers", user_id=u["id"], from_account_id=u["primary"], to_bank=target["bank"],
+                       to_account_no=target["account_no"], to_holder_name=target["holder"], amount=amount, fee=0,
+                       my_display_name=my_name, their_display_name=u["name"],
+                       status="FAILED" if failed else "SUCCESS",
+                       failure_reason=rng.choice(TRANSFER_FAILURES) if failed else None, channel=channel,
+                       scheduled_transfer_id=scheduled, step_up_challenge_id=step_up,
+                       idempotency_key=key or "APP-" + sha(f"{self.seed}-{u['id']}-{at}-{amount}")[:24],
+                       requested_at=at, completed_at=at + timedelta(seconds=rng.randint(1, 5)))
+        if not failed:
+            done = row["completed_at"]
+            self.ledger_add(u["primary"], done, "TRANSFER_OUT", amount, my_name, transfer_id=row["id"],
+                            bank=target["bank"], account_no=target["account_no"])
+            if target.get("account_id"):
+                self.ledger_add(target["account_id"], done, "TRANSFER_IN", amount, u["name"], transfer_id=row["id"],
+                                bank=BANK_NAME, account_no=self.accounts[u["primary"]]["row"]["resAccount"])
+        return row
+
+    def target_of(self, other=None, ext=None):
+        if other:
+            acc = self.accounts[other["primary"]]["row"]
+            return dict(bank=BANK_NAME, account_no=acc["resAccount"], holder=other["name"], account_id=acc["id"])
+        return dict(bank=ext["bank"], account_no=ext["account_no"], holder=ext["holder_name"])
+
+    def build_transfers(self):
+        """앱 송금 + 예약 송금(ONCE) + 자동이체(MONTHLY). 자주 보낸 계좌는 자주 쓰는 계좌로 등록."""
+        rng = self.rng
+        window_start = datetime.combine(TX_START, time())
+        specs = []   # (시각, 사용자, 받는 계좌, 금액) — 시간순으로 이체 ID를 매기려고 모아 둠
+        for u in self.users:
+            friends = [self.target_of(ext=e) for e in rng.sample(self.external, 3)] + \
+                      [self.target_of(other=o) for o in rng.sample(self.users, 2) if o is not u]
+            for _ in range(self.poisson(1.0 if u["youth"] else 4.0)):
+                amount = rng.randrange(1, 300) * 1000 if rng.random() < 0.9 else rng.randrange(10, 51) * 100_000
+                if u["youth"]:
+                    amount = rng.randrange(1, 50) * 1000
+                specs.append((self.rdt(window_start, NOW - timedelta(hours=1)), u, rng.choice(friends), amount))
+            u["friends"] = friends
+        sent = Counter()
+        for at, u, target, amount in sorted(specs, key=lambda s: (s[0], s[1]["id"])):
+            if self.add_transfer(u, at, target, amount)["status"] == "SUCCESS":
+                sent[(u["id"], target["bank"], target["account_no"])] += 1
+
+        for u in self.users:
+            if u["youth"]:
+                continue
+            r = rng.random()
+            if r < 0.12:
+                self.add_auto_transfer(u)
+            elif r < 0.22:
+                self.add_reserved_transfer(u)
+
+        for u in self.users:
+            order = 0
+            for t in u["friends"]:
+                if sent[(u["id"], t["bank"], t["account_no"])] >= 2:
+                    order += 1
+                    self.add("favorite_accounts", user_id=u["id"], bank=t["bank"], account_no=t["account_no"],
+                             holder_name=t["holder"], nickname=rng.choice([None, None, "친구", "가족", "회비"]),
+                             sort_order=order)
+
+    def scheduled_row(self, u, created, target, amount, purpose, **cols):
+        step = self.step_up(u, "SCHEDULED_TRANSFER", created)
+        return self.add("scheduled_transfers", user_id=u["id"], from_account_id=u["primary"], to_bank=target["bank"],
+                        to_account_no=target["account_no"], to_holder_name=target["holder"], amount=amount,
+                        my_display_name=purpose, their_display_name=u["name"], type=cols["type"],
+                        execute_at=cols.get("execute_at"), day_of_month=cols.get("day_of_month"),
+                        start_ym=cols.get("start_ym"), end_ym=cols.get("end_ym"), next_run_at=cols.get("next_run_at"),
+                        status=cols["status"], step_up_challenge_id=step, created_at=created,
+                        updated_at=cols.get("updated_at", created))
+
+    def add_auto_transfer(self, u):
+        """자동이체: 매월 day_of_month 09시. 10% 는 몇 번 돌고 해지됨."""
+        rng = self.rng
+        target = self.target_of(ext=rng.choice(self.external))
+        purpose = rng.choice(AUTO_TRANSFER_PURPOSES)
+        amount = rng.randrange(5, 101) * 10000
+        created = self.rdt(datetime(2026, 3, 1), datetime(2026, 9, 1))
+        start = add_months(created.date().replace(day=1), 1)
+        day = rng.choice([1, 5, 10, 15, 25, 28, 99])
+        runs = []
+        m = start
+        while True:
+            at = datetime.combine(day_of(m, day), time(9))
+            if at >= NOW:
+                break
+            if at.date() >= TX_START:
+                runs.append(at)
+            m = add_months(m, 1)
+        canceled = rng.random() < 0.1 and len(runs) >= 2
+        if canceled:
+            runs = runs[:rng.randint(1, len(runs) - 1)]
+            end = runs[-1] + timedelta(days=3)
+        row = self.scheduled_row(u, created, target, amount, purpose, type="MONTHLY", day_of_month=day,
+                                 start_ym=f"{start:%Y%m}", end_ym=f"{end:%Y%m}" if canceled else None,
+                                 next_run_at=None if canceled else datetime.combine(day_of(m, day), time(9)),
+                                 status="CANCELED" if canceled else "ACTIVE",
+                                 updated_at=end if canceled else (runs[-1] if runs else created))
+        for at in runs:
+            self.add_transfer(u, at, target, amount, channel="AUTO", scheduled=row["id"],
+                              key=f"SCH-{row['id']}-{at:%Y%m%d}", my_name=purpose)
+
+    def add_reserved_transfer(self, u):
+        """예약 송금(1회): 이미 실행됐거나, 앞으로 실행 예정이거나, 취소됨."""
+        rng = self.rng
+        target = rng.choice(u["friends"])
+        amount = rng.randrange(1, 100) * 10000
+        r = rng.random()
+        if r < 0.5:
+            execute = datetime.combine(self.rdt(TX_START, TODAY - timedelta(days=2)).date(), time(rng.choice([9, 12, 18])))
+            created = execute - timedelta(days=rng.randint(1, 20))
+            row = self.scheduled_row(u, created, target, amount, None, type="ONCE", execute_at=execute,
+                                     status="PROCESSING", updated_at=execute)
+            t = self.add_transfer(u, execute, target, amount, channel="SCHEDULED", scheduled=row["id"],
+                                  key=f"SCH-{row['id']}-{execute:%Y%m%d}")
+            row["status"] = t["status"]
+            row["my_display_name"] = t["my_display_name"]
+        else:
+            execute = datetime.combine(TODAY + timedelta(days=rng.randint(1, 14)), time(rng.choice([9, 12, 18])))
+            created = NOW - timedelta(days=rng.randint(1, 10), hours=rng.randint(0, 12))
+            canceled = r > 0.85
+            self.scheduled_row(u, created, target, amount, target["holder"], type="ONCE", execute_at=execute,
+                               next_run_at=None if canceled else execute,
+                               status="CANCELED" if canceled else "SCHEDULED",
+                               updated_at=created + timedelta(hours=2) if canceled else created)
+
+    def build_deposits(self):
+        """예금·적금 가입과 납입. 가입·납입은 SUBSCRIPTION_PAYMENT 출금, 중도 해지는 SUBSCRIPTION_PAYOUT 입금."""
+        rng = self.rng
+        on_sale = [p for p in self.bank_products if p["status"] == "ON_SALE"]
+        self.deposits = []
+        for u in self.users:
+            if u["youth"] or rng.random() > 0.22:
+                continue
+            start_dt = self.rdt(TX_START, TODAY - timedelta(days=3))
+            age = age_on(u["birth"], start_dt.date())
+            cands = [p for p in on_sale if "청년" not in p["name"] or 19 <= age <= 34]
+            p = rng.choice(cands)
+            lo, hi, base, bonus = rng.choice(p["rates"])
+            term = rng.choice([t for t in (6, 12, 24, 36) if lo <= t <= hi] or [lo])
+            rate = f"{float(base) + (float(bonus) if bonus and rng.random() < 0.6 else 0):.2f}"
+            rule = p["rule"]
+            savings = p["type"] == "INSTALLMENT_SAVINGS"
+            amount = (min(rng.choice([10, 20, 30, 50, 100]) * 10000, rule["max_amount"]) if savings
+                      else rng.choice([1, 3, 5, 10, 20]) * 1_000_000)
+            terminated = rng.random() < 0.08
+            start = start_dt.date()
+            row = self.add("subscriptions", user_id=u["id"], product_id=p["id"], source_account_id=u["primary"],
+                           principal=None if savings else amount, monthly_amount=amount if savings else None,
+                           applied_rate=rate, start_date=ymd(start), maturity_date=ymd(add_months(start, term)),
+                           status="ACTIVE", closed_at=None,
+                           idempotency_key="SUB-" + sha(f"{self.seed}-{u['id']}-{start_dt}")[:24])
+            self.step_up(u, "SUBSCRIPTION", start_dt)
+            paid, k = [], 0
+            while True:
+                at = datetime.combine(add_months(start, k), start_dt.time()) if k else start_dt
+                if at >= NOW or (k and not savings):
+                    break
+                paid.append(at)
+                k += 1
+            if terminated and len(paid) >= 2:
+                paid = paid[:-1]
+            for at in paid:
+                if savings:
+                    self.add("subscription_payments", subscription_id=row["id"], paid_amount=amount,
+                             paid_at=ymdhms(at))
+                self.ledger_add(u["primary"], at, "SUBSCRIPTION_PAYMENT", amount, p["name"])
+            if terminated:
+                closed = min(paid[-1] + timedelta(days=rng.randint(5, 25)), NOW - timedelta(hours=1))
+                closed = max(closed, paid[-1] + timedelta(minutes=30))
+                total = amount * len(paid)
+                row["status"], row["closed_at"] = "TERMINATED", ymd(closed)
+                self.ledger_add(u["primary"], closed, "SUBSCRIPTION_PAYOUT", total + round10(total * 0.001),
+                                f"{p['name']} 해지")
+            self.deposits.append(dict(row=row, user=u, product=p))
+
+    def build_ledger(self):
+        """원장을 시간순으로 쌓아 거래 ID·거래 후 잔액·현재 잔액을 정함.
+        창 이전 잔액(opening)은 잔액이 음수가 되지 않도록 넉넉히 잡음."""
+        rng = self.rng
+        self.balance = {}
+        opening = {}
+        for acc_id, meta in self.accounts.items():
+            events = sorted(self.ledger[acc_id], key=lambda e: e["dt"])
+            running, low = 0, 0
+            for e in events:
+                running += e["amount"] if e["type"] in ("TRANSFER_IN", "POINT_CASHOUT", "SUBSCRIPTION_PAYOUT") \
+                    else -e["amount"]
+                low = min(low, running)
+            opening[acc_id] = round10(min(rng.lognormvariate(13.0, 1.0), 30_000_000)) - low
+            self.balance[acc_id] = opening[acc_id]
+        flat = sorted(((e["dt"], acc_id, i, e) for acc_id, evs in self.ledger.items() for i, e in enumerate(evs)),
+                      key=lambda x: (x[0], x[1], x[2]))
+        self.ledger_rows = []
+        for dt, acc_id, _, e in flat:
+            sign = 1 if e["type"] in ("TRANSFER_IN", "POINT_CASHOUT", "SUBSCRIPTION_PAYOUT") else -1
+            self.balance[acc_id] += sign * e["amount"]
+            row = self.add("transactions", account_id=acc_id, type=e["type"], amount=e["amount"], fee=0,
+                           balance_after=self.balance[acc_id], transfer_id=e["transfer_id"],
+                           counterpart_bank=e["bank"], counterpart_account_no=e["account_no"],
+                           display_name=e["display_name"], created_at=dt)
+            self.ledger_rows.append((row, e))
+        last = {}
+        for row, _ in self.ledger_rows:
+            last[row["account_id"]] = row["created_at"]
+        for acc_id, meta in self.accounts.items():
+            self.put("account_balances", account_id=acc_id, currency="KRW", balance=self.balance[acc_id],
+                     updated_at=last.get(acc_id, meta["created"]))
+            seen = last.get(acc_id, meta["created"])
+            inactive = seen < NOW - timedelta(days=365)
+            self.put("account_inactivity", account_id=acc_id, last_activity_at=seen, inactivity_flag=inactive,
+                     flagged_at=seen + timedelta(days=365) if inactive else None)
+
+    def build_withdrawal_checks(self):
+        """탈퇴를 점검하다 그만둔 회원 몇 명 (모든 회원은 ACTIVE)."""
+        rng = self.rng
+        for u in rng.sample(self.users, max(1, len(self.users) // 100)):
+            started = self.rdt(NOW - timedelta(days=60), NOW - timedelta(days=1))
+            self.add("withdrawal_checks", user_id=u["id"], status="CANCELED", started_at=started,
+                     balance_verified_at=started + timedelta(minutes=1), data_review_confirmed_at=None,
+                     data_review_version=None, linked_services_confirmed_at=None, completed_at=None)
+
+    def build_bank(self):
+        self.build_income()
+        self.build_card_payments()
+        self.build_transfers()
+        self.build_deposits()
+        self.build_ledger()
+        self.build_withdrawal_checks()
+
+    def build_notifications(self):
+        """알림. event_id = 원인 이벤트 (같은 이벤트·회원·종류로 두 번 보내지 않음)."""
+        rng = self.rng
+        notes = []   # (회원, 카드, 계좌 id, 종류, 제목, 본문, 시각, event_id)
+
+        def note(u, ntype, title, body, at, event, card=None, account=None):
+            notes.append((u, card, account, ntype, title, body, at, event))
+
         txs_by_card = defaultdict(list)
         for tx in self.txs:
             txs_by_card[tx["card"]["id"]].append(tx)
         for a in self.apps:
             at = a["row"]["updated_at"]
             if a["status"] in APP_NOTICE and at >= NOW - timedelta(days=30):
-                notes.append((a["user"], None, "APPLICATION", APP_NOTICE[a["status"]],
-                              f"{a['prod']['name']} · {APP_MEMO[a['status']]}", at))
+                note(a["user"], "APPLICATION", APP_NOTICE[a["status"]],
+                     f"{a['prod']['name']} · {APP_MEMO[a['status']]}", at, f"{a['id']}:{a['status']}")
         for (cid, p), bill in sorted(self.bills.items()):
             row, card = bill["row"], self.cards[cid]
             if row["status"] != "CONFIRMED" or not row["total_amount"]:
                 continue
-            notes.append((card["user"], card, "PAYMENT_DUE", "카드값 결제 예정",
-                          f"{p.month}월 {p.day}일에 {self.card_name(card)} {row['total_amount']:,}원이 결제될 예정이에요",
-                          row["confirmed_at"] + timedelta(hours=3)))
-            account = self.accounts.get(card["account"])
-            if account and account["balance"] < row["total_amount"]:
-                notes.append((card["user"], card, "LOW_BALANCE", "결제 계좌 잔액이 부족해요",
-                              f"{p.month}월 {p.day}일 결제 예정 금액보다 {account['bank_name']} 계좌 잔액이 "
-                              f"{row['total_amount'] - account['balance']:,}원 부족해요",
-                              row["confirmed_at"] + timedelta(hours=4)))
+            note(card["user"], "PAYMENT_DUE", "카드값 결제 예정",
+                 f"{p.month}월 {p.day}일에 {self.card_name(card)} {row['total_amount']:,}원이 결제될 예정이에요",
+                 row["confirmed_at"] + timedelta(hours=3), row["id"], card=card)
+            acc = card["account"]
+            if acc and self.balance[acc] < row["total_amount"]:
+                display = self.accounts[acc]["row"]["resAccountDisplay"]
+                note(card["user"], "LOW_BALANCE", "결제 계좌 잔액이 부족해요",
+                     f"{p.month}월 {p.day}일 결제 예정 금액보다 {BANK_NAME} {display} 계좌 잔액이 "
+                     f"{row['total_amount'] - self.balance[acc]:,}원 부족해요",
+                     row["confirmed_at"] + timedelta(hours=4), row["id"], card=card, account=acc)
         for h in self.rows["user_card_status_histories"]:
             if h["to_status"] in CARD_STATUS_NOTICE and NOW - timedelta(days=60) <= h["changed_at"] <= NOW:
                 card = self.cards[h["user_card_id"]]
-                notes.append((card["user"], card, "CARD_STATUS", CARD_STATUS_NOTICE[h["to_status"]],
-                              self.card_name(card), h["changed_at"] + timedelta(minutes=1)))
+                note(card["user"], "CARD_STATUS", CARD_STATUS_NOTICE[h["to_status"]], self.card_name(card),
+                     h["changed_at"] + timedelta(minutes=1), h["id"], card=card)
         for card in self.cards.values():
             if card["end"] is not None or card["start"] > NOW:
                 continue
@@ -1459,39 +1935,61 @@ class SeedBuilder:
                            and tx["status"] != "CANCELED" and s <= tx["dt"].date() <= e)
                 nxt = [m for _, m in prod["tiers"] if m > perf]
                 if nxt:
-                    notes.append((card["user"], card, "PERFORMANCE", "다음 달 혜택까지 조금 남았어요",
-                                  f"{self.card_name(card)} 실적 {perf:,}원, {nxt[0] - perf:,}원 더 쓰면 다음 구간 혜택을 받아요",
-                                  datetime.combine(TODAY, time(8))))
+                    note(card["user"], "PERFORMANCE", "다음 달 혜택까지 조금 남았어요",
+                         f"{self.card_name(card)} 실적 {perf:,}원, {nxt[0] - perf:,}원 더 쓰면 다음 구간 혜택을 받아요",
+                         datetime.combine(TODAY, time(8)), f"{card['id']}:{TODAY:%Y%m%d}", card=card)
             fee_date = row["next_annual_fee_date"]
             if fee_date and (fee_date - TODAY).days <= 30:
-                notes.append((card["user"], card, "ANNUAL_FEE", "연회비 청구 예정",
-                              f"{fee_date.month}월 {fee_date.day}일에 {self.card_name(card)} 연회비 "
-                              f"{row['annual_fee_amount']:,}원이 청구될 예정이에요",
-                              NOW - timedelta(hours=rng.randint(1, 72))))
+                note(card["user"], "ANNUAL_FEE", "연회비 청구 예정",
+                     f"{fee_date.month}월 {fee_date.day}일에 {self.card_name(card)} 연회비 "
+                     f"{row['annual_fee_amount']:,}원이 청구될 예정이에요",
+                     NOW - timedelta(hours=rng.randint(1, 72)), f"{card['id']}:{fee_date:%Y%m%d}", card=card)
             unused_since = row["last_used_at"] or card["start"]
             if card["start"] < NOW - timedelta(days=90) and unused_since < NOW - timedelta(days=60):
                 fee = f" 연회비 {row['annual_fee_amount']:,}원이 나가고 있어요" if row["annual_fee_amount"] else ""
-                notes.append((card["user"], card, "UNUSED_CARD", "60일 넘게 안 쓴 카드가 있어요",
-                              f"{self.card_name(card)}를 오래 안 쓰셨어요.{fee}", datetime.combine(TODAY, time(8, 30))))
+                note(card["user"], "UNUSED_CARD", "60일 넘게 안 쓴 카드가 있어요",
+                     f"{self.card_name(card)}를 오래 안 쓰셨어요.{fee}", datetime.combine(TODAY, time(8, 30)),
+                     f"{card['id']}:{TODAY:%Y%m%d}", card=card)
         for u, row in self.point_rows:
             if row["expiring_amount"]:
                 d = row["expiring_date"]
-                notes.append((u, None, "POINT_EXPIRING", "포인트가 곧 사라져요",
-                              f"{d.month}월 {d.day}일에 {row['point_name']} {row['expiring_amount']:,}점이 소멸돼요. "
-                              f"지금 현금으로 바꿔 보세요", NOW - timedelta(hours=rng.randint(1, 48))))
-        for tx in self.txs:
+                note(u, "POINT_EXPIRING", "포인트가 곧 사라져요",
+                     f"{d.month}월 {d.day}일에 {row['point_name']} {row['expiring_amount']:,}점이 소멸돼요. "
+                     f"지금 현금으로 바꿔 보세요", NOW - timedelta(hours=rng.randint(1, 48)), row["id"])
+        for d in self.deposits:
+            row = d["row"]
+            maturity = datetime.strptime(row["maturity_date"], "%Y%m%d").date()
+            if row["status"] == "ACTIVE" and 0 <= (maturity - TODAY).days <= 30:
+                note(d["user"], "MATURITY", "만기가 다가와요",
+                     f"{d['product']['name']}이 {maturity.month}월 {maturity.day}일에 만기돼요",
+                     datetime.combine(TODAY, time(8)), row["id"], account=row["source_account_id"])
+        for tx in self.txs:   # 카드 결제 알림
             s = tx["card"]["settings"]
             if tx["dt"] >= NOW - timedelta(days=2) and s and s["payment_alert_enabled"]:
-                notes.append((tx["card"]["user"], tx["card"], "TRANSACTION", "결제 알림",
-                              f"{tx['merchant']['name']} {tx['amount']:,}원 결제 ({self.card_name(tx['card'])})",
-                              tx["dt"]))
+                note(tx["card"]["user"], "TRANSACTION", "결제 알림",
+                     f"{tx['merchant']['name']} {tx['amount']:,}원 결제 ({self.card_name(tx['card'])})",
+                     tx["dt"], tx["id"], card=tx["card"])
+        for row, e in self.ledger_rows:   # 계좌 입출금 알림 (체크카드 결제는 위 카드 알림으로 대신함)
+            meta = self.accounts[row["account_id"]]
+            prefs = meta["prefs"]
+            deposit = row["type"] in ("TRANSFER_IN", "POINT_CASHOUT", "SUBSCRIPTION_PAYOUT")
+            if (row["created_at"] < NOW - timedelta(days=2) or e["source"] == "card_tx" or not prefs["enabled"]
+                    or not (prefs["deposit_enabled"] if deposit else prefs["withdrawal_enabled"])
+                    or row["amount"] < prefs["minimum_amount"]):
+                continue
+            word = "입금" if deposit else "출금"
+            note(meta["user"], "TRANSACTION", f"{word} 알림",
+                 f"{row['display_name']} {row['amount']:,}원 {word} · 잔액 {row['balance_after']:,}원",
+                 row["created_at"], row["id"], account=row["account_id"])
 
-        for u, card, ntype, title, body, at in sorted(notes, key=lambda n: (n[5], n[0]["id"])):
+        for u, card, account, ntype, title, body, at, event in sorted(notes, key=lambda n: (n[6], n[0]["id"], n[7])):
             if at > NOW:
                 continue
-            self.add("notifications", "notification_id", user_id=u["id"], user_card_id=card["id"] if card else None,
-                     type=ntype, title=title, body=body,
-                     is_read=at < NOW - timedelta(days=1) and rng.random() < 0.8, sent_at=at)
+            read_at = at + timedelta(minutes=rng.randint(1, 600)) \
+                if at < NOW - timedelta(days=1) and rng.random() < 0.8 else None
+            self.add("notifications", user_id=u["id"], account_id=account, user_card_id=card["id"] if card else None,
+                     event_id=event, type=ntype, title=title, body=body, status="READ" if read_at else "SENT",
+                     read_at=min(read_at, NOW) if read_at else None, created_at=at)
 
     # --- 실행 ---------------------------------------------------------------
 
@@ -1513,17 +2011,19 @@ class SeedBuilder:
         self.build_mydata()
         self.build_points()
         self.finalize_cards()
+        self.build_bank()
         self.build_notifications()
         return self
 
     def write_sql(self, path):
         lines = [
-            "-- 토스 카드 서비스 클론 - 목 데이터",
+            "-- 두린은행 계좌·거래·상품·카드 서비스 - 목 데이터",
             f"-- scripts/generate_seed.py 로 생성 (users={self.n_users}, seed={self.seed}, 기준 시각 {NOW:%Y-%m-%d %H:%M})",
             "-- docs/schema.sql 실행 후 이 파일을 실행하세요. 다시 실행하면 기존 데이터를 지우고 새로 넣습니다.",
             "",
             "SET NAMES utf8mb4;",
             "USE toss_card;",
+            "SET time_zone = '+09:00';",
             "SET FOREIGN_KEY_CHECKS = 0;",
         ]
         lines += [f"TRUNCATE TABLE {t};" for t in reversed(TABLE_ORDER)]
@@ -1541,7 +2041,7 @@ class SeedBuilder:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="토스 카드 클론 목 데이터 생성")
+    parser = argparse.ArgumentParser(description="두린은행 서비스 목 데이터 생성")
     parser.add_argument("--users", type=int, default=300, help="회원 수 (기본 300)")
     parser.add_argument("--seed", type=int, default=42, help="난수 seed (기본 42)")
     parser.add_argument("--out", default=str(Path(__file__).resolve().parent.parent / "docs" / "seed.sql"))
