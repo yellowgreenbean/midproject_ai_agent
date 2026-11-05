@@ -59,8 +59,18 @@ py -3.13 -m venv .venv
 .venv\Scripts\python -m pip install -r requirements.txt
 .venv\Scripts\python -m uvicorn app.main:app --reload
 ```
-http://localhost:8000/docs 에서 호출. **로그인은 아직 없다** — 지금은 `X-User-Id: user_001` 헤더로 회원을 정한다(`app/deps.py`).
-회원 상태별 허용(기획서 Part 1 7.3): `ACTIVE`·`RESTRICTED` 조회 가능, `PENDING_VERIFICATION` 403, `WITHDRAWN`·없는 회원 401.
+http://localhost:8000/docs 에서 호출. 먼저 `POST /auth/login` 으로 로그인하면 브라우저에 쿠키가 저장되고, 그 뒤 호출은 그 회원으로 처리된다.
+시드 회원의 아이디는 `users.username`(예: `minjun_kim` = user_001), 비밀번호는 모두 `.env.example` 의 `SEED_PASSWORD`.
+
+**로그인 (기획서 Part 1 AUTH-F05)** — `app/routers/auth.py`, `app/deps.py`, `app/security.py`
+- 서버 세션 + 쿠키 `sid`(HttpOnly·SameSite=Lax). DB `sessions.id` 에는 쿠키 원문이 아니라 해시(`ses_…`)만 둔다.
+- 세션 만료: **유휴 10분**(마지막 요청 기준) · **최대 12시간**(로그인 기준, 써도 안 늘어남) → 401 `SESSION_EXPIRED`. 로그아웃하면 바로 끊긴다.
+- 실패: 없는 아이디·틀린 비밀번호·탈퇴 회원 모두 401 `INVALID_CREDENTIALS` 하나(계정 존재 여부를 숨김).
+  같은 아이디가 5번 연속 틀리면 1분 동안 429 `LOGIN_TOO_MANY_ATTEMPTS`(서버 메모리, 재시작하면 초기화).
+- 로그인 실패는 `local_credentials.failed_attempts` 에 세지 않는다 — 기획서 6.3: 그 칸은 **본인 확인(step-up) 실패만** 센다.
+- 회원 상태별 허용(Part 1 7.3): `ACTIVE`·`RESTRICTED` 사용 가능, `PENDING_VERIFICATION` 은 로그인·`/users/me` 만(나머지 403), `WITHDRAWN`·없는 회원 401.
+- 상태를 바꾸는 요청(POST·PATCH·DELETE)은 CORS 허용 주소나 이 API 자신에서 온 것만 받는다(그 밖의 `Origin` 은 403, CSRF 방어).
+- 개발용 `X-User-Id` 헤더: `backend/.env` 에 `AUTH_DEV_HEADER=true` 일 때만 쓰인다(기본 꺼짐). 테스트는 이 설정을 켜고 돈다.
 
 **CORS** — 화면(프런트엔드)을 다른 포트로 띄워 이 API 를 부를 수 있게 허용한다(`app/main.py`).
 - 허용 주소: `http://localhost:5173`·`http://127.0.0.1:5173`(Vite), `http://localhost:3000`·`http://127.0.0.1:3000`(Next·CRA).
@@ -71,6 +81,8 @@ http://localhost:8000/docs 에서 호출. **로그인은 아직 없다** — 지
 ## 5. API (기획서 경로)
 | 기능 | 엔드포인트 | 기획서 | 위치 |
 |---|---|---|---|
+| 로그인 · 로그아웃 | `POST /auth/login`, `POST /auth/logout` | Part 1 AUTH-F05 | `routers/auth.py` |
+| 내 정보 (가입 마무리 중에도 가능) | `GET /users/me` | Part 1 AUTH-F07(조회만) | `routers/users.py` |
 | 내 계좌 목록 (+잔액, 해지 계좌는 `?status=CLOSED` 로만, `?type=`) | `GET /accounts` | Part 2 ACCT-F02·F07 | `routers/accounts.py` |
 | 계좌 상세 (+잔액) | `GET /accounts/{accountId}` | ACCT-F02 | `routers/accounts.py` |
 | 잔액 (`account_balance_view`) | `GET /accounts/{accountId}/balance` | ACCT-F03 | `routers/accounts.py` |
@@ -88,7 +100,7 @@ CODEF `res…` 빈 칸은 `""`, 우리가 만든 빈 칸은 `null`. 거래에는
 오류 형식 (기획서 Part 1 7.1): `{"success": false, "error": {"code": "ACCOUNT_NOT_FOUND", "message": "계좌를 찾을 수 없어요."}}`
 — 남의 것과 없는 것은 똑같이 404(존재 여부를 숨김, Part 2 ACCT-F02). 기획서 업무 규칙 값(기본 한도, 은행별 자릿수 등)은 `app/rules.py`.
 
-아직 없는 것: 쓰기 API(이체 실행·예약 등록·계좌 개설/설정/해지 등)는 본인 확인(`step_up_challenges`)이 필요해 로그인 구현 뒤에 만든다.
+아직 없는 것: 본인 확인(`POST /auth/step-up`)과, 그것이 필요한 쓰기 API(이체 실행·예약 등록·계좌 개설/설정/해지 등). 회원가입·Google 로그인.
 
 ## 6. 테스트
 ```bash
@@ -98,3 +110,6 @@ CODEF `res…` 빈 칸은 `""`, 우리가 만든 빈 칸은 `null`. 거래에는
   기대값은 더미·시드의 실제 값이다.
 - `tests/test_models_schema.py`: 모델과 DB 의 칸·타입·NULL·기본값·키·제약·인덱스 비교(표 60개 각각). `docs/sql` 만 고치고 모델을 다시 안 만들면 여기서 실패한다.
 - `tests/test_api.py`: 위 API 의 정상·실패 동작(남의 계좌 404, 회원 상태별 401/403, 자릿수 오류, 커서 페이지 등).
+- `tests/test_auth.py`: 로그인·로그아웃(AUTH-F05 완료 기준, 기획서 11장 1차 QA) — 실패 시 세션 없음, 로그아웃·유휴 10분·최대 12시간 뒤 거부,
+  계정 존재 숨김, 실패 속도 제한, 회원 상태별 처리, 쿠키에 HttpOnly, DB 에 쿠키 원문 없음, 다른 `Origin` 의 POST 차단.
+- `tests/test_cors.py`: CORS 허용 주소·차단.

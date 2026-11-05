@@ -23,6 +23,11 @@ def _body(code: str, message: str, **extra) -> dict:
     return {"success": False, "error": {"code": code, "message": message, **extra}}
 
 
+def error_response(status_code: int, code: str, message: str) -> JSONResponse:
+    """예외를 던질 수 없는 곳(미들웨어)에서 같은 모양의 오류를 돌려줄 때."""
+    return JSONResponse(_body(code, message), status_code=status_code)
+
+
 # --- 자주 쓰는 오류 ---------------------------------------------------------------
 def unauthorized() -> ApiError:
     return ApiError(401, "UNAUTHORIZED", "로그인이 필요합니다.")

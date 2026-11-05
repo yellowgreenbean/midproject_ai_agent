@@ -1,35 +1,83 @@
+"""현재 로그인한 회원 꺼내기 — 모든 보호 API 가 여기만 거친다(라우터는 회원을 직접 찾지 않음).
+
+1. 쿠키 sid → sessions 행(id = 토큰의 해시) → 유효한지 확인 (AUTH-F05)
+     끊김(revoked_at) · 최대 12시간(expires_at) · 유휴 10분(last_seen_at) 중 하나라도 걸리면 401 SESSION_EXPIRED
+2. 쿠키가 없고 설정 AUTH_DEV_HEADER=true 이면 X-User-Id 헤더 (개발용)
+3. 회원 상태 (Part 1 7.3)
+     WITHDRAWN · 없는 회원         401
+     PENDING_VERIFICATION          로그인은 되지만 가입 마무리 화면만 → CurrentUserId 는 403, LoginUser(/users/me)는 통과
+     ACTIVE · RESTRICTED           통과 (RESTRICTED 가 새 금융 작업을 못 하는 것은 각 작업 API 가 막는다)
+"""
+
+from dataclasses import dataclass
 from typing import Annotated
 
-from fastapi import Depends, Header
+from fastapi import Depends, Header, Request
 from sqlalchemy.orm import Session
 
+from app.config import settings
 from app.db import get_db
 from app.errors import ApiError, unauthorized
-from app.models import User
+from app.models import AuthSession, User
+from app.rules import SESSION_COOKIE, SESSION_IDLE, SESSION_TOUCH_INTERVAL, now_kst
+from app.security import session_id_for
 
 DB = Annotated[Session, Depends(get_db)]
 
 
-def get_current_user_id(
-    db: DB,
-    x_user_id: Annotated[str | None, Header()] = None,
-) -> str:
-    """현재 로그인한 회원의 id.
+def session_expired() -> ApiError:
+    return ApiError(401, "SESSION_EXPIRED", "다시 로그인해 주세요.")
 
-    임시로 X-User-Id 헤더를 믿는다. 로그인(AUTH-F05)이 들어오면 세션 쿠키에서 user_id 를 꺼내도록
-    이 함수만 바꾸면 된다(라우터는 그대로). 회원 상태별 허용은 기획서 Part 1 7.3:
-      ACTIVE·RESTRICTED  로그인·조회 가능 (RESTRICTED 가 새 금융 작업을 못 하는 것은 각 작업 API 가 막는다)
-      PENDING_VERIFICATION  가입 마무리 화면만 → 403
-      WITHDRAWN · 없는 회원  로그인 불가 → 401
-    """
-    if not x_user_id:
+
+def is_session_alive(s: AuthSession, now) -> bool:
+    return s.revoked_at is None and now < s.expires_at and now < s.last_seen_at + SESSION_IDLE
+
+
+@dataclass
+class Login:
+    user: User
+    session: AuthSession | None  # 개발용 헤더로 들어오면 None
+
+
+def get_login(
+    request: Request,
+    db: DB,
+    x_user_id: Annotated[str | None, Header(description="개발용 — AUTH_DEV_HEADER=true 일 때만 쓰임")] = None,
+) -> Login:
+    token = request.cookies.get(SESSION_COOKIE)
+    session = None
+    if token:
+        session = db.get(AuthSession, session_id_for(token))
+        if session is None:
+            raise unauthorized()
+        now = now_kst()
+        if not is_session_alive(session, now):
+            raise session_expired()
+        if now - session.last_seen_at >= SESSION_TOUCH_INTERVAL:
+            session.last_seen_at = now
+            db.commit()
+        user = db.get(User, session.user_id)
+    elif settings.auth_dev_header and x_user_id:
+        user = db.get(User, x_user_id)
+    else:
         raise unauthorized()
-    user = db.get(User, x_user_id)
+
     if user is None or user.status == "WITHDRAWN":
         raise unauthorized()
-    if user.status == "PENDING_VERIFICATION":
+    return Login(user=user, session=session)
+
+
+def get_login_user(login: Annotated[Login, Depends(get_login)]) -> User:
+    """가입 마무리 중(PENDING_VERIFICATION)도 통과 — /users/me 처럼 그 화면에 필요한 API 용."""
+    return login.user
+
+
+def get_current_user_id(login: Annotated[Login, Depends(get_login)]) -> str:
+    """일반 보호 API 용."""
+    if login.user.status == "PENDING_VERIFICATION":
         raise ApiError(403, "SIGNUP_INCOMPLETE", "가입을 마무리해 주세요.")
-    return user.id
+    return login.user.id
 
 
+LoginUser = Annotated[User, Depends(get_login_user)]
 CurrentUserId = Annotated[str, Depends(get_current_user_id)]

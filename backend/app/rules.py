@@ -32,6 +32,20 @@ BANK_ACCOUNT_DIGITS = {
 }
 
 
+# --- 로그인 세션 (Part 1 AUTH-F05 「세션 만료(유휴/최대)」, 12장 「세션」) ---------------------------
+# 사용자 결정 2026-11-05: 유휴 10분, 최대 12시간 (기획서 12장에는 아직 기록 안 됨)
+SESSION_COOKIE = "sid"
+SESSION_IDLE = timedelta(minutes=10)  # 마지막 요청(last_seen_at)에서 이만큼 지나면 만료
+SESSION_MAX = timedelta(hours=12)  # 로그인(created_at)에서 이만큼 지나면 만료 → expires_at. 써도 늘어나지 않음
+SESSION_TOUCH_INTERVAL = timedelta(minutes=1)  # last_seen_at 은 요청마다가 아니라 1분에 한 번만 갱신
+
+# --- 로그인 실패 보호 (AUTH-F05 [설계 권고] 「속도 제한과 점진적 보호」, 「과도한 영구 잠금 금지」) --------
+# 로그인 실패는 DB(local_credentials.failed_attempts)에 세지 않는다 — 6.3 표: 그 칸은 본인 확인 실패만 센다.
+# 대신 서버 메모리에서 같은 아이디가 연속으로 틀리면 잠깐 기다리게 한다(서버를 다시 켜면 초기화).
+LOGIN_THROTTLE_FAILURES = 5
+LOGIN_THROTTLE_WAIT = timedelta(minutes=1)
+
+
 def now_kst() -> datetime:
     """DB 에 저장하는 모양(시간대 없는 한국 시각)의 지금."""
     return datetime.now(KST).replace(tzinfo=None)

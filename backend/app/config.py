@@ -13,6 +13,13 @@ class Settings(BaseSettings):
         "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
     )
 
+    # 로그인 쿠키에 Secure 를 붙일지. https 로 배포할 때 true. 내 PC(http)에서는 false 라야 쿠키가 저장된다
+    cookie_secure: bool = False
+
+    # 개발용: true 면 로그인 쿠키가 없을 때 X-User-Id 헤더로 회원을 정한다(Swagger·curl 시험용).
+    # 헤더만 바꾸면 누구든 다른 회원 행세를 할 수 있으므로 기본값은 false — 배포 환경에서 켜지 말 것
+    auth_dev_header: bool = False
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]

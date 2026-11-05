@@ -1,6 +1,6 @@
 # 더미에 없는 기능을 시험하기 위한 시드 SQL 만들기 (읽기만 함, DB 에 직접 넣지 않음)
 # docs/세션_작업_정리_2026-11-05.md 「seed가 필요한 상황」 2번(이체·예약·자주 쓰는 계좌·한도·타행·포인트·알림)과
-# 3번(로그인: 비밀번호·PIN 해시). 옛 generate_seed.py / docs/seed.sql 과는 별개이며 그 파일들은 건드리지 않는다.
+# 3번(로그인: 비밀번호·PIN 해시). 목 데이터는 load_dummy.py(더미) → 이 파일(시나리오 시드) 순서 하나뿐이다.
 #
 # 순서: 더미를 먼저 넣고(load_dummy.py) 이 시드를 넣는다. 시드는 더미의 회원·계좌·카드를 가리킨다.
 #   python3 scripts/seed_scenarios.py > seed_scenarios.sql            # 처음 넣을 때
@@ -42,8 +42,10 @@ EXTERNAL_TEST = [("신한은행", 12, "110", "임처리", "PENDING 후 SUCCESS")
 SCENARIOS = """
 로그인 (3번)
   - 탈퇴(user_029)를 뺀 29명: auth_identities(LOCAL, username) + local_credentials. 탈퇴 회원은 해시를 지움(Part 1 즉시 삭제)
-  - user_026 로그인 실패 4회(한 번 더 틀리면 잠금) · user_027 잠김(locked_until = 지금 + 30분)
-  - 정상 계좌가 있는 ACTIVE 회원: pin_credentials. user_019 PIN 잠김
+  - local_credentials.failed_attempts 는 본인 확인(step-up) 비밀번호 실패만 센다(기획서 6.3) — 로그인 실패는 세지 않음
+  - user_026 본인 확인 실패 4회(한 번 더 틀리면 잠김) · user_027 본인 확인 잠김(실패 5회 = 영구 잠금, 영업점 방문 안내.
+    시간이 지나도 풀리지 않으므로 locked_until 은 비움). 둘 다 로그인·조회는 되고 중요 작업만 STEP_UP_LOCKED
+  - 정상 계좌가 있는 ACTIVE 회원: pin_credentials. user_019 PIN 잠김(locked_until = 지금 + 30분 — PIN 잠금 규칙은 3차에 정함)
   - 상태별 로그인: user_024 RESTRICTED · user_028 PENDING_VERIFICATION · user_029 WITHDRAWN(로그인 수단 없음)
 이체 한도
   - 해지 안 된 계좌 모두 1회 500만 · 1일 1,000만. acc_007(user_002)만 1회 30만 · 1일 50만 → 한도 초과 시험
@@ -132,10 +134,11 @@ def build(root, now, password, pin):
         {"id": f"aid_{u['id'][5:]}", "user_id": u["id"], "provider": "LOCAL", "provider_subject": u["username"],
          "linked_at": u["created_at"]} for u in login_users
     ]
+    # 본인 확인 실패 횟수: 5회면 영구 잠금이라 locked_until(시간 잠금용)은 쓰지 않는다
     t["local_credentials"] = [
         {"user_id": u["id"], "password_hash": pw_hash[u["id"]], "password_updated_at": u["created_at"],
          "failed_attempts": {"user_026": 4, "user_027": 5}.get(u["id"], 0),
-         "locked_until": lock_until if u["id"] == "user_027" else None} for u in login_users
+         "locked_until": None} for u in login_users
     ]
     pin_users = sorted({a["user_id"] for a in d["accounts"] if a["lifecycle_status"] == "ACTIVE"
                         and a["account_type"] == "CHECKING" and users[a["user_id"]]["status"] == "ACTIVE"})

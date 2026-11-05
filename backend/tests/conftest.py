@@ -16,6 +16,9 @@ os.environ["DATABASE_URL"] = os.environ.get(
     "postgresql+psycopg://app:app@localhost:5433/midproject_test",
 )
 
+# 조회 API 테스트(test_api.py)는 회원을 개발용 X-User-Id 헤더로 정한다. 로그인 자체는 test_auth.py 가 쿠키로 시험한다.
+os.environ["AUTH_DEV_HEADER"] = "true"
+
 import psycopg  # noqa: E402
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
@@ -53,3 +56,13 @@ def client():
 
 def as_user(user_id: str) -> dict:
     return {"X-User-Id": user_id}
+
+
+def seed_password() -> str:
+    """seed_scenarios.py 가 해시로 넣은 시험용 비밀번호 — 환경변수, 없으면 backend/.env.example (seed 와 같은 순서)."""
+    if os.environ.get("SEED_PASSWORD"):
+        return os.environ["SEED_PASSWORD"]
+    for line in (ROOT / "backend" / ".env.example").read_text(encoding="utf-8").splitlines():
+        if line.startswith("SEED_PASSWORD="):
+            return line.split("=", 1)[1].strip()
+    raise RuntimeError("SEED_PASSWORD 를 찾을 수 없음")
