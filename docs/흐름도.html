@@ -1,0 +1,515 @@
+<!doctype html>
+<!-- 두린은행 기능 흐름도 원본. 기준: docs/기획서.md (Part 1~6). 고친 뒤 PNG 다시 만들기:
+     scripts/render_flowchart.sh  → docs/흐름도.png -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>두린은행 기능 흐름도</title>
+<style>
+:root{
+  --ink:#2b2340; --sub:#5d5675; --line:#3d3570;
+  --lav:#f4efff; --lav2:#e6dcff; --yel:#fff2bf; --blu:#d9edff; --grn:#ddf4d6;
+  --pur:#ece2ff; --org:#ffe3c8; --pnk:#ffdbe8; --gry:#ececf2; --red:#ffe1e1;
+  --yelP:#fff9e6; --grnP:#f0fbec; --bluP:#eef6ff; --pnkP:#fff1f6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{word-break:keep-all;width:1500px;padding:36px 40px 48px;font-family:"Apple SD Gothic Neo","Pretendard","Noto Sans KR",sans-serif;color:var(--ink);
+  background:#fff radial-gradient(#e6e3ef 1.2px,transparent 1.2px) 0 0/22px 22px}
+code,.mono{font-family:"SF Mono",Menlo,monospace;font-size:12.5px;overflow-wrap:anywhere}
+.title{margin:0 auto 26px;width:1100px;background:var(--lav2);border-radius:36px;padding:22px 30px;text-align:center;position:relative}
+.title h1{font-size:40px;font-weight:900;letter-spacing:-1px}
+.title p{font-size:18px;color:var(--sub);margin-top:6px}
+.title .spark{position:absolute;right:-26px;top:-18px;font-size:34px}
+.toc{display:flex;gap:10px;justify-content:center;margin-bottom:30px;flex-wrap:wrap}
+.toc span{border-radius:999px;padding:8px 16px;font-weight:800;font-size:15px}
+.part{border-radius:30px;padding:26px 26px 28px;margin-bottom:34px;border:2px solid #ddd3f7;background:#fbf9ffcc}
+.phead{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.phead .no{background:var(--line);color:#fff;border-radius:14px;padding:6px 14px;font-weight:900;font-size:20px}
+.phead h2{font-size:30px;font-weight:900;letter-spacing:-.5px}
+.phead .ids{margin-left:auto;font-size:15px;color:var(--sub);font-weight:700}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:20px}
+.grid>div,.split>div,.box{min-width:0}
+.pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:7px 20px;font-weight:900;font-size:21px;margin-bottom:12px}
+.box{border-radius:22px;padding:16px 16px 18px;margin-bottom:16px}
+.row{display:flex;align-items:stretch;gap:0}
+.row>.c{flex:1}
+.c{border-radius:16px;padding:12px 10px 13px;text-align:center;box-shadow:0 2px 0 #0000000d}
+.c .i{font-size:26px;line-height:1.2}
+.c b{display:block;font-size:16.5px;font-weight:900;margin:3px 0 4px;letter-spacing:-.3px}
+.c small{display:block;font-size:13px;color:var(--sub);line-height:1.38}
+.ar{align-self:center;font-size:24px;font-weight:900;color:var(--line);padding:0 5px}
+.cols{display:grid;gap:14px}
+.cols .c{text-align:left;display:flex;gap:10px;align-items:flex-start}
+.cols .c .i{font-size:24px}
+.split{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.flow{display:flex;align-items:center;flex-wrap:nowrap}
+.n{border-radius:14px;padding:10px 8px;text-align:center;font-size:13px;line-height:1.35;flex:1 1 0;min-width:0;overflow-wrap:anywhere}
+.n b{display:block;font-size:14.5px;font-weight:900;margin-bottom:2px}
+.n small{color:var(--sub);font-size:12px}
+.n code{font-size:10.5px;overflow-wrap:normal;white-space:nowrap}
+.n b{white-space:nowrap}
+.flow>.n{flex:1 1 auto}
+.dia{width:126px;height:126px;flex:none;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12.5px;font-weight:800;line-height:1.3;
+  background:var(--yel);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);padding:18px}
+.yes,.no{font-size:12px;font-weight:900;border-radius:999px;padding:2px 8px;margin:0 2px}
+.yes{background:var(--grn);color:#256b1b}.no{background:var(--pnk);color:#a3214f}
+.sub{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.note{border-radius:12px;padding:9px 12px;font-size:13px;line-height:1.45;flex:1;min-width:220px}
+.note b{font-weight:900}
+.side .s{background:#fff;border:2px solid #e4dcfa;border-radius:18px;padding:14px 14px;margin-bottom:12px}
+.side h4{font-size:17px;font-weight:900;margin-bottom:8px}
+.side li{list-style:none;font-size:13.5px;line-height:1.5;margin:3px 0}
+.tag{display:inline-block;border-radius:999px;padding:1px 9px;font-weight:800;font-size:12px;font-family:"SF Mono",Menlo,monospace;margin-right:4px}
+.warn{background:var(--red);border:1.5px solid #f3a6a6;border-radius:12px;padding:8px 14px;font-size:13.5px;font-weight:700;color:#9b2c2c;text-align:center;margin-top:10px}
+.hub{display:grid;grid-template-columns:330px 60px 1fr 60px 330px;align-items:center}
+.stack{display:grid;gap:10px}
+.big{font-size:15px}
+.bottom{background:var(--yel);border-radius:999px;padding:20px 30px;text-align:center;font-size:24px;font-weight:900;letter-spacing:-.5px}
+.yel{background:var(--yel)}.blu{background:var(--blu)}.grn{background:var(--grn)}.pur{background:var(--pur)}.org{background:var(--org)}.pnk{background:var(--pnk)}.gry{background:var(--gry)}.lav{background:var(--lav)}.lav2{background:var(--lav2)}
+.yelP{background:var(--yelP)}.grnP{background:var(--grnP)}.bluP{background:var(--bluP)}.pnkP{background:var(--pnkP)}
+</style>
+</head>
+<body>
+
+<div class="title"><span class="spark">✨</span>
+  <h1>🏦 두린은행 — 은행 모바일 웹서비스 기능 흐름도</h1>
+  <p>토스 클론 · 학습용 모의 서비스 · 기준: <b>docs/기획서.md</b> Part 1~6 · 2026-11-05</p>
+</div>
+<div class="toc">
+  <span class="pur">👤 Part 1 회원·인증 · AUTH-F01~F13</span>
+  <span class="blu">🏛️ Part 2 계좌 · ACCT-F01~F13</span>
+  <span class="grn">🐷 Part 3 예금·적금 상품 · PROD-F01~F11</span>
+  <span class="pnk">💳 Part 4 카드 · CARD-F01~F16</span>
+  <span class="yel">💸 Part 5 거래 · TRX-F01~F14</span>
+  <span class="org">🔗 Part 6 연결·공통 규칙</span>
+</div>
+
+<!-- ===================== Part 1 ===================== -->
+<section class="part">
+  <div class="phead"><span class="no">Part 1</span><h2>👤 회원가입 · 로그인 · 인증</h2><span class="ids">AUTH-F01 ~ F13 · 회원·인증 파트</span></div>
+  <div class="grid"><div>
+    <div class="box lav"><span class="pill lav2">🚩 1차 MVP</span>
+      <div class="row">
+        <div class="c yel"><div class="i">🙋</div><b>1. 회원가입</b><small>아이디·비밀번호·이메일<br>이름·생년월일·성별<br>필수 약관 동의</small></div><span class="ar">→</span>
+        <div class="c blu"><div class="i">🔎</div><b>2. 아이디 중복 확인</b><small>가입 전<br>사용 가능 여부</small></div><span class="ar">→</span>
+        <div class="c grn"><div class="i">✉️</div><b>3. 이메일 인증</b><small>인증번호 발송·확인<br>만료·재발송</small></div><span class="ar">→</span>
+        <div class="c org"><div class="i">🇬</div><b>4. 구글 로그인</b><small>Google OIDC<br>계정 연결</small></div><span class="ar">→</span>
+        <div class="c pur"><div class="i">🔐</div><b>5. 로그인·로그아웃</b><small>세션 발급<br>만료·폐기</small></div><span class="ar">→</span>
+        <div class="c blu"><div class="i">🗝️</div><b>6. 아이디 찾기<br>비밀번호 재설정</b><small>이메일로 복구</small></div>
+      </div>
+      <div class="sub"><div class="note pnk"><b>🛡️ 본인 확인(1차부터)</b> — 이체·카드 발급·계좌 해지 같은 중요 작업 전 <b>로그인 비밀번호 재확인</b>(구글 회원은 구글 재인증) → <code>step_up_challenge_id</code> 발급(짧게 유효·한 번만). <b>연속 실패하면 잠김</b>(기본안 5회) <code>STEP_UP_LOCKED</code>. 3차부터 PIN으로.</div></div>
+    </div>
+    <div class="split">
+      <div class="box grnP"><span class="pill grn">📈 2차 확장</span>
+        <div class="cols">
+          <div class="c pur"><div class="i">🪪</div><div><b>7. 내 정보 조회·수정</b><small>생년월일·성별 수정은 본인 확인 <code>PROFILE_CHANGE</code></small></div></div>
+          <div class="c yel"><div class="i">🔑</div><div><b>8. 비밀번호 변경</b><small>기존 비밀번호 확인 · 변경 후 세션 정리</small></div></div>
+          <div class="c pnk"><div class="i">🚪</div><div><b>9. 회원 탈퇴</b><small>탈퇴 전 3단계 점검 + 본인 확인 <code>WITHDRAWAL</code></small></div></div>
+          <div class="c blu"><div class="i">📄</div><div><b>10. 약관 동의·관리</b><small>필수/선택 동의 이력 (필수 동의 수집은 1차 가입부터)</small></div></div>
+        </div></div>
+      <div class="box bluP"><span class="pill blu">🛡️ 3차 간편 인증</span>
+        <div class="cols">
+          <div class="c pur"><div class="i">🔢</div><div><b>11. PIN 등록</b><small>6자리 · 비밀번호와 따로 해시 저장</small></div></div>
+          <div class="c grn"><div class="i">✅</div><div><b>12. PIN 인증</b><small>본인 확인 수단에 PIN 추가 (같은 <code>POST /auth/step-up</code>)</small></div></div>
+          <div class="c pnk"><div class="i">🔄</div><div><b>13. PIN 변경·재설정</b><small>현재 PIN 확인 또는 재인증 후</small></div></div>
+        </div></div>
+      <div class="box yelP"><span class="pill yel">🚪 탈퇴 전 3단계 (AUTH-F09)</span>
+        <div class="cols">
+          <div class="c yel"><div class="i">①</div><div><b>남은 돈 옮기기</b><small>계좌 잔액 0원 · 처리중 이체 없음 · 진행 중 예금·적금 없음</small></div></div>
+          <div class="c blu"><div class="i">②</div><div><b>삭제될 데이터 확인</b><small>금융거래 기록 5년 보존 · 나머지 1개월 유예 뒤 파기</small></div></div>
+          <div class="c pnk"><div class="i">③</div><div><b>연결된 서비스 확인</b><small>자동·예약 이체, 해지 안 된 카드 0개</small></div></div>
+        </div></div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="s"><h4>🏷️ 회원 상태</h4><ul>
+      <li><span class="tag grn">ACTIVE</span> 모두 가능</li>
+      <li><span class="tag yel">PENDING_VERIFICATION</span><br>가입 마무리 화면만</li>
+      <li><span class="tag org">RESTRICTED</span> 새 금융 작업 ✕<br>정리 동작(본인 계좌로 옮기기·해지·탈퇴)만</li>
+      <li><span class="tag pnk">WITHDRAWN</span> 로그인 불가</li></ul></div>
+    <div class="s"><h4>🔒 보안 원칙</h4><ul>
+      <li>• 비밀번호·PIN·인증번호는 해시만 저장</li>
+      <li>• 비밀번호 실패 <code>local_credentials</code>, PIN 실패 <code>pin_credentials</code></li>
+      <li>• 탈퇴·로그아웃 때 세션 폐기</li></ul></div>
+    <div class="warn">⚠️ 실제 은행 수준 인증을 뜻하지 않음</div>
+  </div></div>
+</section>
+
+<!-- ===================== Part 2 ===================== -->
+<section class="part">
+  <div class="phead"><span class="no">Part 2</span><h2>🏛️ 계좌 관리</h2><span class="ids">ACCT-F01 ~ F13 · 계좌 파트 (거래 실행은 Part 5)</span></div>
+  <div class="grid"><div>
+    <div class="box lav"><span class="pill lav2">🚩 1차 MVP</span>
+      <div class="row">
+        <div class="c yel"><div class="i">➕</div><b>1. 계좌 개설</b><small>입출금 <code>CHECKING</code><br>저축예금 <code>SAVINGS</code></small></div><span class="ar">→</span>
+        <div class="c blu"><div class="i">📋</div><b>2. 계좌 조회</b><small>목록·상세</small></div><span class="ar">→</span>
+        <div class="c grn"><div class="i">💰</div><b>3. 잔액 조회</b><small>읽기 전용 보기<br>(원본은 거래 파트)</small></div><span class="ar">→</span>
+        <div class="c pur"><div class="i">⚙️</div><b>4. 계좌 설정</b><small>별명(1~30자)<br>즐겨찾기</small></div><span class="ar">→</span>
+        <div class="c org"><div class="i">⏸️</div><b>5. 계좌 상태 관리</b><small>일시정지·해제·해지<br>본인 확인 필요</small></div><span class="ar">→</span>
+        <div class="c blu"><div class="i">🔔</div><b>6. 입출금 알림</b><small>거래 확정 이벤트로<br>알림 ON / OFF</small></div>
+      </div>
+    </div>
+    <div class="split">
+      <div class="box grnP"><span class="pill grn">📈 2차 확장</span><div class="cols">
+        <div class="c pur"><div class="i">🔍</div><div><b>7. 계좌 검색·필터</b><small>번호·별명 검색, 상태·유형 필터</small></div></div>
+        <div class="c yel"><div class="i">📊</div><div><b>8. 통합 대시보드</b><small>계좌 수 · 전체 잔액 · 비중</small></div></div>
+        <div class="c blu"><div class="i">🧾</div><div><b>9. 계좌 증명서 발급</b><small>통장 사본 · 계좌개설확인서</small></div></div></div></div>
+      <div class="box bluP"><span class="pill blu">🧩 3차 고도화</span><div class="cols">
+        <div class="c pur"><div class="i">🕘</div><div><b>10. 계좌 활동 기록</b><small>설정·상태 변경 이력</small></div></div>
+        <div class="c grn"><div class="i">💤</div><div><b>11. 장기 미사용 계좌</b><small>안내·복귀 (상태와 별도 표시)</small></div></div>
+        <div class="c pnk"><div class="i">🔔</div><div><b>12. 알림 고급 설정</b><small>계좌별·금액별 알림</small></div></div></div></div>
+      <div class="box yelP"><span class="pill yel">🧩 공통</span><div class="cols">
+        <div class="c pur"><div class="i">🗂️</div><div><b>13. 계좌 유형 관리</b><small>개설 때부터 <code>account_type</code> 반영</small></div></div>
+        <div class="c gry"><div class="i">🐷</div><div><b>예금·적금은 계좌가 아님</b><small>Part 3 가입 계약(<code>subscriptions</code>)으로 관리</small></div></div></div></div>
+    </div>
+    <div class="box pnkP"><span class="pill pnk">🔚 계좌 해지 흐름 (ACCT-F05)</span>
+      <div class="flow">
+        <div class="n yel"><b>해지 요청</b><small>내 계좌 선택</small></div><span class="ar">→</span>
+        <div class="dia">해지 조건<br>모두 통과?</div>
+        <span class="yes">YES</span><span class="ar">→</span>
+        <div class="n pur"><b>본인 확인</b><small><code>ACCOUNT_STATUS_CHANGE</code></small></div><span class="ar">→</span>
+        <div class="n grn"><b>CLOSED</b><small>DB 삭제 ✕ · <code>closed_at</code> 기록 · 기록 보존</small></div>
+        <span class="no">NO</span><span class="ar">→</span>
+        <div class="n pnk"><b>해지 거절</b><small><code>ACCOUNT_CLOSE_</code><br><code>NOT_ALLOWED</code><br>+ 사유 코드 4개 ↓</small></div>
+      </div>
+      <div class="sub">
+        <div class="note yel"><b>잔액</b> 0원이어야 · <code>BALANCE_REMAINING</code></div>
+        <div class="note blu"><b>처리중·예약·자동이체</b> 없어야 · <code>PENDING_TRANSFER</code></div>
+        <div class="note grn"><b>진행 중 예금·적금의 출금 계좌</b> 아니어야 · <code>LINKED_SUBSCRIPTION</code></div>
+        <div class="note pur"><b>해지 안 된 카드의 결제 계좌</b> 아니어야 · <code>LINKED_CARD</code></div>
+      </div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="s"><h4>🏷️ 계좌 상태</h4><ul>
+      <li><span class="tag grn">ACTIVE</span> 정상</li>
+      <li><span class="tag yel">SUSPENDED</span> 일시정지 — 입금·출금 모두 막음</li>
+      <li><span class="tag pnk">CLOSED</span> 해지</li></ul></div>
+    <div class="s"><h4>💰 잔액 원칙</h4><ul>
+      <li>• 원본은 거래 파트 <code>account_balances</code></li>
+      <li>• 계좌 파트는 보기(<code>account_balance_view</code>)로 읽기만</li></ul></div>
+    <div class="s"><h4>🔗 다른 파트와</h4><ul>
+      <li>• 거래 확정 이벤트 <code>TransactionConfirmed</code> → 입출금 알림</li>
+      <li>• 해지 전 점검: 거래·카드·상품 파트 내부 API</li></ul></div>
+    <div class="warn">⚠️ 거래 내역 조회·다운로드·이체 실행은 Part 5</div>
+  </div></div>
+</section>
+
+<!-- ===================== Part 3 ===================== -->
+<section class="part">
+  <div class="phead"><span class="no">Part 3</span><h2>🐷 예금·적금 상품</h2><span class="ids">PROD-F01 ~ F11 · 상품 파트 · 두린은행 상품 30개(정기예금 11 · 적금 19)</span></div>
+  <div class="grid"><div>
+    <div class="split" style="grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr)">
+      <div class="box lav"><span class="pill lav2">🚩 1차 탐색·안내</span><div class="cols">
+        <div class="c yel"><div class="i">📃</div><div><b>F01 상품 목록</b><small>판매 중(<code>ON_SALE</code>) 30개</small></div></div>
+        <div class="c pnk"><div class="i">🔎</div><div><b>F02 상품 상세</b><small>금리·기간·한도·유의사항</small></div></div>
+        <div class="c grn"><div class="i">🧭</div><div><b>F03 검색·필터·정렬</b><small>예금/적금 · 금리순</small></div></div>
+        <div class="c blu"><div class="i">ℹ️</div><div><b>F04 가입 조건 안내</b><small>필요 계좌·대상·금액·기간</small></div></div></div></div>
+      <div class="box grnP"><span class="pill grn">🧮 2차 계산·모의 가입</span>
+        <div class="split" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+          <div class="cols">
+            <div class="c pnk"><div class="i">✏️</div><div><b>F05 금액·기간 선택</b><small>만기일 = 가입일과 같은 날짜의 N개월 뒤</small></div></div>
+            <div class="c yel"><div class="i">🧮</div><div><b>F06 예상 이자 계산</b><small>세전·단리(모의). 금리 구간 없으면 <code>RATE_NOT_FOUND</code></small></div></div>
+            <div class="c pur"><div class="i">☑️</div><div><b>F07 가입 조건 검증</b><small>회원 ACTIVE · 본인 ACTIVE 입출금 계좌 · 잔액</small></div></div>
+            <div class="c blu"><div class="i">📝</div><div><b>F08 모의 가입</b><small>본인 확인 <code>SUBSCRIPTION</code> → 출금 기록</small></div></div></div>
+          <div class="cols">
+            <div class="c grn"><div class="i">📚</div><div><b>F09 가입 상품 조회</b><small>계약 금리·원금·만기일·상태</small></div></div>
+            <div class="c org"><div class="i">↩️</div><div><b>F10 중도 해지</b><small>ACTIVE·RESTRICTED 허용 · 중도해지 불가 상품은 거절</small></div></div>
+            <div class="c pnk"><div class="i">🎉</div><div><b>F11 만기 처리</b><small>하루 1회 배치 · 원금+이자 입금 · 만기 알림</small></div></div></div>
+        </div></div>
+      <div class="box bluP"><span class="pill blu">✨ 3차 확장</span><div class="cols">
+        <div class="c pur"><div class="i">⚖️</div><div><b>상품 비교</b><small>2~3개 나란히</small></div></div>
+        <div class="c grn"><div class="i">🎯</div><div><b>조건 기반 추천</b><small>목적·기간·금액</small></div></div>
+        <div class="c yel"><div class="i">🗓️</div><div><b>적금 납입 내역</b><small>회차별 기록</small></div></div></div></div>
+    </div>
+    <div class="box pnkP"><span class="pill pnk">🧭 가입 흐름</span>
+      <div class="flow">
+        <div class="n pur"><b>상품 목록</b><small>로그인 없이도</small></div><span class="ar">→</span>
+        <div class="n yel"><b>상품 상세</b></div><span class="ar">→</span>
+        <div class="n pnk"><b>금액·기간 입력</b><small>예상 이자 계산</small></div><span class="ar">→</span>
+                <div class="n gry"><b>로그인</b><small>가입부터</small></div><span class="ar">→</span>
+        <div class="dia">가입 조건<br>검증 통과?</div><span class="yes">YES</span><span class="ar">→</span>
+        <div class="n pur"><b>본인 확인</b><small><code>SUBSCRIPTION</code></small></div><span class="ar">→</span>
+        <div class="n grn"><b>모의 가입 완료</b><small>계약 생성<br>+ 출금 기록</small></div><span class="ar">→</span>
+        <div class="n yel"><b>내 상품</b></div>
+      </div>
+      <div class="sub">
+        <div class="note pnk"><span class="no">NO</span> 사유 안내 → 금액·기간 다시 입력 (잔액 부족 · 금액 범위 밖 · 금리 구간 없음 · 출금 계좌 상태)</div>
+        <div class="note org"><b>끝내기</b> 중도 해지(본인 확인) 또는 만기 → 출금 계좌로 입금 <code>SUBSCRIPTION_PAYOUT</code> → <code>TERMINATED</code> / <code>MATURED</code></div>
+      </div>
+    </div>
+    <div class="box yelP"><span class="pill yel">🤖 AI · RAG 처리</span>
+      <div class="split">
+        <div class="note yel">💬 “적금 상품 보여줘” → <b>상품 DB 조회</b> → 목록 또는 화면 링크</div>
+        <div class="note pnk">❓ “이 상품 가입 조건이 뭐야?” → <b>RAG 답변</b> (상품설명서·약관, 근거 조항과 함께)</div>
+        <div class="note grn">🧮 “매달 20만 원 1년 넣으면?” → <b>이자 계산</b> (상품을 안 고르면 되묻기)</div>
+      </div>
+      <div class="sub"><div class="note lav"><b>LLM은 안내·라우팅만</b> — 금리·자격·가입 검증과 숫자는 백엔드와 DB가 정함. 가입·해지는 사용자 확인 없이 실행하지 않음.</div></div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="s"><h4>🏷️ 상태값</h4><ul>
+      <li>상품 <span class="tag grn">ON_SALE</span><span class="tag gry">STOPPED</span></li>
+      <li>계약 <span class="tag grn">ACTIVE</span><span class="tag blu">MATURED</span><span class="tag pnk">TERMINATED</span></li></ul></div>
+    <div class="s"><h4>📌 핵심 규칙</h4><ul>
+      <li>• 가입 금리는 계약에 고정(<code>applied_rate</code>) — 상품 금리가 바뀌어도 소급 ✕</li>
+      <li>• 출금·입금 계좌는 본인 <code>ACTIVE</code> <code>CHECKING</code></li>
+      <li>• 같은 가입 요청 두 번 → 계약 하나(<code>Idempotency-Key</code>)</li></ul></div>
+    <div class="s"><h4>🗄️ DB</h4><ul>
+      <li><code>products</code> → <code>product_rates</code> · <code>product_rules</code></li>
+      <li><code>users</code> · <code>accounts</code> → <code>subscriptions</code> → <code>subscription_payments</code></li></ul></div>
+  </div></div>
+</section>
+
+<!-- ===================== Part 4 ===================== -->
+<section class="part">
+  <div class="phead"><span class="no">Part 4</span><h2>💳 카드</h2><span class="ids">CARD-F01 ~ F16 · 카드 파트(팀원) · 1차는 더미 데이터로, 카드사 API는 2차</span></div>
+  <div class="grid"><div>
+    <div class="split">
+      <div class="box lav"><span class="pill lav2">🚩 1차 필수</span><div class="cols">
+        <div class="c yel"><div class="i">🗂️</div><div><b>F01 내 카드 모아보기</b><small>이번 달 낼 돈 · 상태 배지</small></div></div>
+        <div class="c blu"><div class="i">💳</div><div><b>F02 카드 상세 · F03 이용 내역</b><small>혜택 · 취소/할부 표시</small></div></div>
+        <div class="c grn"><div class="i">📅</div><div><b>F04 청구 예정 · 결제일 알림</b><small>D-3 잔액 부족 알림 · 결제 캘린더</small></div></div>
+        <div class="c pur"><div class="i">📦</div><div><b>F05 체크카드 발급·배송 조회</b><small>심사 없이 바로 승인</small></div></div>
+        <div class="c org"><div class="i">🔁</div><div><b>F08 결제 계좌 바꾸기</b><small>계좌 해지 전에 필요</small></div></div>
+        <div class="c pnk"><div class="i">✂️</div><div><b>F09 카드 해지</b><small>계좌 해지·회원 탈퇴 전에 필요</small></div></div></div></div>
+      <div class="box grnP"><span class="pill grn">📈 2차 편의</span><div class="cols">
+        <div class="c pur"><div class="i">🏦</div><div><b>F06 신용카드 발급·한도</b><small>모의 심사 (나이·소득·중복)</small></div></div>
+        <div class="c yel"><div class="i">💵</div><div><b>F07 신용카드 대금 결제</b><small>결제일 출금 · 전액만</small></div></div>
+        <div class="c blu"><div class="i">🛑</div><div><b>F08 카드 관리</b><small>분실·정지·해외/온라인 차단·이용 한도</small></div></div>
+        <div class="c grn"><div class="i">🔄</div><div><b>F10 마이데이터 연동</b><small>모의 카드사 API 동기화</small></div></div>
+        <div class="c pnk"><div class="i">📶</div><div><b>F11 전월 실적</b><small>다음 구간까지 남은 금액</small></div></div></div></div>
+      <div class="box bluP"><span class="pill blu">✨ 3차 확장</span><div class="cols">
+        <div class="c yel"><div class="i">🎁</div><div><b>F12 포인트 조회·현금화</b><small>입금 <code>POINT_CASHOUT</code></small></div></div>
+        <div class="c org"><div class="i">📣</div><div><b>F13 연회비·안 쓰는 카드</b><small>D-30 알림 · 미사용 안내</small></div></div>
+        <div class="c pur"><div class="i">🔮</div><div><b>F14 사용 금액 예측</b><small>이동 평균·선형 → 시계열</small></div></div>
+        <div class="c grn"><div class="i">🎯</div><div><b>F15 카드 추천</b><small>소비 패턴 → 순혜택</small></div></div>
+        <div class="c pnk"><div class="i">🏆</div><div><b>F16 발급 순위</b><small>연령대·성별</small></div></div></div></div>
+    </div>
+    <div class="box pnkP"><span class="pill pnk">📮 발급 흐름 (CARD-F05 · F06)</span>
+      <div class="flow">
+        <div class="n yel"><b>카드 선택</b><small>회원 ACTIVE · 나이</small></div><span class="ar">→</span>
+        <div class="n pur"><b>본인 확인</b><small><code>CARD_APPLICATION</code></small></div><span class="ar">→</span>
+        <div class="n org"><b>약관 동의</b><small>필수 약관</small></div><span class="ar">→</span>
+        <div class="n blu"><b>신청 정보</b><small><code>APPLIED</code> → <code>REVIEWING</code></small></div><span class="ar">→</span>
+        <div class="dia">모의 심사<br>통과?<br>(1차는 우리 서버)</div><span class="yes">YES</span><span class="ar">→</span>
+        <div class="n grn"><b>배송</b><small><code>APPROVED</code><br>→ <code>SHIPPING</code><br>→ <code>DELIVERED</code></small></div><span class="ar">→</span>
+        <div class="n yel"><b>수령·활성화</b><small><code>ACTIVATED</code> → 내 카드</small></div>
+      </div>
+      <div class="sub">
+        <div class="note pnk"><span class="no">NO</span> <b>REJECTED</b> — <code>AGE</code> · <code>NO_INCOME</code> · <code>DUPLICATE</code></div>
+        <div class="note gry"><b>신청 취소</b> 배송 전(<code>APPLIED</code>·<code>REVIEWING</code>·<code>APPROVED</code>)만 → <code>CANCELED</code>. 배송 뒤엔 받아서 해지</div>
+        <div class="note grn"><b>체크카드</b> 심사 없이 즉시 승인 · 본인 ACTIVE 입출금 계좌 연결 필수 · 1차 배송은 [배송 완료] 버튼</div>
+      </div>
+    </div>
+    <div class="split" style="grid-template-columns:minmax(0,1fr)">
+      <div class="box org" style="background:#fff4ea"><span class="pill org">✂️ 해지 흐름 (CARD-F09)</span>
+        <div class="flow">
+          <div class="n yel"><b>해지 신청</b></div><span class="ar">→</span>
+          <div class="n pur"><b>본인 확인</b><small><code>CARD_TERMINATION</code></small></div><span class="ar">→</span>
+          <div class="dia">확정·연체<br>청구서 있음?</div><span class="no">YES</span><span class="ar">→</span>
+          <div class="n pnk"><b>해지 거절</b><small><code>REJECTED</code></small></div>
+        </div>
+        <div class="sub"><div class="note grn"><span class="yes">NO</span> 확인 항목(남은 할부·자동결제·포인트·연회비 환급) → 사유 선택 → <b><code>TERMINATED</code></b> + 알림 <code>CARD_STATUS</code>. 이번 기간 사용액은 해지 뒤 결제일에 청구</div></div>
+      </div>
+      <div class="box blu" style="background:#eef6ff"><span class="pill blu">💵 대금 결제 흐름 (CARD-F07, 2차)</span>
+        <div class="flow">
+          <div class="n yel"><b>결제일 배치</b><small><code>CONFIRMED</code> · 오늘</small></div><span class="ar">→</span>
+          <div class="dia">계좌 ACTIVE<br>잔액 ≥ 청구액?</div><span class="yes">YES</span><span class="ar">→</span>
+          <div class="n grn"><b>출금</b><small><code>CARD_PAYMENT</code> + <code>PAID</code></small></div>
+        </div>
+        <div class="sub"><div class="note pnk"><span class="no">NO</span> 출금 안 함(일부 출금 ✕) → <b><code>OVERDUE</code></b> + 알림 → [지금 결제하기] 본인 확인 <code>CARD_MANAGEMENT</code></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="s"><h4>🏷️ 카드 상태</h4><ul>
+      <li><span class="tag grn">ACTIVE</span><span class="tag yel">SUSPENDED</span><span class="tag org">LOST</span></li>
+      <li><span class="tag gry">EXPIRED</span><span class="tag pnk">TERMINATED</span></li>
+      <li>해지 안 된 카드 = <code>TERMINATED</code> 아닌 전부</li></ul></div>
+    <div class="s"><h4>🧾 청구서</h4><ul>
+      <li><span class="tag blu">SCHEDULED</span>→<span class="tag yel">CONFIRMED</span>→<span class="tag grn">PAID</span> / <span class="tag pnk">OVERDUE</span></li></ul></div>
+    <div class="s"><h4>💳 신용카드 모의 한도</h4><ul>
+      <li>연소득 2천만 원 미만 → 100만 원</li>
+      <li>4천만 원 미만 → 300만 원</li>
+      <li>그 이상 → 500만 원</li>
+      <li>초과 승인 거절 <code>CREDIT_LIMIT_EXCEEDED</code></li>
+      <li>할부는 무이자</li></ul></div>
+    <div class="s"><h4>🏦 연결 계좌</h4><ul>
+      <li>• 본인 <code>ACTIVE</code> <code>CHECKING</code>만</li>
+      <li>• 바꾸기는 본인 확인 <code>CARD_MANAGEMENT</code></li></ul></div>
+    <div class="warn">⚠️ 리볼빙·현금서비스·카드론은 범위 밖 (BACKLOG)</div>
+  </div></div>
+</section>
+
+<!-- ===================== Part 5 ===================== -->
+<section class="part">
+  <div class="phead"><span class="no">Part 5</span><h2>💸 거래 (입·출금)</h2><span class="ids">TRX-F01 ~ F14 · 거래 파트(팀원) · 잔액을 바꾸는 유일한 곳</span></div>
+  <div class="grid"><div>
+    <div class="split">
+      <div class="box lav"><span class="pill lav2">🚩 1차 필수</span><div class="cols">
+        <div class="c yel"><div class="i">💸</div><div><b>F01 계좌이체</b><small>확인·재확인·본인 확인·처리</small></div></div>
+        <div class="c blu"><div class="i">📊</div><div><b>F02 이체 결과</b><small>처리중·완료·실패</small></div></div>
+        <div class="c grn"><div class="i">📒</div><div><b>F03 입출금 내역</b><small>기간·유형 필터</small></div></div>
+        <div class="c pur"><div class="i">🔗</div><div><b>F04 다른 파트 출금·입금 기록</b><small>카드·포인트·예금·적금</small></div></div></div></div>
+      <div class="box grnP"><span class="pill grn">📈 2차 편의</span><div class="cols">
+        <div class="c pnk"><div class="i">⚡</div><div><b>F05 간편 송금</b><small>최근 · 자주 쓰는 계좌 · 내 계좌로</small></div></div>
+        <div class="c yel"><div class="i">🧾</div><div><b>F06 이체확인증 · F07 한도 확인</b></div></div>
+        <div class="c blu"><div class="i">🏦</div><div><b>F08 타행 이체(가상)</b><small>가상 다른 은행 계좌</small></div></div>
+        <div class="c grn"><div class="i">📥</div><div><b>F09 다른 은행 이체내역</b><small>CODEF</small></div></div></div></div>
+      <div class="box bluP"><span class="pill blu">✨ 3차 확장</span><div class="cols">
+        <div class="c pur"><div class="i">⏰</div><div><b>F10 예약 송금 · F11 자동이체</b></div></div>
+        <div class="c org"><div class="i">🪣</div><div><b>F12 결제일 잔액 채우기</b><small>카드 D-3 알림에서</small></div></div>
+        <div class="c yel"><div class="i">🎚️</div><div><b>F13 한도 변경</b></div></div>
+        <div class="c grn"><div class="i">📈</div><div><b>F14 다른 은행 예적금 내역</b><small>CODEF</small></div></div></div></div>
+    </div>
+    <div class="box yelP"><span class="pill yel">💸 이체 흐름 (TRX-F01)</span>
+      <div class="flow">
+        <div class="n yel"><b>출금 계좌</b><small>정상 계좌만 · 잔액 표시</small></div><span class="ar">→</span>
+        <div class="n blu"><b>받는 계좌</b><small>예금주 이름 확인</small></div><span class="ar">→</span>
+        <div class="n grn"><b>금액</b><small>1원 이상 · 한글 금액</small></div><span class="ar">→</span>
+                <div class="n org"><b>재확인</b><small>표시 이름(10자)<br>큰 금액 강조<br>지금 / 예약</small></div><span class="ar">→</span>
+        <div class="n pur"><b>본인 확인</b><small><code>TRANSFER</code><br>(3차 PIN)</small></div><span class="ar">→</span>
+        <div class="dia">서버 재검증<br>잔액·상태·한도</div><span class="yes">YES</span><span class="ar">→</span>
+        <div class="n grn"><b>원장 기록</b><small>출금+입금 한 번에</small></div><span class="ar">→</span>
+        <div class="n blu"><b>완료</b><small>거래 후 잔액</small></div>
+      </div>
+      <div class="sub">
+        <div class="note pnk"><span class="no">NO</span> <b>FAILED</b> 사유 안내 + [다시 보내기] (처리중 건엔 다시 보내기 ✕)</div>
+        <div class="note org"><b>금액 실수 막기</b> 이전 평균의 10배↑ · 첫 송금 100만 원↑ 강조 · 10분 안 같은 이체 안내</div>
+      </div>
+    </div>
+    <div class="box grnP"><span class="pill grn">⏰ 예약 송금 · 자동이체 (3차)</span>
+      <div class="flow">
+        <div class="n yel"><b>예약 등록</b><small>10분 뒤 ~ 1년 · 본인 확인 <code>SCHEDULED_TRANSFER</code></small></div><span class="ar">→</span>
+        <div class="n blu"><b>SCHEDULED</b><small>실행 10분 전까지 변경·취소</small></div><span class="ar">→</span>
+        <div class="n org"><b>PROCESSING</b><small>1분 배치 · 잔액·한도 재검증</small></div><span class="ar">→</span>
+        <div class="n grn"><b>SUCCESS</b><small>알림</small></div><span class="ar">/</span>
+        <div class="n pnk"><b>FAILED</b><small>알림 + 다시 보내기</small></div>
+      </div>
+      <div class="sub">
+        <div class="note gry"><b>CANCELED</b> 실행 전 취소 — 이체 기록은 만들지 않음</div>
+        <div class="note blu"><b>자동이체</b> 매달 지정일(1~28일·말일) 06:00 (기본안) · <code>ACTIVE</code> / <code>PAUSED</code> / <code>CANCELED</code></div>
+      </div>
+    </div>
+  </div>
+  <div class="side">
+    <div class="s"><h4>🏷️ 이체 상태 (3종)</h4><ul>
+      <li><span class="tag yel">PENDING</span><span class="tag grn">SUCCESS</span><span class="tag pnk">FAILED</span></li>
+      <li>취소 <code>CANCELED</code>는 예약에만</li>
+      <li>PENDING 10분 지나면 배치가 확정</li></ul></div>
+    <div class="s"><h4>📒 거래 유형 (6종)</h4><ul>
+      <li><code>TRANSFER_OUT</code> − · <code>TRANSFER_IN</code> +</li>
+      <li><code>CARD_PAYMENT</code> −</li>
+      <li><code>POINT_CASHOUT</code> +</li>
+      <li><code>SUBSCRIPTION_PAYMENT</code> −</li>
+      <li><code>SUBSCRIPTION_PAYOUT</code> +</li></ul></div>
+    <div class="s"><h4>⚠️ 실패 사유</h4><ul>
+      <li><code>INSUFFICIENT_BALANCE</code> 잔액 부족</li>
+      <li><code>LIMIT_EXCEEDED</code> 1회·1일 한도</li>
+      <li><code>INVALID_ACCOUNT</code> · <code>ACCOUNT_NOT_ACTIVE</code></li>
+      <li><code>STEP_UP_LOCKED</code> · <code>SYSTEM_ERROR</code></li></ul></div>
+    <div class="s"><h4>📡 채널</h4><ul><li><code>APP</code> 직접 · <code>SCHEDULED</code> 예약 · <code>AUTO</code> 자동이체</li></ul></div>
+  </div></div>
+</section>
+
+<!-- ===================== Part 6 ===================== -->
+<section class="part">
+  <div class="phead"><span class="no">Part 6</span><h2>🔗 파트 사이 연결 · 공통 규칙</h2><span class="ids">카드·거래 연결(C-1~C-6) · 모든 Part가 같은 이름·형식 규칙(C-5)</span></div>
+  <div class="box lav"><span class="pill lav2">💰 거래 원장이 잔액을 바꾸는 유일한 문</span>
+    <div class="hub">
+      <div class="stack">
+        <div class="c blu big"><b>💳 카드 결제·대금 출금</b><small><code>CARD_PAYMENT</code> (−) · Part 4</small></div>
+        <div class="c pnk big"><b>🎁 포인트 현금화</b><small><code>POINT_CASHOUT</code> (+) · Part 4</small></div>
+        <div class="c grn big"><b>🐷 예금·적금 가입·납입</b><small><code>SUBSCRIPTION_PAYMENT</code> (−) · Part 3</small></div>
+        <div class="c grn big"><b>🎉 중도 해지·만기</b><small><code>SUBSCRIPTION_PAYOUT</code> (+) · Part 3</small></div>
+        <div class="c yel big"><b>💸 이체</b><small><code>TRANSFER_OUT</code> (−) / <code>TRANSFER_IN</code> (+) · Part 5</small></div>
+      </div>
+      <div class="ar" style="text-align:center;font-size:40px">⇒</div>
+      <div class="stack">
+        <div class="c pur big" style="padding:22px"><div class="i">📒</div><b style="font-size:20px">거래 원장 <code>transactions</code></b><small>성공한 건만 기록 · 원장 기록이 실패하면<br>부른 파트의 작업도 함께 실패</small></div>
+        <div class="c yel big"><b>💰 잔액 <code>account_balances</code></b><small>다른 파트는 <code>account_balance_view</code>로 읽기만</small></div>
+      </div>
+      <div class="ar" style="text-align:center;font-size:40px">⇒</div>
+      <div class="stack">
+        <div class="c grn big"><b>📋 입출금 내역 화면</b><small>거래 후 잔액 · 카드 출금 표시</small></div>
+        <div class="c blu big"><b>🔔 계좌 알림 (Part 2)</b><small><code>TransactionConfirmed</code> 이벤트 → 입출금 알림</small></div>
+        <div class="c pnk big"><b>⚠️ 결제일 D-3 잔액 부족</b><small>→ 채우기 송금 제안 (3차)</small></div>
+      </div>
+    </div>
+  </div>
+  <div class="split">
+    <div class="box pnkP"><span class="pill pnk">🛡️ 본인 확인은 한 곳에서</span>
+      <div class="note pur" style="margin-bottom:8px">회원·인증 파트 <code>POST /auth/step-up</code> → <code>step_up_challenges</code><br>1차 로그인 비밀번호 재확인 · 3차 PIN · 연속 실패 잠금(기본안 5회)</div>
+      <div class="note lav mono" style="line-height:1.7">TRANSFER · SCHEDULED_TRANSFER<br>CARD_APPLICATION · CARD_TERMINATION<br>CARD_MANAGEMENT · SUBSCRIPTION<br>ACCOUNT_STATUS_CHANGE<br>WITHDRAWAL · PROFILE_CHANGE</div>
+    </div>
+    <div class="box yelP"><span class="pill yel">🚧 탈퇴·계좌 해지 전 점검</span>
+      <div class="cols">
+        <div class="c blu"><div class="i">🏛️</div><div><b>계좌</b><small><code>account-readiness</code> 잔액·상태</small></div></div>
+        <div class="c yel"><div class="i">💸</div><div><b>거래</b><small><code>transfer-blockers</code> 처리중·예약·자동이체</small></div></div>
+        <div class="c pnk"><div class="i">💳</div><div><b>카드</b><small><code>card-blockers</code> · <code>linked-cards</code> 해지 안 된 카드</small></div></div>
+        <div class="c grn"><div class="i">🐷</div><div><b>상품</b><small><code>subscription-blockers</code> 진행 중 계약</small></div></div>
+      </div>
+      <div class="note gry" style="margin-top:10px">모두 <code>/internal/…</code> — 그 점검을 하는 파트만 호출</div>
+    </div>
+    <div class="box bluP"><span class="pill blu">📐 이름·형식 규칙 (C-5)</span>
+      <ul class="side" style="padding-left:2px">
+        <li style="list-style:none;font-size:13.5px;line-height:1.75">• 기본 키 <code>id</code>, 참조 <code>&lt;표&gt;_id</code><br>• ID는 문자열 <code>user_001</code> · <code>acc_001</code> · <code>tx_0001</code><br>• DB·API 이름 snake_case (CODEF 칸은 원래 이름)<br>• 금액: DB 원 단위 정수, API는 문자열<br>• 시각 <code>+09:00</code> · 우리 빈 칸 <code>null</code><br>• API 경로에 <code>/api</code> 없음</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box grnP"><span class="pill grn">⚙️ 배치</span>
+    <div class="row">
+      <div class="c blu"><b>1 마이데이터 동기화</b><small>2차</small></div><span class="ar">→</span>
+      <div class="c gry"><b>2 카드 만료</b><small><code>EXPIRED</code></small></div><span class="ar">→</span>
+      <div class="c yel"><b>3 청구 기간 마감</b><small>→ <code>CONFIRMED</code></small></div><span class="ar">→</span>
+      <div class="c pnk"><b>4 결제일 대금 출금</b><small><code>PAID</code> / <code>OVERDUE</code></small></div><span class="ar">→</span>
+      <div class="c org"><b>5 마지막 사용일</b><small>카드별 갱신</small></div><span class="ar">→</span>
+      <div class="c grn"><b>6 고정지출 탐지</b><small>3개월 · ±10% · ±3일</small></div><span class="ar">→</span>
+      <div class="c pur"><b>7 사용 금액 예측</b></div><span class="ar">→</span>
+      <div class="c blu"><b>8 카드 추천</b></div><span class="ar">→</span>
+      <div class="c yel"><b>9 발급 순위</b></div><span class="ar">→</span>
+      <div class="c pnk"><b>10 알림 생성</b></div>
+    </div>
+    <div class="sub">
+      <div class="note grn"><b>하루 1회 · 순서 고정</b> (카드) · 예금·적금 <b>만기 처리</b>도 하루 1회(Part 3)</div>
+      <div class="note yel"><b>1분마다</b> 예약 송금·자동이체 실행 (<code>SCHEDULED → PROCESSING</code>을 먼저 잡은 쪽만)</div>
+      <div class="note blu"><b>10분 지난 PENDING</b> 이체는 배치가 결과 확정</div>
+    </div>
+  </div>
+  <div class="split" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+    <div class="box bluP"><span class="pill blu">🎯 구현 순서</span>
+      <div class="row">
+        <div class="c gry"><b>공통 설계</b><small>이름 규칙 · 더미 · 본인 확인 · 원장</small></div><span class="ar">→</span>
+        <div class="c yel"><b>1차</b><small>가입·로그인 · 계좌 · 상품 조회 · 카드 조회·체크카드·해지 · 이체·내역</small></div><span class="ar">→</span>
+        <div class="c grn"><b>2차</b><small>회원 관리·탈퇴 · 상품 가입 · 신용카드 · 간편·타행 송금</small></div><span class="ar">→</span>
+        <div class="c pnk"><b>3차</b><small>PIN · 예약·자동이체 · 예측·추천·순위</small></div>
+      </div>
+    </div>
+    <div class="box pnkP"><span class="pill pnk">❓ 아직 정할 것 (팀 회의)</span>
+      <ul style="padding-left:4px;font-size:14px;line-height:1.75;list-style:none">
+        <li>☐ 1회·1일 이체 한도 금액 (예: 500만 · 1,000만 원)</li>
+        <li>☐ 동시성 처리 방식 · 타행 수수료(0원 기본안)</li>
+        <li>☐ 고정지출 탐지 = 자동이체 제안 기준 통일</li>
+        <li>☐ 채우기 송금 화면에 넘길 값 · 카드 파트 단계 확정</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="bottom">👑 한 줄 약속: 잔액은 거래 원장으로만 바뀐다 · 중요한 작업은 본인 확인 한 곳에서 ✨</div>
+<script>
+document.body.setAttribute("data-h", document.documentElement.scrollHeight);
+// 테두리 밖으로 삐져나온 칸 수 (0 이어야 함) — render_flowchart.sh 가 확인
+const over = [];
+document.querySelectorAll("section.part, .box, .c, .n, .note").forEach(el => {
+  const box = el.closest("section.part");
+  if (el.scrollWidth > el.clientWidth + 1 ||
+      (box && el !== box && el.getBoundingClientRect().right > box.getBoundingClientRect().right + 1))
+    over.push(el.textContent.replace(/\s+/g, " ").trim().slice(0, 20));
+});
+document.body.setAttribute("data-over", over.length);
+document.body.setAttribute("data-over-list", over.join(" | "));
+</script>
+</body>
+</html>
