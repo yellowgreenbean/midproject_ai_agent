@@ -14,7 +14,7 @@
 #   docker compose exec postgres psql -U app -d midproject
 services:
   postgres:
-    image: postgres:17
+    image: pgvector/pgvector:pg17   # postgres:17 + pgvector 확장 (챗봇 RAG 벡터 저장, scripts/rag_ingest.py)
     container_name: midproject-postgres
     environment:
       POSTGRES_USER: app
