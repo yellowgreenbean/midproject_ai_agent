@@ -48,6 +48,16 @@ def session_id_for(token: str) -> str:
     return "ses_" + digest[:36]
 
 
+def new_email_code() -> str:
+    """이메일 인증번호 6자리 (암호용 난수 — random 모듈은 예측 가능해서 쓰지 않는다)."""
+    return f"{secrets.randbelow(10**6):06d}"
+
+
+def digest(value: str) -> str:
+    """인증번호·인증 토큰을 DB 에 둘 때 원문 대신 넣는 SHA-256 (Part 1 8.1 「원문 비노출」)."""
+    return hashlib.sha256(value.encode()).hexdigest()
+
+
 def new_id(prefix: str) -> str:
     """앱이 새로 만드는 행의 id (예: aud_3f9c…). 더미처럼 일련번호를 쓰면 동시 요청에서 겹칠 수 있어 무작위로 만든다."""
     return f"{prefix}_{secrets.token_hex(10)}"

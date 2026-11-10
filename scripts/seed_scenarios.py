@@ -13,7 +13,7 @@
 #   - 원장(transactions)·잔액(account_balances)을 바꾸는 행은 만들지 않는다 → 성공한 이체(SUCCESS)·포인트 현금화는 없음.
 #     성공 기록은 원장 출금·입금이 같이 있어야 해서(기획서 Part 5 9장) 넣으면 더미 잔액과 어긋난다. 앱에서 이체해 만든다.
 #   - 예약 시각·잠금 시각은 SQL 을 만드는 시각 기준이다. 만든 뒤 바로 넣는다(오래 두면 "곧 실행" 같은 상황이 지나간다).
-#   - 시험용 비밀번호·PIN 은 환경변수 SEED_PASSWORD·SEED_PIN(없으면 backend/.env.example 의 값)에서 읽고,
+#   - 시험용 비밀번호·PIN 은 환경변수 SEED_PASSWORD·SEED_PIN(없으면 backend/.env 의 값)에서 읽고,
 #     SQL 에는 Argon2id 해시만 남는다(기획서 Part 1 「안전한 비밀번호 해시(예: Argon2id)」). 실제 비밀번호를 쓰지 말 것.
 #   - 본인 확인(step_up_challenges)은 로그인 세션이 있어야 해서 만들지 않는다 → 예약·이체의 step_up_challenge_id 는 NULL.
 import argparse, calendar, collections, datetime, os, sys
@@ -40,6 +40,10 @@ EXTERNAL = [  # (은행, 자릿수, 앞자리, 예금주)
 EXTERNAL_TEST = [("신한은행", 12, "110", "임처리", "PENDING 후 SUCCESS"), ("KB국민은행", 14, "940", "오실패", "FAILED")]
 
 SCENARIOS = """
+가입 약관 (AUTH-F10)
+  - 공통 약관 4개: trm_001 서비스 이용약관 · trm_002 전자금융거래 이용약관 · trm_003 개인정보 수집·이용(이상 필수)
+    · trm_004 마케팅 정보 수신(선택). 본문 파일: trm_001 토스 원문(scripts/crawl_toss_terms.py) · trm_002 우리은행 PDF,
+    trm_003·004 의 content_url 은 아직 빈 자리
 로그인 (3번)
   - 탈퇴(user_029)를 뺀 29명: auth_identities(LOCAL, username) + local_credentials. 탈퇴 회원은 해시를 지움(Part 1 즉시 삭제)
   - local_credentials.failed_attempts 는 본인 확인(step-up) 비밀번호 실패만 센다(기획서 6.3) — 로그인 실패는 세지 않음
@@ -51,6 +55,7 @@ SCENARIOS = """
   - 해지 안 된 계좌 모두 1회 500만 · 1일 1,000만. acc_007(user_002)만 1회 30만 · 1일 50만 → 한도 초과 시험
 타행·자주 쓰는 계좌
   - external_accounts: 10개 은행에 1개씩 + 결과 시험용 2개(신한 PENDING→SUCCESS, KB국민 FAILED)
+    + 탈퇴 안 한 회원 29명마다 본인 명의 계좌 1개(ext_user_001 …, 예금주 = 회원 이름) — 탈퇴 전 남은 돈을 옮길 곳
   - user_001: 이서연(acc_007) · 정지 계좌 정도윤(acc_011, ACCOUNT_NOT_ACTIVE 시험) · 신한 김가람(집주인)
   - user_002: 김민준(acc_001)
 예약 송금·자동이체 (user_001, 출금 acc_001)
@@ -69,14 +74,15 @@ SCENARIOS = """
 """.strip()
 
 
-def read_env_example():
+def read_env():
+    """backend/.env 의 KEY=VALUE (서버 app/config.py 와 같은 파일). 다른 칸(API 키 등)은 쓰지 않는다"""
     vals = {}
-    path = os.path.join(HERE, "..", "backend", ".env.example")
+    path = os.path.join(HERE, "..", "backend", ".env")
     if os.path.exists(path):
         for line in open(path, encoding="utf-8"):
             if "=" in line and not line.lstrip().startswith("#"):
                 k, v = line.strip().split("=", 1)
-                vals[k] = v
+                vals[k] = v.strip().strip("\"'")
     return vals
 
 
@@ -125,6 +131,18 @@ def build(root, now, password, pin):
     t = {}
     lock_until = fmt(now + datetime.timedelta(minutes=30))
 
+    # 가입 약관 (AUTH-F10, 사용자 결정 2026-11-09: 토스식 4개). 카드 상품 약관이 아니라 card_product_id 는 NULL
+    t["terms"] = [
+        {"id": tid, "version": "1.0", "title": title, "required": req, "content_url": url,
+         "effective_at": "2026-11-01 00:00:00", "card_product_id": None}
+        for tid, title, req, url in [
+            ("trm_001", "서비스 이용약관", True, "data/rag/terms/service_terms.md"),
+            ("trm_002", "전자금융거래 이용약관", True, "data/rag/terms/electronic_financial_transactions_terms.pdf"),
+            ("trm_003", "개인정보 수집·이용 동의", True, "docs/terms/privacy_consent.md"),
+            ("trm_004", "마케팅 정보 수신 동의", False, "docs/terms/marketing_consent.md"),
+        ]
+    ]
+
     # 로그인 (3번)
     login_users = [u for u in d["users"] if u["status"] != "WITHDRAWN"]
     need_user("user_024", "RESTRICTED"), need_user("user_028", "PENDING_VERIFICATION"), need_user("user_029", "WITHDRAWN")
@@ -167,6 +185,12 @@ def build(root, now, password, pin):
     for j, (bank, digits, prefix, holder, _) in enumerate(EXTERNAL_TEST, len(EXTERNAL) + 1):
         ext.append({"id": f"ext_{j:03d}", "bank": bank, "account_no": prefix + "9" * (digits - len(prefix) - 3) + str(j).zfill(3),
                     "holder_name": holder})
+    # 회원마다 본인 명의 타행 계좌 1개 (사용자 결정 2026-11-09) — 탈퇴 ① 「남은 돈을 본인 명의 계좌로」의 받을 곳.
+    # 은행은 EXTERNAL 순서대로 돌아가며, 번호는 앞자리 + 7…7 + 회원 번호 3자리(위 두 줄과 겹치지 않음)
+    for n, u in enumerate(login_users):
+        bank, digits, prefix, _ = EXTERNAL[n % len(EXTERNAL)]
+        ext.append({"id": f"ext_{u['id']}", "bank": bank,
+                    "account_no": prefix + "7" * (digits - len(prefix) - 3) + u["id"][-3:], "holder_name": u["name"]})
     t["external_accounts"] = ext
     landlord = ext[0]  # 신한은행 김가람
 
@@ -310,6 +334,8 @@ def reset_sql(tables):
     """이 시드가 만든 행만 지운다(자식 → 부모). 앱이 만든 행은 건드리지 않음"""
     out = []
     for table, rows in reversed(list(tables.items())):
+        if table == "terms":  # 앱이 만든 가입 동의(user_consents)가 가리키므로 지우지 않는다(다시 넣을 때 ON CONFLICT 로 그대로)
+            continue
         cols = PK.get(table, ("id",))
         keys = ", ".join("(" + ", ".join(parents.sql_value(r[c]) for c in cols) + ")" for r in rows)
         out.append(f"DELETE FROM {table} WHERE ({', '.join(cols)}) IN ({keys});")
@@ -322,11 +348,11 @@ if __name__ == "__main__":
     ap.add_argument("--reset", action="store_true", help="이 시드 행을 먼저 지우고 다시 넣기")
     args = ap.parse_args()
     sys.stderr.reconfigure(encoding="utf-8")
-    env = read_env_example()
+    env = read_env()
     password = os.environ.get("SEED_PASSWORD") or env.get("SEED_PASSWORD")
     pin = os.environ.get("SEED_PIN") or env.get("SEED_PIN")
     if not password or not pin or not (len(pin) == 6 and pin.isdigit()):
-        print("오류: SEED_PASSWORD 와 6자리 숫자 SEED_PIN 이 필요함 (환경변수 또는 backend/.env.example)", file=sys.stderr)
+        print("오류: SEED_PASSWORD 와 6자리 숫자 SEED_PIN 이 필요함 (환경변수 또는 backend/.env)", file=sys.stderr)
         sys.exit(1)
     now = datetime.datetime.now(KST).replace(tzinfo=None, second=0, microsecond=0)
     try:

@@ -19,7 +19,7 @@ data/dummy/      직접 만든 더미 데이터 (CODEF 응답 모양을 따름) 
   transactions/  transactions.json                       (거래 파트)
   cards/         cards.json · card_approvals.json · card_billing.json  (카드 파트)
   products/      products.json · subscriptions.json · subscription_payments.json  (상품 파트)
-data/rag/        챗봇 RAG 문서 — 우리은행 원본 PDF 그대로 (약관 terms/ · 상품설명서 products/ · 특약 riders/ · 동의서 consents/ · 카드 약관 cards/(우리카드) · 수수료·FAQ·예금자보호·착오송금·휴면예금 안내 guides/(웹페이지를 PDF 로) · 법령 laws/, 출처는 docs/domain-rules.md 5-2). 같은 이름의 `.md` 는 `py -3.13 scripts/pdf_to_md.py <폴더>` 로 만든 변환본(설치: `pip install pdfplumber rapidocr rapid-layout rapid-table onnxruntime`) — 원본 PDF 를 고치면 다시 돌린다
+data/rag/        챗봇 RAG 문서 — 우리은행 원본 PDF 그대로 (약관 terms/ · 상품설명서 products/ · 특약 riders/ · 동의서 consents/ · 카드 약관 cards/(우리카드) · 수수료·FAQ·예금자보호·착오송금·휴면예금 안내 guides/(웹페이지를 PDF 로) · 법령 laws/, 출처는 docs/domain-rules.md 5-2). 같은 이름의 `.md` 는 `py -3.13 scripts/pdf_to_md.py <폴더>` 로 만든 변환본(설치: `pip install pdfplumber rapidocr rapid-layout rapid-table onnxruntime`) — 원본 PDF 를 고치면 다시 돌린다. 예외: `terms/service_terms.md` 는 PDF 없이 토스 웹페이지를 `py -3.13 scripts/crawl_toss_terms.py` 로 받은 원본(가입 약관 `trm_001` 본문 겸용, 출처 5-4)
 scripts/         CODEF 샌드박스 시험 코드 등 단발 실행 스크립트
 (앞으로) 앱 코드는 새 폴더(예: backend/ · frontend/)를 만들어 거기에 둔다. 루트에 파일을 늘어놓지 않는다.
 ```

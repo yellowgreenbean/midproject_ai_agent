@@ -9,16 +9,18 @@
 """
 
 import uuid
+from typing import Annotated, Literal
 
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Depends, Request, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from app.config import settings
-from app.deps import DB, is_session_alive, set_session_expires_header
-from app.errors import ApiError
-from app.models import AuthAuditLog, AuthIdentity, AuthSession, LocalCredential, User
-from app.rules import SESSION_COOKIE, SESSION_MAX, now_kst
+from app.deps import DB, Login, get_login, is_session_alive, set_session_expires_header
+from app.errors import ApiError, unauthorized
+from app.models import AuthAuditLog, AuthIdentity, AuthSession, LocalCredential, StepUpChallenge, User
+from app.rules import SESSION_COOKIE, SESSION_MAX, STEP_UP_MAX_FAILURES, STEP_UP_TTL, now_kst
+from app.schemas import KstDatetime
 from app.security import (
     hash_password,
     login_throttle,
@@ -91,6 +93,14 @@ def login(body: LoginIn, request: Request, response: Response, db: DB):
     if password_needs_rehash(cred.password_hash):
         cred.password_hash = hash_password(body.password)
 
+    start_session(db, request, response, user.id)
+    _audit(db, user.id, "LOGIN", "SUCCESS", request_id)
+    db.commit()
+    return LoginOut(user_id=user.id, status=user.status)
+
+
+def start_session(db, request: Request, response: Response, user_id: str) -> None:
+    """로그인 세션을 만들고 쿠키·만료 시각 헤더를 붙인다. 커밋은 부르는 쪽이 한다(가입도 이걸로 바로 로그인)."""
     # 이 브라우저에 예전 세션이 살아 있으면 끊는다(한 브라우저에 세션 하나)
     old_token = request.cookies.get(SESSION_COOKIE)
     now = now_kst()
@@ -100,15 +110,11 @@ def login(body: LoginIn, request: Request, response: Response, db: DB):
             old.revoked_at = now
 
     token = new_session_token()
-    session = AuthSession(id=session_id_for(token), user_id=user.id, created_at=now, last_seen_at=now,
+    session = AuthSession(id=session_id_for(token), user_id=user_id, created_at=now, last_seen_at=now,
                           expires_at=now + SESSION_MAX)
     db.add(session)
-    _audit(db, user.id, "LOGIN", "SUCCESS", request_id)
-    db.commit()
-
     _set_session_cookie(response, token)
     set_session_expires_header(response, session)
-    return LoginOut(user_id=user.id, status=user.status)
 
 
 @router.post("/logout", status_code=204)
@@ -124,3 +130,63 @@ def logout(request: Request, db: DB):
     response = Response(status_code=204)
     _clear_session_cookie(response)
     return response
+
+
+# --- 본인 확인 (Part 1 7장 POST /auth/step-up, 9.3 「3차 PIN 전에는 로그인 비밀번호 재확인」) ---------------------
+# 중요 작업(이체·카드·가입·계좌 상태 변경·탈퇴·생년월일 수정) 직전에 비밀번호를 다시 받고, 그 작업 하나에만 쓸 수 있는 번호를 준다.
+#   - 번호는 5분 · 한 번만 · 받은 action 에만 · 받은 세션에서만 (step_up_challenges)
+#   - 실패는 local_credentials.failed_attempts 에 센다(로그인 실패는 세지 않음, 6.3). 5번이면 영구 잠금 → STEP_UP_LOCKED
+#     (사용자 결정 2026-11-09, 시드 user_027 과 같음. locked_until 은 시간 잠금용이라 쓰지 않는다)
+def step_up_locked() -> ApiError:
+    return ApiError(423, "STEP_UP_LOCKED", "본인 확인에 여러 번 실패해 잠겼어요. 신분증을 가지고 가까운 영업점을 방문해 주세요.")
+
+
+class StepUpIn(BaseModel):
+    action: Literal[StepUpChallenge.ACTION_VALUES]
+    password: str = Field(min_length=1, max_length=128, repr=False)  # PIN({"pin": …})은 3차 — 지금은 비밀번호만
+
+
+class StepUpOut(BaseModel):
+    step_up_challenge_id: str
+    expires_at: KstDatetime
+
+
+@router.post("/step-up", response_model=StepUpOut, status_code=201)
+def step_up(body: StepUpIn, login: Annotated[Login, Depends(get_login)], db: DB):
+    if login.session is None:  # 개발용 X-User-Id 헤더로는 받을 수 없다 — 번호는 세션에 묶이므로
+        raise unauthorized()
+    user = login.user
+    cred = db.get(LocalCredential, user.id, with_for_update=True)  # 동시에 여러 번 틀려도 횟수가 정확하게
+    if cred is None:
+        raise ApiError(400, "STEP_UP_NOT_AVAILABLE", "비밀번호로 본인 확인을 할 수 없는 계정이에요.")
+    if cred.failed_attempts >= STEP_UP_MAX_FAILURES:
+        raise step_up_locked()
+
+    request_id = uuid.uuid4().hex
+    if not verify_password(cred.password_hash, body.password):
+        cred.failed_attempts += 1
+        _audit(db, user.id, "STEP_UP", "FAILURE", request_id)
+        db.commit()
+        left = STEP_UP_MAX_FAILURES - cred.failed_attempts
+        if left <= 0:
+            raise step_up_locked()
+        raise ApiError(400, "STEP_UP_FAILED", f"비밀번호가 맞지 않아요. {left}번 더 틀리면 잠겨요.")
+
+    now = now_kst()
+    cred.failed_attempts = 0
+    challenge = StepUpChallenge(id=new_id("stu"), user_id=user.id, action=body.action, session_id=login.session.id,
+                                expires_at=now + STEP_UP_TTL)
+    db.add(challenge)
+    _audit(db, user.id, "STEP_UP", "SUCCESS", request_id)
+    db.commit()
+    return StepUpOut(step_up_challenge_id=challenge.id, expires_at=challenge.expires_at)
+
+
+def consume_step_up(db, challenge_id: str | None, login: Login, action: str) -> None:
+    """중요 작업 API 가 부른다: 번호가 이 회원·이 세션·이 action 의 것이고, 5분 안이고, 처음 쓰는 것인지 확인하고 「사용함」으로 표시.
+    커밋은 작업과 같이 한다 — 작업이 실패해 롤백되면 번호도 다시 쓸 수 있다."""
+    ch = db.get(StepUpChallenge, challenge_id, with_for_update=True) if challenge_id else None
+    if (ch is None or login.session is None or ch.user_id != login.user.id or ch.session_id != login.session.id
+            or ch.action != action or ch.consumed_at is not None or now_kst() >= ch.expires_at):
+        raise ApiError(403, "STEP_UP_REQUIRED", "본인 확인을 다시 해 주세요.")
+    ch.consumed_at = now_kst()

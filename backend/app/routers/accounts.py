@@ -6,12 +6,16 @@
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Path, Query
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 
-from app.deps import DB, CurrentUserId
+from app.deps import DB, CurrentLogin, CurrentUserId
 from app.errors import ApiError, account_not_found
-from app.models import Account, AccountBalanceView
+from app.models import Account, AccountActivityLog, AccountBalanceView
+from app.routers.auth import consume_step_up
+from app.rules import now_kst
 from app.schemas import AccountOut, BalanceOut
+from app.security import new_id
 
 router = APIRouter(tags=["accounts"])
 
@@ -81,3 +85,24 @@ def get_balance(account_id: AccountId, db: DB, user_id: CurrentUserId):
     if row[1] is None:
         raise balance_unavailable()
     return row[1]
+
+
+class StepUpBody(BaseModel):
+    step_up_challenge_id: str = Field(max_length=40)
+
+
+# ACCT-F05: 정지 해제 — 본인 확인(ACCOUNT_STATUS_CHANGE) 뒤 SUSPENDED → ACTIVE. 회원 탈퇴 ①(정지 계좌의 남은 돈 옮기기)의 첫 단계
+@router.post("/accounts/{accountId}/resume", response_model=AccountOut)
+def resume_account(account_id: AccountId, body: StepUpBody, login: CurrentLogin, db: DB):
+    account = db.scalar(select(Account).where(Account.id == account_id, Account.user_id == login.user.id)
+                        .with_for_update())
+    if account is None:
+        raise account_not_found()
+    consume_step_up(db, body.step_up_challenge_id, login, "ACCOUNT_STATUS_CHANGE")
+    if account.lifecycle_status != "SUSPENDED":
+        raise ApiError(409, "ACCOUNT_NOT_SUSPENDED", "정지된 계좌가 아니에요.")
+    account.lifecycle_status = "ACTIVE"
+    db.add(AccountActivityLog(id=new_id("aal"), account_id=account.id, actor_id=login.user.id, action="RESUME",
+                              occurred_at=now_kst(), metadata_={"from_status": "SUSPENDED"}))
+    db.commit()
+    return get_account(account_id, db, login.user.id)

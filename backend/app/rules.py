@@ -32,6 +32,20 @@ BANK_ACCOUNT_DIGITS = {
 }
 
 
+# Part 5 11장 「테스트용으로 특정 계좌번호는 PENDING 후 SUCCESS, 또는 FAILED」 — 시드 external_accounts 의 예금주 이름으로 고른다
+EXTERNAL_PENDING_HOLDER = "임처리"  # 처리중(PENDING) → settle_pending_transfers(app/jobs.py)가 10분 뒤 확정
+EXTERNAL_FAIL_HOLDER = "오실패"  # 받는 은행이 거절 → FAILED
+PENDING_SETTLE_AFTER = timedelta(minutes=10)  # Part 5 9장 「10분이 지나도 PENDING 이면 배치가 결과를 확정」
+TRANSFER_NAME_MAX = 10  # 통장 표시 이름 최대 글자 (Part 5 7장, 화면 TransferPage NAME_MAX 와 같음)
+TRANSFER_FAILURE_MESSAGES = {  # Part 5 9장 실패 사유 코드 → 사용자 안내
+    "INSUFFICIENT_BALANCE": "잔액이 부족해 보내지 못했어요.",
+    "LIMIT_EXCEEDED": "이체 한도를 초과했어요.",
+    "INVALID_ACCOUNT": "받는 계좌를 찾을 수 없어요.",
+    "ACCOUNT_NOT_ACTIVE": "거래할 수 없는 계좌예요.",
+    "SYSTEM_ERROR": "이체가 완료되지 않았어요. 잠시 후 다시 시도해 주세요.",
+}
+
+
 # --- 로그인 세션 (Part 1 AUTH-F05 「세션 만료(유휴/최대)」, 12장 「세션」) ---------------------------
 # 사용자 결정 2026-11-05: 유휴 10분, 최대 12시간 (기획서 12장에는 아직 기록 안 됨)
 SESSION_COOKIE = "sid"
@@ -44,6 +58,32 @@ SESSION_TOUCH_INTERVAL = timedelta(minutes=1)  # last_seen_at 은 요청마다�
 # 대신 서버 메모리에서 같은 아이디가 연속으로 틀리면 잠깐 기다리게 한다(서버를 다시 켜면 초기화).
 LOGIN_THROTTLE_FAILURES = 5
 LOGIN_THROTTLE_WAIT = timedelta(minutes=1)
+
+
+# --- 회원가입 입력 규칙 (Part 1 AUTH-F01·F02) — frontend/src/signupRules.ts 와 같은 규칙. 바꿀 때 둘 다 고친다 ---
+USERNAME_RE = r"^[a-z][a-z0-9_]{3,19}$"  # 영문 소문자로 시작, 소문자·숫자·밑줄 4~20자
+PASSWORD_MIN, PASSWORD_MAX = 8, 64  # 영문과 숫자를 모두 넣고, 아이디가 들어가면 안 됨
+EMAIL_RE = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
+NAME_RE = r"^[가-힣a-zA-Z ]{2,20}$"
+
+# --- 이메일 인증 (AUTH-F03 「예시 정책: 5분 만료 / 60초 재발송 대기 / 연속 오류 제한」) ----------------
+# 사용자 결정 2026-11-09: 기획서 예시값 + 하루 10번 발송 + 인증 후 30분 안에 가입. 1 이메일 = 1 계정(탈퇴 회원 제외)
+EMAIL_CODE_TTL = timedelta(minutes=5)
+EMAIL_RESEND_WAIT = timedelta(seconds=60)
+EMAIL_CODE_MAX_ATTEMPTS = 5  # 5번 틀리면 그 번호는 못 쓰고 새로 받아야 함
+EMAIL_DAILY_SENDS = 10  # 같은 이메일·용도로 24시간 안에 보낼 수 있는 횟수
+EMAIL_VERIFIED_TTL = timedelta(minutes=30)  # 인증을 마친 뒤 이 시간 안에 가입해야 함
+EMAIL_PURPOSES = ("SIGNUP", "EMAIL_CHANGE", "USERNAME_RECOVERY", "PASSWORD_RESET")  # 쓰임마다 따로 센다
+
+
+# --- 본인 확인 (Part 1 7장 POST /auth/step-up, 6.3 local_credentials) — 사용자 결정 2026-11-09 -----------------
+STEP_UP_TTL = timedelta(minutes=5)  # 받은 본인 확인 번호를 쓸 수 있는 시간 (한 번만, 그 action 에만, 그 세션에서만)
+STEP_UP_MAX_FAILURES = 5  # 비밀번호를 연속으로 이만큼 틀리면 영구 잠금(STEP_UP_LOCKED) — 시드 user_027 과 같은 규칙
+
+# --- 회원 탈퇴 (Part 1 AUTH-F09) — 사용자 결정 2026-11-09 ------------------------------------------------
+# ② 「삭제될 데이터」 안내문 버전. 화면(frontend/src/pages/WithdrawPage.tsx 의 DATA_GROUPS)을 바꾸면 같이 올린다 → 예전 확인은 무효
+WITHDRAWAL_DATA_REVIEW_VERSION = "2026-11-09"
+WITHDRAWN_NAME = "탈퇴회원"  # 탈퇴 1개월 뒤 가명 처리 때 이름 (아이디는 다른 사람이 못 쓰게 그대로 둔다)
 
 
 def now_kst() -> datetime:

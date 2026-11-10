@@ -8,11 +8,12 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Query
-from sqlalchemy import select
+from pydantic import BaseModel
+from sqlalchemy import func, select
 
 from app.deps import DB, CurrentUserId
 from app.errors import ApiError, not_found
-from app.models import Account, ExternalAccount, User
+from app.models import Account, ExternalAccount, Transfer, User
 from app.rules import BANK_ACCOUNT_DIGITS, OUR_BANK
 from app.schemas import TransferTargetOut
 
@@ -55,6 +56,28 @@ def verify_transfer_target(
     )
     if ext is None:
         raise target_not_found
-    return TransferTargetOut(
-        bank=bank, account_no=account_no, holder_name=ext.holder_name, account_status="ACTIVE", is_mine=False
+    my_name = db.scalar(select(User.name).where(User.id == user_id))
+    return TransferTargetOut(  # 가상 타행은 회원 id 가 없어 예금주 이름이 같으면 본인 명의로 본다(탈퇴 정리용 본인 계좌, 시드)
+        bank=bank, account_no=account_no, holder_name=ext.holder_name, account_status="ACTIVE",
+        is_mine=ext.holder_name == my_name,
     )
+
+
+class RecentTargetOut(BaseModel):
+    id: None = None  # 화면 SavedTarget — 최근 보낸 계좌는 id 가 없다(자주 쓰는 계좌만 있음)
+    account_no: str
+    account_display: str
+    holder_name: str
+    nickname: None = None
+
+
+# Part 5 6장 간편 송금 「최근 보낸 계좌」 — 성공한 이체의 받는 계좌, 같은 계좌는 한 번, 최근 20개
+@router.get("/transfer-targets/recent", response_model=list[RecentTargetOut])
+def recent_transfer_targets(db: DB, user_id: CurrentUserId):
+    # shortcut: 두린은행 계좌만 — 화면의 간편 송금 목록에 은행 칸이 없어서. 화면에 은행을 붙이면 타행도 넣는다
+    rows = db.execute(
+        select(Transfer.to_account_no, Transfer.to_holder_name, func.max(Transfer.requested_at).label("last"))
+        .where(Transfer.user_id == user_id, Transfer.status == "SUCCESS", Transfer.to_bank == OUR_BANK)
+        .group_by(Transfer.to_account_no, Transfer.to_holder_name).order_by(func.max(Transfer.requested_at).desc())
+        .limit(20)).all()
+    return [RecentTargetOut(account_no=no, account_display=no, holder_name=name) for no, name, _ in rows]

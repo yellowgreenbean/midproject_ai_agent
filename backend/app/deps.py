@@ -93,5 +93,12 @@ def get_current_user_id(login: Annotated[Login, Depends(get_login)]) -> str:
     return login.user.id
 
 
+def get_current_login(login: Annotated[Login, Depends(get_login)]) -> Login:
+    """본인 확인 번호를 쓰는 쓰기 API 용 — 세션까지 필요하다(번호가 세션에 묶임). 가입 마무리 중은 403."""
+    get_current_user_id(login)
+    return login
+
+
 LoginUser = Annotated[User, Depends(get_login_user)]
 CurrentUserId = Annotated[str, Depends(get_current_user_id)]
+CurrentLogin = Annotated[Login, Depends(get_current_login)]

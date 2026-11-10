@@ -9,6 +9,7 @@ import {
   getAccounts,
   getCard,
   getTerminationCheck,
+  payCard,
   terminateCard,
   type Account,
   type CardDetail,
@@ -31,7 +32,7 @@ const REASONS: { value: TerminationReason; label: string }[] = [
   { value: 'OTHER', label: '기타' },
 ]
 
-type Op = 'account' | 'terminate'
+type Op = 'account' | 'terminate' | 'pay'
 
 export default function CardDetailPage({ id }: { id: string }) {
   const [c, setC] = useState<CardDetail | null>(null)
@@ -68,6 +69,8 @@ export default function CardDetailPage({ id }: { id: string }) {
     )
 
   const ended = c.status === 'TERMINATED'
+  // 지금 낼 수 있는 대금 — 확정·연체 청구서, 해지한 카드면 이번 기간 사용액까지 (서버 POST /cards/{id}/payments 와 같은 계산)
+  const payAmount = c.cardType === 'CREDIT' ? c.unpaidAmount + (ended ? c.periodSpent : 0) : 0
   // 옮길 수 있는 계좌 = 내 정상 입출금 계좌 중 지금 계좌가 아닌 것 (서버도 같은 검사를 한다)
   const choices = accounts.filter((a) => a.type === 'CHECKING' && a.status === 'ACTIVE' && a.id !== c.linkedAccountId)
 
@@ -101,6 +104,20 @@ export default function CardDetailPage({ id }: { id: string }) {
     setC(r.data)
     setOp(null)
     setNotice(`결제 계좌를 ${r.data.linkedAccountName}(${r.data.linkedAccountNumber})로 바꿨어요.`)
+  }
+
+  async function onPay(e: FormEvent) {
+    e.preventDefault()
+    if (auth.missing) return setFormError(auth.missing)
+    setBusy(true)
+    const ch = await auth.verify('CARD_MANAGEMENT')
+    const r = ch.success ? await payCard(id, ch.data) : ch
+    setBusy(false)
+    auth.setValue('')
+    if (!r.success) return setFormError(r.error.message)
+    setC(r.data)
+    setOp(null)
+    setNotice(`카드 대금 ${won(payAmount)}을 ${r.data.linkedAccountNumber ?? '결제 계좌'}에서 냈어요.`)
   }
 
   async function onTerminate(e: FormEvent) {
@@ -260,6 +277,37 @@ export default function CardDetailPage({ id }: { id: string }) {
             </section>
           )}
 
+          {payAmount > 0 && (
+            <section aria-labelledby="card-pay" className="prod-manage">
+              <h2 id="card-pay" className="section-title">
+                <span className="section-icon">
+                  <Icon name="coins" size={18} />
+                </span>
+                카드 대금
+              </h2>
+              <ul className="panel acct-menu">
+                <li>
+                  <button type="button" aria-expanded={op === 'pay'} onClick={() => start(op === 'pay' ? null : 'pay')}>
+                    <span className="acct-menu-label">지금 결제하기</span>
+                    <span className="acct-menu-value">{won(payAmount)}</span>
+                    <Icon name="chevron" size={18} />
+                  </button>
+                  {op === 'pay' && (
+                    <form className="acct-menu-form prod-form" onSubmit={onPay} noValidate>
+                      <p className="prod-sub">
+                        {c.linkedAccountName} {c.linkedAccountNumber}에서 {won(payAmount)}이 빠져나가요. 잔액이 모자라면 한 푼도 빠지지 않아요.
+                      </p>
+                      <StepUpField auth={auth} id="card-pay-password" message={formError ? { tone: 'error', text: formError } : null} />
+                      <button className="btn-primary" type="submit" disabled={busy}>
+                        {busy ? '내는 중…' : `${won(payAmount)} 내기`}
+                      </button>
+                    </form>
+                  )}
+                </li>
+              </ul>
+            </section>
+          )}
+
           {!ended && (
             <section aria-labelledby="card-manage" className="prod-manage">
               <h2 id="card-manage" className="section-title">
@@ -316,10 +364,7 @@ export default function CardDetailPage({ id }: { id: string }) {
                       <p className="empty-title">지금은 해지할 수 없어요</p>
                       <ul className="acct-blockers">
                         <li>
-                          아직 내지 않은 카드 대금 {won(check.unpaidAmount)}이 있어요. 결제일에 대금이 빠져나간 뒤 해지할 수 있어요.{' '}
-                          <a className="more" href="#/cards">
-                            결제 캘린더 <Icon name="chevron" size={14} />
-                          </a>
+                          아직 내지 않은 카드 대금 {won(check.unpaidAmount)}이 있어요. 위의 「지금 결제하기」로 먼저 낸 뒤 해지할 수 있어요.
                         </li>
                       </ul>
                     </div>

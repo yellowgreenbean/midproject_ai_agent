@@ -22,6 +22,9 @@ export default function TransfersPage() {
       <section className="prod-head">
         <h2 className="prod-title is-dup">이체 결과</h2>
         <p className="prod-sub">내가 보낸 이체가 잘 갔는지 볼 수 있어요. 실패한 이체는 돈이 빠져나가지 않아요.</p>
+        <a className="more" href="#/scheduled-transfers">
+          예약·자동이체 보기
+        </a>
       </section>
       {error && (
         <p className="home-error" role="alert">

@@ -47,7 +47,8 @@ def _in_values(sqltext: str) -> list[str] | None:
 
 
 def test_same_tables(insp):
-    assert TABLES == sorted(insp.get_table_names())
+    # rag_* (docs/sql/08_rag.sql) 는 모델 없이 scripts/rag_ingest.py 가 SQL 로 직접 다룬다
+    assert TABLES == sorted(t for t in insp.get_table_names() if not t.startswith("rag_"))
     assert len(TABLES) == 60
 
 

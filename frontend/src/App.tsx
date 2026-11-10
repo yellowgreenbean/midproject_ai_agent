@@ -22,6 +22,7 @@ import CardBillPage from './pages/CardBillPage'
 import CardApplyPage from './pages/CardApplyPage'
 import TransferPage from './pages/TransferPage'
 import TransfersPage from './pages/TransfersPage'
+import ScheduledTransfersPage from './pages/ScheduledTransfersPage'
 import TransferResultPage from './pages/TransferResultPage'
 import TransactionsPage from './pages/TransactionsPage'
 import ChatPage from './pages/ChatPage'
@@ -33,9 +34,9 @@ import ConsentsPage from './pages/ConsentsPage'
 import WithdrawPage from './pages/WithdrawPage'
 import TransferLimitsPage from './pages/TransferLimitsPage'
 
-const TITLES = { signup: '회원가입', login: '로그인', findId: '아이디 찾기', resetPassword: '비밀번호 재설정', home: '홈', products: '금융상품', product: '상품 상세', subscribe: '상품 가입', savings: '내 가입 상품', saving: '내 가입 상품', accounts: '내 계좌', accountOpen: '계좌 개설', account: '계좌 상세', notifications: '알림', transfer: '송금', transfers: '이체 결과', transferResult: '이체 결과', transactions: '거래내역', chat: '두린 챗봇', settings: '마이페이지', profile: '내 정보', password: '비밀번호 변경', pin: '간편 비밀번호', consents: '약관 및 동의 내역', withdraw: '회원 탈퇴', limits: '이체 한도', cards: '내 카드', card: '카드 상세', cardBill: '카드 청구서', cardApply: '카드 신청', soon: '준비 중' }
+const TITLES = { signup: '회원가입', login: '로그인', findId: '아이디 찾기', resetPassword: '비밀번호 재설정', home: '홈', products: '금융상품', product: '상품 상세', subscribe: '상품 가입', savings: '내 가입 상품', saving: '내 가입 상품', accounts: '내 계좌', accountOpen: '계좌 개설', account: '계좌 상세', notifications: '알림', transfer: '송금', transfers: '이체 결과', scheduled: '예약·자동이체', transferResult: '이체 결과', transactions: '거래내역', chat: '두린 챗봇', settings: '마이페이지', profile: '내 정보', password: '비밀번호 변경', pin: '간편 비밀번호', consents: '약관 및 동의 내역', withdraw: '회원 탈퇴', limits: '이체 한도', cards: '내 카드', card: '카드 상세', cardBill: '카드 청구서', cardApply: '카드 신청', soon: '준비 중' }
 type Page = keyof typeof TITLES
-const PAGES: Record<string, Page> = { '/signup': 'signup', '/login': 'login', '/find-id': 'findId', '/reset-password': 'resetPassword', '/home': 'home', '/products': 'products', '/my/savings': 'savings', '/accounts': 'accounts', '/accounts/new': 'accountOpen', '/notifications': 'notifications', '/transfer': 'transfer', '/transfers': 'transfers', '/transactions': 'transactions', '/chat': 'chat', '/settings': 'settings', '/settings/profile': 'profile', '/settings/password': 'password', '/settings/pin': 'pin', '/settings/terms': 'consents', '/settings/withdraw': 'withdraw', '/settings/limits': 'limits', '/cards': 'cards', '/cards/apply': 'cardApply' }
+const PAGES: Record<string, Page> = { '/signup': 'signup', '/login': 'login', '/find-id': 'findId', '/reset-password': 'resetPassword', '/home': 'home', '/products': 'products', '/my/savings': 'savings', '/accounts': 'accounts', '/accounts/new': 'accountOpen', '/notifications': 'notifications', '/transfer': 'transfer', '/transfers': 'transfers', '/scheduled-transfers': 'scheduled', '/transactions': 'transactions', '/chat': 'chat', '/settings': 'settings', '/settings/profile': 'profile', '/settings/password': 'password', '/settings/pin': 'pin', '/settings/terms': 'consents', '/settings/withdraw': 'withdraw', '/settings/limits': 'limits', '/cards': 'cards', '/cards/apply': 'cardApply' }
 
 export default function App() {
   const [hash, setHash] = useState(location.hash)
@@ -72,6 +73,7 @@ export default function App() {
   if (page === 'notifications') return <NotificationsPage />
   if (page === 'transfer') return <TransferPage query={new URLSearchParams(qs)} />
   if (page === 'transfers') return <TransfersPage />
+  if (page === 'scheduled') return <ScheduledTransfersPage />
   if (page === 'transactions') return <TransactionsPage />
   if (page === 'chat') return <ChatPage />
   if (page === 'settings') return <SettingsPage />

@@ -4,6 +4,7 @@ import AppShell from '../components/AppShell'
 import Field from '../components/Field'
 import {
   BANK,
+  BANKS,
   addFavorite,
   getAccounts,
   getFavorites,
@@ -50,6 +51,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
   const [error, setError] = useState<string | null>(null)
   const [step, setStep] = useState<'to' | 'amount' | 'confirm'>('to') // 한 화면에 질문 하나 — 누구에게 → 얼마 → 보낼까요
   const [fromId, setFromId] = useState(query.get('from') ?? '')
+  const [bank, setBank] = useState(query.get('bank') ?? BANK) // 받는 은행 — 다른 은행은 가상 타행(Part 5 11장)
   const [toNo, setToNo] = useState(digitsOnly(query.get('to') ?? ''))
   const [target, setTarget] = useState<TransferTarget | null>(null)
   const [toError, setToError] = useState<string | null>(null)
@@ -115,11 +117,12 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
   const from = accounts.find((a) => a.id === fromId)
   const n = Number(amount)
 
-  async function onVerify(no = toNo) {
+  async function onVerify(no = toNo, b = bank) {
     if (!no) return setToError('받는 계좌번호를 입력해 주세요.')
     setToNo(no)
+    setBank(b)
     setBusy(true)
-    const r = await verifyTransferTarget(no, fromId)
+    const r = await verifyTransferTarget(no, fromId, undefined, b)
     setBusy(false)
     if (!r.success) {
       setTarget(null)
@@ -159,7 +162,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
     if (from && n > from.balance) return setFormError('잔액이 부족해요.')
     if (myName.trim().length > NAME_MAX || theirName.trim().length > NAME_MAX) return setFormError(`통장 표시 이름은 ${NAME_MAX}자까지예요.`)
     setBusy(true)
-    const r = await verifyTransferTarget(target.accountNo, fromId, n) // 재확인 화면 경고를 받는다
+    const r = await verifyTransferTarget(target.accountNo, fromId, n, bank) // 재확인 화면 경고를 받는다
     setBusy(false)
     if (!r.success) return setFormError(r.error.message)
     setFormError(null)
@@ -179,7 +182,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
       return setFormError(ch.error.message)
     }
     const r = await sendTransfer(
-      { fromAccountId: fromId, toAccountNo: target.accountNo, amount: n, stepUpChallengeId: ch.data, myDisplayName: myName, theirDisplayName: theirName },
+      { fromAccountId: fromId, toBank: bank, toAccountNo: target.accountNo, amount: n, stepUpChallengeId: ch.data, myDisplayName: myName, theirDisplayName: theirName },
       key,
     )
     setBusy(false)
@@ -250,7 +253,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
           <dd className={n > from.balance ? 'is-over' : undefined}>{n > 0 ? won(from.balance - n) : won(from.balance)}</dd>
         </div>
       </dl>
-      <p className="prod-fine">지금은 {BANK} 계좌로만 보낼 수 있어요.</p>
+      <p className="prod-fine">다른 은행으로 보내도 수수료는 0원이에요.</p>
     </aside>
   )
   const toWho = target && (
@@ -262,7 +265,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
           {target.isMine ? ' (내 계좌)' : ''}
         </strong>
         <small>
-          {BANK} {target.accountDisplay}
+          {bank} {target.accountDisplay}
         </small>
       </span>
     </div>
@@ -319,10 +322,24 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
             <p className="field-label">받는 분 계좌</p>
             <div className="trf-bank">
               <img src={logoMark} alt="" width={36} height={36} />
-              <span className="acct-card-main">
-                <strong>{BANK}</strong>
-                <small>다른 은행으로 보내기는 준비 중이에요</small>
-              </span>
+              <Field id="trf-bank" label="받는 은행">
+                <select
+                  id="trf-bank"
+                  className="input"
+                  value={bank}
+                  onChange={(e) => {
+                    setBank(e.target.value)
+                    setTarget(null) // 은행이 바뀌면 계좌를 다시 확인한다
+                    setToError(null)
+                  }}
+                >
+                  {BANKS.map((b) => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                </select>
+              </Field>
             </div>
             <Field id="trf-to" label="계좌번호" message={toError ? { tone: 'error', text: toError } : null}>
               <div className="trf-to-box">
@@ -456,7 +473,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
                     const fav = favs.some((f) => f.accountNo === t.accountNo)
                     return (
                       <li key={t.accountNo}>
-                        <button type="button" className="trf-pick" onClick={() => void onVerify(t.accountNo)} disabled={busy}>
+                        <button type="button" className="trf-pick" onClick={() => void onVerify(t.accountNo, BANK)} disabled={busy}>
                           {avatar(t.holderName, t.mine)}
                           <span className="acct-card-main">
                             <strong>{t.nickname ? `${t.nickname} (${t.holderName})` : t.holderName}</strong>
@@ -606,7 +623,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
                 <div>
                   <dt>받는 계좌</dt>
                   <dd>
-                    {BANK} {target.accountDisplay}
+                    {bank} {target.accountDisplay}
                   </dd>
                 </div>
                 <div>

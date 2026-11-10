@@ -9,11 +9,12 @@ import { useStepUp } from './useStepUp'
 import './ProductPages.css'
 import './SettingsPages.css'
 
-// ② 안내문 — 바꾸면 서버의 DATA_REVIEW_VERSION(backend/app/crud.py)도 올린다
+// ② 안내문 — 바꾸면 서버의 WITHDRAWAL_DATA_REVIEW_VERSION(backend/app/rules.py)도 올린다. 실제 처리는 backend/app/routers/withdrawal.py · app/jobs.py
 const DATA_GROUPS = [
-  { title: '바로 삭제돼요', items: '로그인 기록, 계좌 별명·즐겨찾기, 알림 설정과 알림, 자주 쓰는 계좌, 카드 설정' },
-  { title: '1개월 뒤 삭제돼요', items: '이름·아이디·이메일·생년월일 같은 회원 정보 (부정 가입을 막으려고 잠깐 둬요)' },
-  { title: '5년 동안 따로 보관해요', items: '계좌·거래 기록, 이체 기록, 예금·적금 가입 기록, 카드 이용 기록 (전자금융거래법)' },
+  { title: '바로 삭제돼요', items: '비밀번호·간편 비밀번호, 계좌 별명·즐겨찾기, 알림 설정과 알림, 자주 쓰는 계좌, 카드 설정·별명·포인트·추천, 마이데이터 연동' },
+  { title: '1개월 뒤 정리돼요', items: '이름·이메일·월급일·로그인 연결은 지우고, 생년월일은 태어난 해만 남겨요 (부정 가입을 막으려고 잠깐 둬요)' },
+  { title: '5년 동안 따로 보관해요', items: '계좌·거래 기록, 이체 기록, 예금·적금 가입 기록, 카드 이용·청구 기록, 로그인 기록 (전자금융거래법)' },
+  { title: '계속 남아요', items: '아이디 — 다른 사람이 같은 아이디를 쓰지 못하게 해요. 다시 가입할 때는 새 아이디를 만들어 주세요' },
 ]
 const INFO_SERVICES = ['입출금 알림 — 설정이 지워지고 알림이 멈춰요', '모든 약관 동의 — 탈퇴하면 자동으로 철회돼요']
 

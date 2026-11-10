@@ -59,10 +59,11 @@ def as_user(user_id: str) -> dict:
 
 
 def seed_password() -> str:
-    """seed_scenarios.py 가 해시로 넣은 시험용 비밀번호 — 환경변수, 없으면 backend/.env.example (seed 와 같은 순서)."""
+    """seed_scenarios.py 가 해시로 넣은 시험용 비밀번호 — 환경변수, 없으면 backend/.env (seed 와 같은 순서)."""
     if os.environ.get("SEED_PASSWORD"):
         return os.environ["SEED_PASSWORD"]
-    for line in (ROOT / "backend" / ".env.example").read_text(encoding="utf-8").splitlines():
+    env = ROOT / "backend" / ".env"
+    for line in (env.read_text(encoding="utf-8").splitlines() if env.exists() else []):
         if line.startswith("SEED_PASSWORD="):
-            return line.split("=", 1)[1].strip()
-    raise RuntimeError("SEED_PASSWORD 를 찾을 수 없음")
+            return line.split("=", 1)[1].strip().strip("\"'")
+    raise RuntimeError("SEED_PASSWORD 를 찾을 수 없음 — 환경변수나 backend/.env 에 넣어 주세요")

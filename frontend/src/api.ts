@@ -568,6 +568,7 @@ export type StepUpAction =
   | 'SUBSCRIPTION'
   | 'ACCOUNT_STATUS_CHANGE'
   | 'TRANSFER'
+  | 'SCHEDULED_TRANSFER'
   | 'WITHDRAWAL'
   | 'CARD_APPLICATION'
   | 'CARD_TERMINATION'
@@ -765,14 +766,16 @@ export async function getNotifications(): Promise<ApiResult<AppNotification[]>> 
 export const readAllNotifications = () => call<null>('POST', '/notifications/read-all')
 
 // ---- 이체 (Part 5 TRX-F01·F02) ----
-export const BANK = '두린은행' // 1차는 두린은행 계좌끼리만
+export const BANK = '두린은행' // 우리 은행 (기본값)
+// 보낼 수 있는 은행 — 서버 backend/app/rules.py BANK_ACCOUNT_DIGITS 와 같은 목록. 다른 은행은 가상 타행(Part 5 11장)
+export const BANKS = [BANK, '우리은행', 'KB국민은행', '신한은행', '하나은행', 'NH농협은행', 'IBK기업은행', '카카오뱅크', '토스뱅크', '케이뱅크', '새마을금고']
 
 export type TransferWarning = 'FIRST_LARGE' | 'LARGE_VS_USUAL' | 'RECENT_SAME'
 export type TransferTarget = { accountNo: string; accountDisplay: string; holderName: string; isMine: boolean; warnings: TransferWarning[] }
 
 /** GET /transfer-targets/verify — 받는 계좌 확인. amount 를 주면 재확인 화면 경고도 온다 */
-export async function verifyTransferTarget(accountNo: string, fromAccountId: string, amount?: number): Promise<ApiResult<TransferTarget>> {
-  const q = new URLSearchParams({ bank: BANK, account_no: accountNo, from_account_id: fromAccountId, ...(amount ? { amount: String(amount) } : {}) })
+export async function verifyTransferTarget(accountNo: string, fromAccountId: string, amount?: number, bank = BANK): Promise<ApiResult<TransferTarget>> {
+  const q = new URLSearchParams({ bank, account_no: accountNo, from_account_id: fromAccountId, ...(amount ? { amount: String(amount) } : {}) })
   // backend(TransferTargetOut)는 표시용 번호·재확인 경고를 아직 주지 않는다 → 번호 그대로, 경고 없음
   const r = await call<{ bank: string; account_no: string; holder_name: string; account_status: string; is_mine: boolean }>('GET', `/transfer-targets/verify?${q}`)
   return map(r, (t) => ({ accountNo: t.account_no, accountDisplay: t.account_no, holderName: t.holder_name, isMine: t.is_mine, warnings: [] }))
@@ -896,12 +899,12 @@ const fromBackendTransfer = (t: TransferOutRaw, displays: Map<string, string>): 
 
 /** POST /transfers — 같은 idempotencyKey 로 다시 보내면 새로 보내지 않고 처음 결과를 돌려준다. 잔액 부족·한도 초과는 FAILED 결과로 온다 */
 export async function sendTransfer(
-  b: { fromAccountId: string; toAccountNo: string; amount: number; stepUpChallengeId: string; myDisplayName: string; theirDisplayName: string },
+  b: { fromAccountId: string; toBank?: string; toAccountNo: string; amount: number; stepUpChallengeId: string; myDisplayName: string; theirDisplayName: string },
   idempotencyKey: string,
 ): Promise<ApiResult<Transfer>> {
   const body = {
     from_account_id: b.fromAccountId,
-    to_bank: BANK,
+    to_bank: b.toBank ?? BANK,
     to_account_no: b.toAccountNo,
     amount: String(b.amount),
     step_up_challenge_id: b.stepUpChallengeId,
@@ -921,6 +924,58 @@ export async function getTransfers(): Promise<ApiResult<Transfer[]>> {
 export async function getTransfer(id: string): Promise<ApiResult<Transfer>> {
   const [r, displays] = await Promise.all([call<TransferOutRaw>('GET', `/transfers/${encodeURIComponent(id)}`), myAccountDisplays()])
   return map(r, (t) => fromBackendTransfer(t, displays))
+}
+
+// ---- 예약 송금 · 자동이체 (Part 5 8장) ----
+export type ScheduledTransfer = {
+  id: string
+  fromAccountId: string
+  toBank: string
+  toAccountNo: string
+  toHolderName: string
+  amount: number
+  type: 'ONCE' | 'MONTHLY'
+  executeAt: string | null // 예약 송금 실행 시각
+  dayOfMonth: number | null // 자동이체 매월 며칠 (99 = 말일)
+  nextRunAt: string | null
+  status: string
+}
+type ScheduledTransferRaw = {
+  id: string
+  from_account_id: string
+  to_bank: string
+  to_account_no: string
+  to_holder_name: string
+  amount: string
+  type: 'ONCE' | 'MONTHLY'
+  execute_at: string | null
+  day_of_month: number | null
+  next_run_at: string | null
+  status: string
+}
+const toScheduled = (s: ScheduledTransferRaw): ScheduledTransfer => ({
+  id: s.id,
+  fromAccountId: s.from_account_id,
+  toBank: s.to_bank,
+  toAccountNo: s.to_account_no,
+  toHolderName: s.to_holder_name,
+  amount: Number(s.amount),
+  type: s.type,
+  executeAt: s.execute_at,
+  dayOfMonth: s.day_of_month,
+  nextRunAt: s.next_run_at,
+  status: s.status,
+})
+
+/** GET /scheduled-transfers — 취소·끝난 예약도 함께, 최근 등록이 먼저 */
+export async function getScheduledTransfers(): Promise<ApiResult<ScheduledTransfer[]>> {
+  return map(await call<ScheduledTransferRaw[]>('GET', '/scheduled-transfers'), (l) => l.map(toScheduled))
+}
+
+/** DELETE /scheduled-transfers/{id} — 예약 송금 취소 · 자동이체 해지 (본인 확인 SCHEDULED_TRANSFER) */
+export async function cancelScheduledTransfer(id: string, stepUpChallengeId: string): Promise<ApiResult<ScheduledTransfer>> {
+  const r = await call<ScheduledTransferRaw>('DELETE', `/scheduled-transfers/${encodeURIComponent(id)}`, { step_up_challenge_id: stepUpChallengeId })
+  return map(r, toScheduled)
 }
 
 // ---- 챗봇 (Part 3 7장 POST /agent/chat) — 대화 맥락(context)은 서버가 준 것을 다음 요청에 그대로 돌려보낸다 ----
@@ -1237,6 +1292,11 @@ const toTermination = (t: TerminationRaw): TerminationCheck => ({
   forfeitedPoints: Number(t.forfeited_points),
   refundedAnnualFee: Number(t.refunded_annual_fee),
 })
+
+/** POST /cards/{cardId}/payments — 지금 결제하기 (본인 확인 CARD_MANAGEMENT). 확정·연체 청구서, 해지한 카드면 이번 기간 사용액까지 */
+export async function payCard(id: string, stepUpChallengeId: string): Promise<ApiResult<CardDetail>> {
+  return map(await call<CardDetailRaw>('POST', `${card(id)}/payments`, { step_up_challenge_id: stepUpChallengeId }), toCardDetail)
+}
 
 /** GET /cards/{cardId}/termination-check — 해지 전에 확인할 것 */
 export async function getTerminationCheck(id: string): Promise<ApiResult<TerminationCheck>> {
