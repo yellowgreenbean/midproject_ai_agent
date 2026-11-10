@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import errors
 from app.config import settings
 from app.routers import (
-    accounts, auth, cards, favorites, password, signup, subscriptions, transactions, transfer_targets, transfers, users,
+    accounts, auth, cards, favorites, password, pin, signup, subscriptions, transactions, transfer_targets, transfers, users,
     withdrawal,
 )
 
@@ -44,6 +44,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(signup.router)
 app.include_router(password.router)
+app.include_router(pin.router)
 app.include_router(withdrawal.router)
 app.include_router(users.router)
 app.include_router(accounts.router)

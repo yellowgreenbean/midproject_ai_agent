@@ -18,8 +18,16 @@ from sqlalchemy import select
 from app.config import settings
 from app.deps import DB, Login, get_login, is_session_alive, set_session_expires_header
 from app.errors import ApiError, unauthorized
-from app.models import AuthAuditLog, AuthIdentity, AuthSession, LocalCredential, StepUpChallenge, User
-from app.rules import SESSION_COOKIE, SESSION_MAX, STEP_UP_MAX_FAILURES, STEP_UP_TTL, now_kst
+from app.models import AuthAuditLog, AuthIdentity, AuthSession, LocalCredential, PinCredential, StepUpChallenge, User
+from app.rules import (
+    PIN_LOCK,
+    PIN_MAX_FAILURES,
+    SESSION_COOKIE,
+    SESSION_MAX,
+    STEP_UP_MAX_FAILURES,
+    STEP_UP_TTL,
+    now_kst,
+)
 from app.schemas import KstDatetime
 from app.security import (
     hash_password,
@@ -132,18 +140,39 @@ def logout(request: Request, db: DB):
     return response
 
 
-# --- 본인 확인 (Part 1 7장 POST /auth/step-up, 9.3 「3차 PIN 전에는 로그인 비밀번호 재확인」) ---------------------
-# 중요 작업(이체·카드·가입·계좌 상태 변경·탈퇴·생년월일 수정) 직전에 비밀번호를 다시 받고, 그 작업 하나에만 쓸 수 있는 번호를 준다.
+# --- 본인 확인 (Part 1 7장 POST /auth/step-up, AUTH-F12) -----------------------------------------------------
+# 중요 작업(이체·카드·가입·계좌 상태 변경·탈퇴·생년월일 수정·PIN 관리) 직전에 비밀번호나 간편 비밀번호(PIN)를 다시 받고,
+# 그 작업 하나에만 쓸 수 있는 번호를 준다.
 #   - 번호는 5분 · 한 번만 · 받은 action 에만 · 받은 세션에서만 (step_up_challenges)
-#   - 실패는 local_credentials.failed_attempts 에 센다(로그인 실패는 세지 않음, 6.3). 5번이면 영구 잠금 → STEP_UP_LOCKED
+#   - 비밀번호 실패는 local_credentials.failed_attempts 에 센다(로그인 실패는 세지 않음, 6.3). 5번이면 영구 잠금 → STEP_UP_LOCKED
 #     (사용자 결정 2026-11-09, 시드 user_027 과 같음. locked_until 은 시간 잠금용이라 쓰지 않는다)
+#   - PIN 실패는 pin_credentials 에 센다. 5번이면 10분 잠금 → PIN_LOCKED (사용자 결정 2026-11-10, rules.PIN_LOCK)
+#   - 어떤 수단을 받나 (사용자 결정 2026-11-10)
+#       PIN_CHANGE                 지금 PIN 만 (「기존 PIN 인증」, AUTH-F13)
+#       PIN_ENROLL · PIN_RESET     로그인 비밀번호만 (PIN 이 없거나 잊었으니 PIN 과 다른 수단, AUTH-F13 「PIN 자체가 아닌」)
+#       그 밖의 작업               둘 다 — 화면은 PIN 을 만든 회원에게 PIN 키패드를 보여 준다(frontend useStepUp)
+PIN_ONLY_ACTIONS = ("PIN_CHANGE",)
+PASSWORD_ONLY_ACTIONS = ("PIN_ENROLL", "PIN_RESET")
+
+
 def step_up_locked() -> ApiError:
     return ApiError(423, "STEP_UP_LOCKED", "본인 확인에 여러 번 실패해 잠겼어요. 신분증을 가지고 가까운 영업점을 방문해 주세요.")
 
 
+def pin_locked(until) -> ApiError:
+    return ApiError(423, "PIN_LOCKED", f"간편 비밀번호를 여러 번 틀려서 {until:%H:%M}까지 쓸 수 없어요. "
+                                       "마이페이지 > 간편 비밀번호에서 다시 정하면 바로 풀려요.")
+
+
+def pin_not_set() -> ApiError:
+    return ApiError(400, "PIN_NOT_SET", "간편 비밀번호가 아직 없어요. 마이페이지 > 간편 비밀번호에서 먼저 만들어 주세요.")
+
+
 class StepUpIn(BaseModel):
     action: Literal[StepUpChallenge.ACTION_VALUES]
-    password: str = Field(min_length=1, max_length=128, repr=False)  # PIN({"pin": …})은 3차 — 지금은 비밀번호만
+    # 둘 중 하나만 보낸다
+    password: str | None = Field(default=None, min_length=1, max_length=128, repr=False)
+    pin: str | None = Field(default=None, min_length=1, max_length=20, repr=False)
 
 
 class StepUpOut(BaseModel):
@@ -151,19 +180,13 @@ class StepUpOut(BaseModel):
     expires_at: KstDatetime
 
 
-@router.post("/step-up", response_model=StepUpOut, status_code=201)
-def step_up(body: StepUpIn, login: Annotated[Login, Depends(get_login)], db: DB):
-    if login.session is None:  # 개발용 X-User-Id 헤더로는 받을 수 없다 — 번호는 세션에 묶이므로
-        raise unauthorized()
-    user = login.user
+def _check_password(db, user: User, password: str, request_id: str) -> None:
     cred = db.get(LocalCredential, user.id, with_for_update=True)  # 동시에 여러 번 틀려도 횟수가 정확하게
     if cred is None:
         raise ApiError(400, "STEP_UP_NOT_AVAILABLE", "비밀번호로 본인 확인을 할 수 없는 계정이에요.")
     if cred.failed_attempts >= STEP_UP_MAX_FAILURES:
         raise step_up_locked()
-
-    request_id = uuid.uuid4().hex
-    if not verify_password(cred.password_hash, body.password):
+    if not verify_password(cred.password_hash, password):
         cred.failed_attempts += 1
         _audit(db, user.id, "STEP_UP", "FAILURE", request_id)
         db.commit()
@@ -171,13 +194,55 @@ def step_up(body: StepUpIn, login: Annotated[Login, Depends(get_login)], db: DB)
         if left <= 0:
             raise step_up_locked()
         raise ApiError(400, "STEP_UP_FAILED", f"비밀번호가 맞지 않아요. {left}번 더 틀리면 잠겨요.")
+    cred.failed_attempts = 0
+
+
+def _check_pin(db, user: User, pin: str, request_id: str) -> None:
+    cred = db.get(PinCredential, user.id, with_for_update=True)
+    if cred is None:
+        raise pin_not_set()
+    now = now_kst()
+    if cred.locked_until is not None:
+        if now < cred.locked_until:
+            raise pin_locked(cred.locked_until)
+        cred.locked_until, cred.failed_attempts = None, 0  # 잠금 시간이 지났으면 다시 5번
+    if not verify_password(cred.pin_hash, pin):  # 6자리가 아닌 값도 그냥 틀린 번호로 센다
+        cred.failed_attempts += 1
+        if cred.failed_attempts >= PIN_MAX_FAILURES:
+            cred.locked_until = now + PIN_LOCK  # failed_attempts 는 5 로 남겨 둔다(왜 잠겼는지 보이게)
+        _audit(db, user.id, "STEP_UP_PIN", "FAILURE", request_id)
+        db.commit()
+        if cred.locked_until is not None:
+            raise pin_locked(cred.locked_until)
+        left = PIN_MAX_FAILURES - cred.failed_attempts
+        raise ApiError(400, "STEP_UP_FAILED", f"간편 비밀번호가 맞지 않아요. {left}번 더 틀리면 "
+                                                  f"{PIN_LOCK.seconds // 60}분 동안 쓸 수 없어요.")
+    cred.failed_attempts = 0
+
+
+@router.post("/step-up", response_model=StepUpOut, status_code=201)
+def step_up(body: StepUpIn, login: Annotated[Login, Depends(get_login)], db: DB):
+    if login.session is None:  # 개발용 X-User-Id 헤더로는 받을 수 없다 — 번호는 세션에 묶이므로
+        raise unauthorized()
+    if (body.password is None) == (body.pin is None):
+        raise ApiError(400, "STEP_UP_CREDENTIAL_REQUIRED", "비밀번호나 간편 비밀번호 중 하나로 확인해 주세요.")
+    if body.action in PIN_ONLY_ACTIONS and body.pin is None:
+        raise ApiError(400, "PIN_REQUIRED", "지금 간편 비밀번호로 확인해 주세요.")
+    if body.action in PASSWORD_ONLY_ACTIONS and body.password is None:
+        raise ApiError(400, "PASSWORD_REQUIRED", "로그인 비밀번호로 확인해 주세요.")
+
+    user = login.user
+    request_id = uuid.uuid4().hex
+    if body.pin is not None:
+        _check_pin(db, user, body.pin, request_id)
+    else:
+        _check_password(db, user, body.password, request_id)
 
     now = now_kst()
-    cred.failed_attempts = 0
     challenge = StepUpChallenge(id=new_id("stu"), user_id=user.id, action=body.action, session_id=login.session.id,
                                 expires_at=now + STEP_UP_TTL)
     db.add(challenge)
-    _audit(db, user.id, "STEP_UP", "SUCCESS", request_id)
+    _audit(db, user.id, "STEP_UP_PIN" if body.pin is not None else "STEP_UP", "SUCCESS", request_id)
     db.commit()
     return StepUpOut(step_up_challenge_id=challenge.id, expires_at=challenge.expires_at)
 

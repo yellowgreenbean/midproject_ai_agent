@@ -49,7 +49,7 @@ SCENARIOS = """
   - local_credentials.failed_attempts 는 본인 확인(step-up) 비밀번호 실패만 센다(기획서 6.3) — 로그인 실패는 세지 않음
   - user_026 본인 확인 실패 4회(한 번 더 틀리면 잠김) · user_027 본인 확인 잠김(실패 5회 = 영구 잠금, 영업점 방문 안내.
     시간이 지나도 풀리지 않으므로 locked_until 은 비움). 둘 다 로그인·조회는 되고 중요 작업만 STEP_UP_LOCKED
-  - 정상 계좌가 있는 ACTIVE 회원: pin_credentials. user_019 PIN 잠김(locked_until = 지금 + 30분 — PIN 잠금 규칙은 3차에 정함)
+  - 정상 계좌가 있는 ACTIVE 회원: pin_credentials. user_019 PIN 잠김(5번 틀림, locked_until = 지금 + 10분 — backend rules.PIN_LOCK)
   - 상태별 로그인: user_024 RESTRICTED · user_028 PENDING_VERIFICATION · user_029 WITHDRAWN(로그인 수단 없음)
 이체 한도
   - 해지 안 된 계좌 모두 1회 500만 · 1일 1,000만. acc_007(user_002)만 1회 30만 · 1일 50만 → 한도 초과 시험
@@ -129,7 +129,7 @@ def build(root, now, password, pin):
         return users.get(uid, {})
 
     t = {}
-    lock_until = fmt(now + datetime.timedelta(minutes=30))
+    pin_lock_until = fmt(now + datetime.timedelta(minutes=10))  # backend/app/rules.py PIN_LOCK 과 같게
 
     # 가입 약관 (AUTH-F10, 사용자 결정 2026-11-09: 토스식 4개). 카드 상품 약관이 아니라 card_product_id 는 NULL
     t["terms"] = [
@@ -164,7 +164,7 @@ def build(root, now, password, pin):
         errs.append("user_019 에 정상 계좌가 없어 PIN 잠금 시나리오를 만들 수 없음")
     t["pin_credentials"] = [
         {"user_id": uid, "pin_hash": ph.hash(pin), "enabled_at": users[uid]["created_at"],
-         "failed_attempts": 5 if uid == "user_019" else 0, "locked_until": lock_until if uid == "user_019" else None}
+         "failed_attempts": 5 if uid == "user_019" else 0, "locked_until": pin_lock_until if uid == "user_019" else None}
         for uid in pin_users
     ]
 

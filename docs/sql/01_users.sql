@@ -130,7 +130,7 @@ CREATE TABLE auth_audit_logs (
 CREATE INDEX idx_auth_audit_logs_user ON auth_audit_logs (user_id, occurred_at);
 COMMENT ON TABLE auth_audit_logs IS '인증 기록';
 
--- 본인 확인 (이체·예약 이체·카드 신청/해지/관리·가입·계좌 상태 변경·탈퇴·정보 변경)
+-- 본인 확인 (이체·예약 이체·카드 신청/해지/관리·가입·계좌 상태 변경·탈퇴·정보 변경·PIN 등록/변경/재설정)
 CREATE TABLE step_up_challenges (
   id           VARCHAR(40)   NOT NULL,
   user_id      VARCHAR(40)   NOT NULL,
@@ -141,7 +141,7 @@ CREATE TABLE step_up_challenges (
   PRIMARY KEY (id),
   CONSTRAINT fk_step_up_user FOREIGN KEY (user_id) REFERENCES users (id),
   CONSTRAINT fk_step_up_session FOREIGN KEY (session_id) REFERENCES sessions (id),
-  CONSTRAINT ck_step_up_challenges_action CHECK (action IN ('TRANSFER', 'SCHEDULED_TRANSFER', 'CARD_APPLICATION', 'CARD_TERMINATION', 'CARD_MANAGEMENT', 'SUBSCRIPTION', 'ACCOUNT_STATUS_CHANGE', 'WITHDRAWAL', 'PROFILE_CHANGE'))
+  CONSTRAINT ck_step_up_challenges_action CHECK (action IN ('TRANSFER', 'SCHEDULED_TRANSFER', 'CARD_APPLICATION', 'CARD_TERMINATION', 'CARD_MANAGEMENT', 'SUBSCRIPTION', 'ACCOUNT_STATUS_CHANGE', 'WITHDRAWAL', 'PROFILE_CHANGE', 'PIN_ENROLL', 'PIN_CHANGE', 'PIN_RESET'))
 );
 CREATE INDEX idx_step_up_user ON step_up_challenges (user_id);
 CREATE INDEX idx_step_up_session ON step_up_challenges (session_id);

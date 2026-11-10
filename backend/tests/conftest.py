@@ -58,12 +58,21 @@ def as_user(user_id: str) -> dict:
     return {"X-User-Id": user_id}
 
 
-def seed_password() -> str:
-    """seed_scenarios.py 가 해시로 넣은 시험용 비밀번호 — 환경변수, 없으면 backend/.env (seed 와 같은 순서)."""
-    if os.environ.get("SEED_PASSWORD"):
-        return os.environ["SEED_PASSWORD"]
+def _seed_secret(name: str) -> str:
+    """seed_scenarios.py 가 해시로 넣은 시험용 값 — 환경변수, 없으면 backend/.env (seed 와 같은 순서)."""
+    if os.environ.get(name):
+        return os.environ[name]
     env = ROOT / "backend" / ".env"
     for line in (env.read_text(encoding="utf-8").splitlines() if env.exists() else []):
-        if line.startswith("SEED_PASSWORD="):
+        if line.startswith(f"{name}="):
             return line.split("=", 1)[1].strip().strip("\"'")
-    raise RuntimeError("SEED_PASSWORD 를 찾을 수 없음 — 환경변수나 backend/.env 에 넣어 주세요")
+    raise RuntimeError(f"{name} 를 찾을 수 없음 — 환경변수나 backend/.env 에 넣어 주세요")
+
+
+def seed_password() -> str:
+    return _seed_secret("SEED_PASSWORD")
+
+
+def seed_pin() -> str:
+    """정상 계좌가 있는 ACTIVE 회원의 간편 비밀번호(PIN)."""
+    return _seed_secret("SEED_PIN")

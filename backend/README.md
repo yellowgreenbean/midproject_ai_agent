@@ -94,7 +94,8 @@ http://localhost:8010/docs 에서 호출 (화면 `frontend/` 가 8010 을 부른
 | 아이디 중복 확인 (`available` true/false, 형식 오류 400) | `GET /auth/usernames/availability?username=` | Part 1 AUTH-F02 | `routers/signup.py` |
 | 이메일 인증번호 발송·확인 (모의 메일: 응답 `dev_code`) | `POST /auth/email-verifications`, `POST /auth/email-verifications/confirm` | Part 1 AUTH-F03 | `routers/signup.py` |
 | 회원가입 (성공하면 바로 로그인 쿠키) | `POST /auth/register` | Part 1 AUTH-F01 | `routers/signup.py` |
-| 본인 확인 (로그인 비밀번호 재확인 → 5분·1회·그 작업·그 세션 한정 번호, 5번 틀리면 영구 잠금 423 `STEP_UP_LOCKED`) | `POST /auth/step-up` | Part 1 7장·9.3 | `routers/auth.py` (`consume_step_up()` 은 작업 API 가 부름) |
+| 본인 확인 (로그인 비밀번호 `password` 또는 간편 비밀번호 `pin` → 5분·1회·그 작업·그 세션 한정 번호. 비밀번호 5번 틀리면 영구 잠금 423 `STEP_UP_LOCKED`, PIN 5번 틀리면 10분 잠금 423 `PIN_LOCKED`) | `POST /auth/step-up` | Part 1 7장·9.3·AUTH-F12 | `routers/auth.py` (`consume_step_up()` 은 작업 API 가 부름) |
+| 간편 비밀번호(PIN) 상태 · 만들기 · 바꾸기 · 다시 정하기 (본인 확인 `PIN_ENROLL`(비밀번호) · `PIN_CHANGE`(지금 PIN) · `PIN_RESET`(비밀번호) 뒤 숫자 6자리 두 번. 같은 숫자·이어지는 숫자·생년월일 금지, 바꾸기는 지금 PIN 과 같은 번호도 금지) | `GET /auth/pin`, `POST /auth/pin/enroll` · `/change` · `/reset` | Part 1 AUTH-F11·F13 | `routers/pin.py`, 금지 규칙 `rules.pin_error` |
 | 탈퇴 전 3단계 점검 (① 남은 돈 ② 삭제될 데이터 ③ 연결된 서비스, 막는 항목과 이동할 화면) | `GET /users/me/withdrawal-checks`, `POST …/data-review`, `POST …/linked-services` | Part 1 AUTH-F09 | `routers/withdrawal.py` |
 | 회원 탈퇴 (본인 확인 `WITHDRAWAL` → ①②③ 재검사 → 남은 계좌 일괄 해지 → `WITHDRAWN`·세션 끊기·동의 철회·즉시 삭제) | `POST /users/me/withdraw` | Part 1 AUTH-F09 | `routers/withdrawal.py`, 다른 파트 조회는 `app/internal.py` |
 | 내 정보 (가입 마무리 중에도 가능) | `GET /users/me` | Part 1 AUTH-F07(조회만) | `routers/users.py` |
@@ -125,7 +126,7 @@ CODEF `res…` 빈 칸은 `""`, 우리가 만든 빈 칸은 `null`. 거래에는
 — 남의 것과 없는 것은 똑같이 404(존재 여부를 숨김, Part 2 ACCT-F02). 기획서 업무 규칙 값(기본 한도, 은행별 자릿수 등)은 `app/rules.py`.
 
 아직 없는 것: 예약 등록·변경과 예약 실행 배치, 계좌 개설·설정·정지·해지, 카드 신청·이용 내역(`GET /cards/{id}/transactions`)·혜택 표시,
-적금 추가 납입·만기 처리(PROD-F11), PIN 본인 확인(3차), Google 로그인.
+적금 추가 납입·만기 처리(PROD-F11), Google 로그인.
 
 **예약 작업 (`app/jobs.py`)** — 스케줄러가 생기면 이 함수들을 부르고 `db.commit()`. 그 전에는 손으로 한 번씩: `.venv\Scripts\python -m app.jobs`
 | 함수 | 하는 일 | 주기 |

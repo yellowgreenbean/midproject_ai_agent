@@ -1,6 +1,6 @@
 """기획서에서 정한 업무 규칙 값. 근거 절을 같이 적는다 — 기획서가 바뀌면 여기만 고친다."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 KST = timezone(timedelta(hours=9))
 
@@ -79,6 +79,28 @@ EMAIL_PURPOSES = ("SIGNUP", "EMAIL_CHANGE", "USERNAME_RECOVERY", "PASSWORD_RESET
 # --- 본인 확인 (Part 1 7장 POST /auth/step-up, 6.3 local_credentials) — 사용자 결정 2026-11-09 -----------------
 STEP_UP_TTL = timedelta(minutes=5)  # 받은 본인 확인 번호를 쓸 수 있는 시간 (한 번만, 그 action 에만, 그 세션에서만)
 STEP_UP_MAX_FAILURES = 5  # 비밀번호를 연속으로 이만큼 틀리면 영구 잠금(STEP_UP_LOCKED) — 시드 user_027 과 같은 규칙
+
+# --- 간편 비밀번호 PIN (AUTH-F11~F13) — 사용자 결정 2026-11-10. 금지 규칙은 frontend/src/pinRules.ts 와 같다 ------
+# PIN 실패는 pin_credentials 에 센다(비밀번호 본인 확인의 local_credentials 와 따로). 5번 틀리면 10분 잠금 —
+# 잠금 시간이 지나면 다시 5번, 그 전에 풀려면 로그인 비밀번호로 「다시 정하기」(PIN_RESET).
+PIN_LENGTH = 6
+PIN_MAX_FAILURES = 5
+PIN_LOCK = timedelta(minutes=10)
+
+
+def pin_error(pin: str, birth_date: date | None) -> str | None:
+    """새 PIN 이 쓸 수 있는 번호인지. 문제없으면 None. 지금 PIN 과 같은지는 해시를 봐야 해서 부르는 쪽이 따로 본다."""
+    if len(pin) != PIN_LENGTH or not pin.isascii() or not pin.isdigit():
+        return f"숫자 {PIN_LENGTH}자리로 정해 주세요."
+    if len(set(pin)) == 1:
+        return "같은 숫자만 쓸 수는 없어요."
+    steps = {int(b) - int(a) for a, b in zip(pin, pin[1:])}
+    if steps in ({1}, {-1}):
+        return "이어지는 숫자(123456 같은)는 쓸 수 없어요."
+    if birth_date is not None and pin == birth_date.strftime("%y%m%d"):
+        return "생년월일은 쓸 수 없어요."
+    return None
+
 
 # --- 아이디 찾기 · 비밀번호 재설정 · 비밀번호 변경 (AUTH-F06 · F08) — 사용자 결정 2026-11-10 ------------------
 PASSWORD_RESET_TTL = timedelta(minutes=5)  # 재설정 ①이 준 재설정 토큰을 ②에서 쓸 수 있는 시간 (한 번만, 새로 받으면 이전 것은 무효)
