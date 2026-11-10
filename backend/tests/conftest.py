@@ -18,6 +18,12 @@ os.environ["DATABASE_URL"] = os.environ.get(
 
 # 조회 API 테스트(test_api.py)는 회원을 개발용 X-User-Id 헤더로 정한다. 로그인 자체는 test_auth.py 가 쿠키로 시험한다.
 os.environ["AUTH_DEV_HEADER"] = "true"
+# 이메일 인증: 테스트는 메일을 받을 수 없으니 응답의 dev_code 로 번호를 받고, backend/.env 에 SMTP 를 넣어 두었어도
+# 진짜 메일(…@example.com)이 나가지 않게 SMTP_HOST 를 비운다(환경변수가 .env 보다 우선)
+os.environ["EMAIL_DEV_CODE"] = "true"
+os.environ["SMTP_HOST"] = ""
+# 서버 안 1분 스케줄러는 끈다 — 테스트가 예약 실행(app/jobs.py)을 직접 부른다
+os.environ["SCHEDULER_ENABLED"] = "false"
 
 import psycopg  # noqa: E402
 import pytest  # noqa: E402

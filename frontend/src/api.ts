@@ -93,13 +93,13 @@ export const getTerms = () => call<Term[]>('GET', '/terms')
 export const checkUsername = (username: string) =>
   call<{ available: boolean }>('GET', `/auth/usernames/availability?username=${encodeURIComponent(username)}`)
 
-/** POST /auth/email-verifications — 메일 대신 서버가 dev_code 로 번호를 돌려준다(모의 메일) */
 /** 인증번호를 어디에 쓰나 — 쓰임마다 따로 센다(가입 번호로 비밀번호를 바꿀 수 없게) */
 export type MailPurpose = 'SIGNUP' | 'EMAIL_CHANGE' | 'USERNAME_RECOVERY' | 'PASSWORD_RESET'
 
-export async function sendEmailCode(email: string, purpose: MailPurpose = 'SIGNUP'): Promise<ApiResult<{ expiresAt: number; resendAt: number; devCode: string }>> {
-  const r = await call<{ expires_at: string; resend_at: string; dev_code: string }>('POST', '/auth/email-verifications', { email, purpose })
-  return map(r, (d) => ({ expiresAt: Date.parse(d.expires_at), resendAt: Date.parse(d.resend_at), devCode: d.dev_code }))
+/** POST /auth/email-verifications — 서버가 인증번호를 메일로 보낸다(번호는 응답에 없다) */
+export async function sendEmailCode(email: string, purpose: MailPurpose = 'SIGNUP'): Promise<ApiResult<{ expiresAt: number; resendAt: number }>> {
+  const r = await call<{ expires_at: string; resend_at: string }>('POST', '/auth/email-verifications', { email, purpose })
+  return map(r, (d) => ({ expiresAt: Date.parse(d.expires_at), resendAt: Date.parse(d.resend_at) }))
 }
 
 /** POST /auth/email-verifications/confirm */

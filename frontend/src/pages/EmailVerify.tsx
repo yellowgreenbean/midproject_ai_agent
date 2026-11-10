@@ -1,5 +1,5 @@
 // 메일 인증번호 받기·맞히기 — 아이디 찾기 · 비밀번호 재설정 · 이메일 바꾸기가 같이 쓴다 (가입 화면의 메일 인증과 같은 서버 주소)
-// 모의 메일이라 보낸 번호를 화면에 함께 보여 준다(가입 화면과 같음).
+// 번호는 서버가 메일로만 보낸다(화면·응답에 없음) — 가입 화면과 같음.
 import { useEffect, useState } from 'react'
 import Field, { type FieldMessage } from '../components/Field'
 import { confirmEmailCode, sendEmailCode, type MailPurpose } from '../api'
@@ -31,7 +31,7 @@ export default function EmailVerify({ purpose, label, onVerified }: Props) {
     setNow(Date.now())
     setCode('')
     setCodeMsg(null)
-    setMsg({ tone: 'info', text: `인증번호를 보냈어요. (모의 메일 — 인증번호 ${r.data.devCode})` })
+    setMsg({ tone: 'info', text: `${email.trim()}로 인증번호를 보냈어요. 메일함(스팸함 포함)을 확인해 주세요.` })
   }
 
   async function confirm() {

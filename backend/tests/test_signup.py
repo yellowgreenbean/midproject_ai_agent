@@ -183,3 +183,40 @@ def test_code_is_not_stored_in_plain_text(client):
     code = client.post("/auth/email-verifications", json={"email": "plain@example.com"}).json()["dev_code"]
     stored = sql("SELECT challenge_digest FROM email_verifications WHERE email = 'plain@example.com'").scalar()
     assert code not in stored and len(stored) == 64
+
+
+# --- 인증번호 메일 (app/mailer.py) -----------------------------------------------------------------
+def test_code_goes_by_mail_not_in_response(client, monkeypatch):
+    """평소(EMAIL_DEV_CODE=false)에는 응답에 번호가 없고, 메일로 보낸 번호로만 인증된다."""
+    from app.config import settings
+    from app.routers import signup
+    sent = []
+    monkeypatch.setattr(settings, "email_dev_code", False)
+    monkeypatch.setattr(signup, "send_code_mail", lambda to, code, purpose, ttl: sent.append((to, code, purpose, ttl)))
+    r = client.post("/auth/email-verifications", json={"email": "Mailed@Example.com"})
+    assert r.status_code == 201 and r.json()["dev_code"] is None
+    assert len(sent) == 1 and sent[0][0] == "mailed@example.com" and sent[0][2:] == ("SIGNUP", 5)
+    r = client.post("/auth/email-verifications/confirm", json={"email": "mailed@example.com", "code": sent[0][1]})
+    assert r.status_code == 200 and r.json()["token"]
+
+
+def test_mail_failure_returns_503_and_saves_nothing(client, monkeypatch):
+    """메일을 못 보내면 503, 인증 행을 남기지 않아 바로 다시 받을 수 있다(재발송 대기에 안 걸림)."""
+    from app.mailer import MailError
+    from app.routers import signup
+
+    def fail(*_):
+        raise MailError
+    monkeypatch.setattr(signup, "send_code_mail", fail)
+    r = client.post("/auth/email-verifications", json={"email": "down@example.com"})
+    assert r.status_code == 503 and r.json()["error"]["code"] == "EMAIL_SEND_FAILED"
+    assert sql("SELECT count(*) FROM email_verifications WHERE email = 'down@example.com'").scalar() == 0
+    monkeypatch.undo()
+    assert client.post("/auth/email-verifications", json={"email": "down@example.com"}).status_code == 201
+
+
+def test_code_mail_content():
+    from app.mailer import build_code_mail
+    m = build_code_mail("a@example.com", "123456", "PASSWORD_RESET", 5)
+    assert m["Subject"] == "[두린은행] 비밀번호 재설정 인증번호 123456" and m["To"] == "a@example.com"
+    assert "123456" in m.get_content() and "5분" in m.get_content()

@@ -16,7 +16,7 @@ import hero from '../assets/signup-hero.png'
 import './SignupPage.css'
 
 type IdCheck = 'idle' | 'checking' | 'available' | 'taken'
-type Mail = { expiresAt: number; resendAt: number; devCode: string }
+type Mail = { expiresAt: number; resendAt: number }
 
 const STEPS = ['아이디·비밀번호', '이메일 인증', '기본 정보', '약관 동의']
 const mmss = (ms: number) => {
@@ -122,7 +122,7 @@ export default function SignupPage() {
     setMail(r.data)
     setNow(Date.now())
     setCode('')
-    setMailMsg({ tone: 'info', text: `인증번호를 보냈어요. (모의 메일 — 인증번호 ${r.data.devCode})` })
+    setMailMsg({ tone: 'info', text: `${email}로 인증번호를 보냈어요. 메일함(스팸함 포함)을 확인해 주세요.` })
   }
 
   async function onConfirmCode() {

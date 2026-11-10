@@ -2,8 +2,10 @@
 
 화면(frontend/src/pages/SignupPage.tsx) 순서
   GET  /terms                               가입 화면에 보여 줄 공통 약관
+  GET  /terms/{terms_id}                    약관 본문 (「보기」 · 마이페이지 「자세히 보기」)
   GET  /auth/usernames/availability         아이디 중복 확인 (확인 결과는 예약이 아님 — 가입 때 다시 검사)
-  POST /auth/email-verifications            인증번호 발송 (모의 메일: 응답의 dev_code 로 번호를 돌려준다)
+  POST /auth/email-verifications            인증번호 발송 — SMTP 메일로 보낸다(app/mailer.py). 번호는 응답에 없다
+                                            (테스트만 EMAIL_DEV_CODE=true 로 응답 dev_code 에 받는다)
   POST /auth/email-verifications/confirm    인증번호 확인 → 인증 토큰
   POST /auth/register                       모든 값을 서버가 다시 검사 → users·auth_identities·local_credentials·
                                             user_consents 를 한 트랜잭션으로 만들고 바로 로그인(쿠키)
@@ -19,6 +21,7 @@ import re
 import secrets
 import uuid
 from datetime import date, timedelta
+from pathlib import Path
 from typing import Literal
 
 from fastapi import APIRouter, Query, Request, Response
@@ -26,8 +29,10 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 
+from app.config import settings
 from app.deps import DB
 from app.errors import ApiError
+from app.mailer import MailError, send_code_mail
 from app.models import AuthIdentity, EmailVerification, LocalCredential, Terms, User, UserConsent
 from app.routers.auth import _audit, start_session
 from app.rules import (
@@ -120,6 +125,47 @@ def list_terms(db: DB):
             for t in common_terms(db)]
 
 
+REPO_ROOT = Path(__file__).resolve().parents[3]  # backend/app/routers/signup.py → 저장소 맨 위
+TERMS_DIRS = (REPO_ROOT / "data", REPO_ROOT / "docs")  # 약관 본문은 이 두 폴더의 .md 만 읽는다(content_url 로 다른 파일을 못 열게)
+
+
+class TermDetailOut(BaseModel):
+    id: str
+    title: str
+    required: bool
+    version: str
+    effective_at: KstDatetime
+    source: str | None  # 본문 파일 앞머리의 source: (원문 주소 또는 원본 PDF 이름)
+    content: str | None  # Markdown 본문(앞머리·맨 위 # 제목 뺌). 파일이 아직 없으면 None → 화면이 「준비 중」
+
+
+def read_terms_body(content_url: str) -> tuple[str | None, str | None]:
+    """약관 본문 파일을 읽어 (본문, source) 를 돌려준다. 파일이 없거나 허용 폴더 밖이면 (None, None)."""
+    path = (REPO_ROOT / content_url).resolve()
+    if path.suffix != ".md" or not any(path.is_relative_to(d) for d in TERMS_DIRS) or not path.is_file():
+        return None, None
+    text = path.read_text(encoding="utf-8").replace("\r\n", "\n")
+    source = None
+    if text.startswith("---\n"):  # 앞머리(crawl_toss_terms.py · pdf_to_md.py 가 적는 출처·시행일)
+        head, _, text = text[4:].partition("\n---\n")
+        source = next((line[7:].strip() for line in head.splitlines() if line.startswith("source:")), None)
+    text = text.lstrip("\n")
+    if text.startswith("# "):  # 제목은 화면이 따로 보여 준다
+        text = text.partition("\n")[2]
+    return text.strip() + "\n", source
+
+
+@router.get("/terms/{terms_id}", response_model=TermDetailOut)
+def get_terms(terms_id: str, db: DB):
+    """약관 본문 — 가입 화면(로그인 전)과 마이페이지 「약관 및 동의 내역」이 같이 쓴다. 공개 정보라 로그인 없이."""
+    t = db.get(Terms, terms_id)
+    if t is None:
+        raise ApiError(404, "TERMS_NOT_FOUND", "약관을 찾을 수 없어요.")
+    content, source = read_terms_body(t.content_url)
+    return TermDetailOut(id=t.id, title=t.title, required=t.required, version=t.version, effective_at=t.effective_at,
+                         source=source, content=content)
+
+
 # --- 아이디 중복 확인 (AUTH-F02) -------------------------------------------------------------------
 @router.get("/auth/usernames/availability")
 def username_availability(db: DB, username: str = Query(max_length=50)):
@@ -140,7 +186,7 @@ class EmailSendIn(BaseModel):
 class EmailSendOut(BaseModel):
     expires_at: KstDatetime
     resend_at: KstDatetime
-    dev_code: str  # shortcut: 실제 메일 대신 응답으로 번호를 준다(학습용 모의 메일), 메일 발송을 붙이면 이 칸을 지운다
+    dev_code: str | None = None  # 테스트 전용(EMAIL_DEV_CODE=true 일 때만). 평소에는 번호가 메일로만 간다
 
 
 @router.post("/auth/email-verifications", response_model=EmailSendOut, status_code=201)
@@ -164,8 +210,15 @@ def send_email_code(body: EmailSendIn, db: DB):
                             attempt_count=0)
     row.challenge_digest = digest(f"{row.id}:{code}")  # 행 id 를 섞어 같은 번호라도 해시가 다르게
     db.add(row)
+    # 메일을 먼저 보내고 성공해야 저장한다 — 못 보낸 번호가 재발송 대기·하루 횟수를 잡아먹지 않게
+    try:
+        send_code_mail(email, code, body.purpose, int(EMAIL_CODE_TTL.total_seconds() // 60))
+    except MailError:
+        db.rollback()
+        raise ApiError(503, "EMAIL_SEND_FAILED", "인증 메일을 보내지 못했어요. 잠시 뒤 다시 시도해 주세요.")
     db.commit()
-    return EmailSendOut(expires_at=row.expires_at, resend_at=now + EMAIL_RESEND_WAIT, dev_code=code)
+    return EmailSendOut(expires_at=row.expires_at, resend_at=now + EMAIL_RESEND_WAIT,
+                        dev_code=code if settings.email_dev_code else None)
 
 
 class EmailConfirmIn(BaseModel):
