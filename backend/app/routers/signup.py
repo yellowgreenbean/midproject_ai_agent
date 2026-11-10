@@ -87,6 +87,18 @@ def latest_verification(db, email: str, purpose: str, lock: bool = False) -> Ema
     return db.scalar(q.with_for_update() if lock else q)
 
 
+def take_email_proof(db, email: str, purpose: str, token: str) -> EmailVerification:
+    """인증번호 확인(/confirm)이 준 토큰이 이 이메일·용도로 30분 안에 인증한 것인지 확인하고, 그 행을 잠가 돌려준다.
+    잠그므로 같은 토큰을 동시에 두 번 써도 하나만 통과한다. 행을 지우는(토큰 1회용) 것은 부르는 쪽이 성공했을 때 한다."""
+    proof = db.scalar(select(EmailVerification).where(
+        EmailVerification.email == email, EmailVerification.purpose == purpose,
+        EmailVerification.challenge_digest == digest(token),
+        EmailVerification.used_at.is_not(None)).with_for_update())
+    if proof is None or now_kst() > proof.used_at + EMAIL_VERIFIED_TTL:
+        raise ApiError(400, "EMAIL_NOT_VERIFIED", "이메일 인증을 다시 해 주세요.")
+    return proof
+
+
 # --- 약관 (AUTH-F10) ----------------------------------------------------------------------------
 class TermOut(BaseModel):
     id: str
@@ -226,12 +238,7 @@ def register(body: RegisterIn, request: Request, response: Response, db: DB):
         raise ApiError(400, "INVALID_BIRTH_DATE", "생년월일을 다시 확인해 주세요.")
 
     # 2. 이메일 인증 토큰 — 이 이메일·가입 용도로 30분 안에 인증한 것만. 잠가서 같은 토큰 두 번 가입을 막는다
-    proof = db.scalar(select(EmailVerification).where(
-        EmailVerification.email == email, EmailVerification.purpose == "SIGNUP",
-        EmailVerification.challenge_digest == digest(body.email_verification_token),
-        EmailVerification.used_at.is_not(None)).with_for_update())
-    if proof is None or now > proof.used_at + EMAIL_VERIFIED_TTL:
-        raise ApiError(400, "EMAIL_NOT_VERIFIED", "이메일 인증을 다시 해 주세요.")
+    proof = take_email_proof(db, email, "SIGNUP", body.email_verification_token)
 
     # 3. 약관 — 공통 약관만 받고, 필수는 모두 동의해야 한다(AUTH-F10)
     terms = common_terms(db)

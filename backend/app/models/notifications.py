@@ -16,7 +16,7 @@ class Notification(Base):
     """알림"""
 
     __tablename__ = "notifications"
-    TYPE_VALUES = ("TRANSACTION", "PAYMENT_DUE", "LOW_BALANCE", "OVERDUE", "PERFORMANCE", "POINT_EXPIRING", "ANNUAL_FEE", "UNUSED_CARD", "APPLICATION", "CARD_STATUS", "INACTIVE_ACCOUNT", "MATURITY")
+    TYPE_VALUES = ("TRANSACTION", "PAYMENT_DUE", "LOW_BALANCE", "OVERDUE", "PERFORMANCE", "POINT_EXPIRING", "ANNUAL_FEE", "UNUSED_CARD", "APPLICATION", "CARD_STATUS", "INACTIVE_ACCOUNT", "MATURITY", "SECURITY")
     __table_args__ = (
         one_of("type", TYPE_VALUES, "ck_notifications_type"),
         UniqueConstraint("event_id", "user_id", "type", name="uk_notifications_event"),

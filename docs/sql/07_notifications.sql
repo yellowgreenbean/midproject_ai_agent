@@ -23,7 +23,7 @@ CREATE TABLE notifications (
   CONSTRAINT fk_notifications_card FOREIGN KEY (user_card_id) REFERENCES user_cards (id),
   CONSTRAINT ck_notifications_type CHECK (type IN ('TRANSACTION', 'PAYMENT_DUE', 'LOW_BALANCE', 'OVERDUE',
     'PERFORMANCE', 'POINT_EXPIRING', 'ANNUAL_FEE', 'UNUSED_CARD', 'APPLICATION', 'CARD_STATUS',
-    'INACTIVE_ACCOUNT', 'MATURITY'))
+    'INACTIVE_ACCOUNT', 'MATURITY', 'SECURITY'))
 );
 COMMENT ON CONSTRAINT uk_notifications_event ON notifications IS '같은 이벤트로 중복 알림 금지';
 CREATE INDEX idx_notifications_user_created ON notifications (user_id, created_at);

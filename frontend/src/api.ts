@@ -110,15 +110,16 @@ export const confirmEmailCode = (email: string, code: string, purpose: MailPurpo
 export const recoverUsernames = (email: string, emailVerificationToken: string) =>
   call<{ username: string; created_at: string }[]>('POST', '/auth/username-recovery', { email, email_verification_token: emailVerificationToken })
 
-/** POST /auth/password-resets — 비밀번호 재설정 (AUTH-F06). 성공하면 모든 기기에서 로그아웃 */
-export const resetPassword = (b: { username: string; email: string; emailVerificationToken: string; newPassword: string; newPasswordConfirm: string }) =>
-  call<object>('POST', '/auth/password-resets', {
-    username: b.username,
-    email: b.email,
-    email_verification_token: b.emailVerificationToken,
-    new_password: b.newPassword,
-    new_password_confirm: b.newPasswordConfirm,
-  })
+/** POST /auth/password-resets — 비밀번호 재설정 ① (AUTH-F06). 아이디 + 이메일 인증 토큰 → 재설정 토큰(5분·한 번).
+ *  아이디·이메일이 안 맞으면 IDENTITY_MISMATCH — 이메일 인증 토큰은 그대로라 아이디만 고쳐 다시 보내면 된다 */
+export async function startPasswordReset(username: string, email: string, emailVerificationToken: string): Promise<ApiResult<{ resetToken: string; expiresAt: number }>> {
+  const r = await call<{ reset_token: string; expires_at: string }>('POST', '/auth/password-resets', { username, email, email_verification_token: emailVerificationToken })
+  return map(r, (d) => ({ resetToken: d.reset_token, expiresAt: Date.parse(d.expires_at) }))
+}
+
+/** POST /auth/password-resets/confirm — 비밀번호 재설정 ② 새 비밀번호. 성공하면 모든 기기에서 로그아웃 */
+export const confirmPasswordReset = (resetToken: string, newPassword: string, newPasswordConfirm: string) =>
+  call<object>('POST', '/auth/password-resets/confirm', { reset_token: resetToken, new_password: newPassword, new_password_confirm: newPasswordConfirm })
 
 /** POST /auth/register — 성공하면 서버가 로그인 쿠키도 준다(가입 직후 로그인, docs/decisions.md) */
 export const register = (b: RegisterBody) =>

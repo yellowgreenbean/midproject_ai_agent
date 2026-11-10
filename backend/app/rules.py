@@ -80,6 +80,11 @@ EMAIL_PURPOSES = ("SIGNUP", "EMAIL_CHANGE", "USERNAME_RECOVERY", "PASSWORD_RESET
 STEP_UP_TTL = timedelta(minutes=5)  # 받은 본인 확인 번호를 쓸 수 있는 시간 (한 번만, 그 action 에만, 그 세션에서만)
 STEP_UP_MAX_FAILURES = 5  # 비밀번호를 연속으로 이만큼 틀리면 영구 잠금(STEP_UP_LOCKED) — 시드 user_027 과 같은 규칙
 
+# --- 아이디 찾기 · 비밀번호 재설정 · 비밀번호 변경 (AUTH-F06 · F08) — 사용자 결정 2026-11-10 ------------------
+PASSWORD_RESET_TTL = timedelta(minutes=5)  # 재설정 ①이 준 재설정 토큰을 ②에서 쓸 수 있는 시간 (한 번만, 새로 받으면 이전 것은 무효)
+RECOVERABLE_STATUSES = ("ACTIVE", "RESTRICTED", "PENDING_VERIFICATION")  # 탈퇴(WITHDRAWN)는 찾지도 바꾸지도 않는다
+USERNAME_VISIBLE = 3  # 아이디 찾기 결과에서 보여 줄 앞 글자 수 — 나머지는 글자 수만큼 *
+
 # --- 회원 탈퇴 (Part 1 AUTH-F09) — 사용자 결정 2026-11-09 ------------------------------------------------
 # ② 「삭제될 데이터」 안내문 버전. 화면(frontend/src/pages/WithdrawPage.tsx 의 DATA_GROUPS)을 바꾸면 같이 올린다 → 예전 확인은 무효
 WITHDRAWAL_DATA_REVIEW_VERSION = "2026-11-09"

@@ -6,7 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import errors
 from app.config import settings
 from app.routers import (
-    accounts, auth, cards, favorites, signup, subscriptions, transactions, transfer_targets, transfers, users, withdrawal,
+    accounts, auth, cards, favorites, password, signup, subscriptions, transactions, transfer_targets, transfers, users,
+    withdrawal,
 )
 
 app = FastAPI(title="두린은행 계좌·거래 API", version="0.3.0")
@@ -42,6 +43,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(signup.router)
+app.include_router(password.router)
 app.include_router(withdrawal.router)
 app.include_router(users.router)
 app.include_router(accounts.router)
