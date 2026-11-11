@@ -1,5 +1,5 @@
-// 카드 화면이 쓰는 작은 규칙 — 금액 판정은 서버(backend/app/crud_cards.py)가 하고, 화면은 묶고 더해 보여 주기만 한다
-import type { CardBill, CardTransaction } from './api'
+// 카드 화면이 쓰는 작은 규칙 — 금액 판정은 서버(backend/app/routers/cards.py)가 하고, 화면은 묶고 더해 보여 주기만 한다
+import type { CardBill, CardPerformance, CardTransaction } from './api'
 
 export const CARD_TYPE_LABEL = { CHECK: '체크', CREDIT: '신용' } as const
 export const CARD_STATUS_LABEL: Record<string, string> = { ACTIVE: '정상', SUSPENDED: '일시정지', LOST: '분실 신고', EXPIRED: '유효기간 지남', TERMINATED: '해지' }
@@ -39,6 +39,17 @@ export function groupByPaymentDate(bills: CardBill[]) {
     upcoming: all.filter((g) => !g.done).sort((a, b) => a.date.localeCompare(b.date)),
     past: all.filter((g) => g.done).sort((a, b) => b.date.localeCompare(a.date)),
   }
+}
+
+/** 금액 — productRules.won 과 같은 모양 (노드 테스트가 확장자 없는 값 import 를 못 읽어 여기 둔다) */
+const won = (n: number) => `${n.toLocaleString('ko-KR')}원`
+
+/** 실적 한 줄 — 「지난달 21,300원 썼어요. 300,000원 이상 쓰면 혜택을 받아요」 */
+export function performanceText(p: CardPerformance) {
+  const when = p.period === 'QUARTER' ? '지난 분기' : '지난달'
+  if (p.tierLevel === null) return `${when} ${won(p.spent)} 썼어요. ${won(p.tierMinSpend)} 이상 쓰면 혜택을 받아요`
+  const next = p.nextMinSpend === null ? '가장 높은 구간이에요' : `${won(p.nextMinSpend - p.spent)} 더 쓰면 다음 구간이에요`
+  return `${when} ${won(p.spent)} 써서 ${p.tierLevel}구간 혜택을 받는 중 · ${next}`
 }
 
 /** 이번 달부터 거꾸로 n달 — 'YYYYMM' (이용 내역의 달 고르기) */

@@ -2,6 +2,8 @@
 // 서버: backend/ (FastAPI, 이 컴퓨터의 8010번 문). 서버는 snake_case·금액 문자열로 주고받고(C-5),
 // 화면이 쓰기 편한 모양(camelCase·숫자)으로 바꾸는 일도 여기서만 한다.
 
+import { CHAT_TIMEOUT_MS, TIMEOUT_MS, callFailure } from './apiRules'
+
 export type ApiError = { code: string; message: string }
 export type ApiResult<T> = { success: true; data: T } | { success: false; error: ApiError }
 
@@ -19,7 +21,8 @@ export type RegisterBody = {
   agreedTermIds: string[]
 }
 export type SessionUser = { user_id: string; username: string; name: string; status: string }
-export type Account = { id: string; name: string; number: string; type: string; status: string; isFavorite: boolean; balance: number }
+// number = 화면 표시 번호(하이픈), accountNo = 계좌번호 숫자 전체 — 더미 계좌의 표시 번호는 숫자 일부가 빠져 있어 이체에는 accountNo 를 쓴다
+export type Account = { id: string; name: string; number: string; accountNo: string; type: string; status: string; isFavorite: boolean; balance: number }
 export type Product = { id: string; name: string; description: string; maxRate: string; termLabel: string; icon: 'safe' | 'coins' }
 
 // 서버 주소: 환경 변수 VITE_API_URL(frontend/.env.local) 이 있으면 그것, 없으면 화면 주소의 8010번 문 (8000 은 다른 프로젝트가 씀).
@@ -50,14 +53,17 @@ export function onSessionExpires(fn: (expiresAt: number | null) => void) {
 }
 export const currentSessionExpires = () => sessionExpiresAt
 
-async function call<T>(method: 'GET' | 'POST' | 'PATCH' | 'DELETE', path: string, body?: unknown, headers?: Record<string, string>): Promise<ApiResult<T>> {
+async function call<T>(method: 'GET' | 'POST' | 'PATCH' | 'DELETE', path: string, body?: unknown, headers?: Record<string, string>, timeoutMs = TIMEOUT_MS): Promise<ApiResult<T>> {
+  let gotResponse = false
   try {
     const res = await fetch(API + path, {
       method,
       credentials: 'include', // 로그인 쿠키를 함께 보낸다
       headers: body === undefined ? headers : { 'Content-Type': 'application/json', ...headers },
       body: body === undefined ? undefined : JSON.stringify(body),
+      signal: AbortSignal.timeout(timeoutMs), // 서버가 멈추면 끝없이 기다리지 않게
     })
+    gotResponse = true
     const exp = res.headers.get('X-Session-Expires-At')
     if (exp) setSessionExpires(Date.parse(exp))
     const text = await res.text() // 204(로그아웃 등)는 본문이 없다
@@ -76,9 +82,9 @@ async function call<T>(method: 'GET' | 'POST' | 'PATCH' | 'DELETE', path: string
     }
     if (json !== null && typeof json === 'object' && 'success' in json) return json as ApiResult<T>
     return { success: true, data: (json ?? {}) as T }
-  } catch {
-    // 서버가 꺼져 있거나 응답이 JSON 이 아닐 때 — 화면에 그대로 알린다
-    return { success: false, error: { code: 'NETWORK', message: '서버에 연결할 수 없어요. 서버가 켜져 있는지 확인해 주세요.' } }
+  } catch (e) {
+    // 서버가 꺼짐 · 너무 늦음 · 응답이 JSON 이 아님 — 화면에 그대로 알린다
+    return { success: false, error: callFailure(e, method, gotResponse) }
   }
 }
 
@@ -88,6 +94,14 @@ const map = <A, B>(r: ApiResult<A>, f: (a: A) => B): ApiResult<B> => (r.success 
 
 /** GET /terms */
 export const getTerms = () => call<Term[]>('GET', '/terms')
+
+/** 약관 본문 — content 는 Markdown, 본문 파일이 아직 없으면 null. 상품 약관(getProductTerm)은 필수 여부·버전·시행일이 없다(null) */
+export type TermDetail = { id: string; title: string; required: boolean | null; version: string | null; effectiveAt: string | null; source: string | null; content: string | null }
+type TermDetailRaw = Omit<TermDetail, 'effectiveAt'> & { effective_at: string }
+
+/** GET /terms/{termsId} — 로그인 없이 (가입 화면에서도 쓴다) */
+export const getTermDetail = async (termsId: string) =>
+  map(await call<TermDetailRaw>('GET', `/terms/${encodeURIComponent(termsId)}`), ({ effective_at, ...t }) => ({ ...t, effectiveAt: effective_at }))
 
 /** GET /auth/usernames/availability */
 export const checkUsername = (username: string) =>
@@ -282,15 +296,16 @@ export async function getTransferLimits(): Promise<ApiResult<TransferLimit[]>> {
   return { success: true, data: out }
 }
 
-/** PATCH /users/me/transfer-limits/{id} — 하나라도 올리면 stepUpChallengeId 가 있어야 한다 */
-export const setTransferLimit = async (accountId: string, perTransfer: number, daily: number, stepUpChallengeId?: string) =>
+/** PATCH /accounts/{accountId}/transfer-limits (TRX-F13) — 하나라도 올리면 stepUpChallengeId(TRANSFER) 가 있어야 한다.
+ *  상한 1회 1억·1일 5억. 응답에는 계좌 이름·번호가 없어 지금 값(current)에서 가져온다 */
+export const setTransferLimit = async (current: TransferLimit, perTransfer: number, daily: number, stepUpChallengeId?: string) =>
   map(
-    await call<TransferLimitRaw>('PATCH', `/users/me/transfer-limits/${encodeURIComponent(accountId)}`, {
+    await call<TransferLimitRaw>('PATCH', `/accounts/${encodeURIComponent(current.accountId)}/transfer-limits`, {
       per_transfer_limit: perTransfer,
       daily_limit: daily,
       step_up_challenge_id: stepUpChallengeId ?? null,
     }),
-    toLimit,
+    (l) => ({ ...toLimit(l), accountName: current.accountName, accountNumber: current.accountNumber }),
   )
 
 export type CheckItem = { label: string; detail: string; href: string }
@@ -360,11 +375,14 @@ type AccountRaw = {
   resAccountCurrency: string
   resAccountBalance: string
   balance_as_of: string // YYYYMMDDHHmmss
+  close_blockers?: CloseBlocker[] // 상세(GET /accounts/{id})와 상태 변경 응답에만 있음 — 지금 해지를 막는 사유
+  notifications_enabled?: boolean // 상세에만 — 입출금 알림 켬 (ACCT-F06)
 }
 const toAccount = (a: AccountRaw): Account => ({
   id: a.id,
   name: a.resAccountNickName || a.resAccountName,
   number: a.resAccountDisplay || a.resAccount,
+  accountNo: a.resAccount,
   type: a.account_type,
   status: a.lifecycle_status,
   isFavorite: a.is_favorite,
@@ -394,6 +412,8 @@ export async function getRecommendedProducts(): Promise<ApiResult<Product[]>> {
 // ---- 예금·적금 상품 (Part 3 7절) ----
 
 export type ProductType = 'TIME_DEPOSIT' | 'INSTALLMENT_SAVINGS'
+/** 적금 납입 방식 — FIXED 정액적립식(매 회차 정한 금액) · FREE 자유적립식(회차 한도 안에서 자유) */
+export type PaymentType = 'FIXED' | 'FREE'
 export type ProductSummary = {
   id: string
   name: string
@@ -419,7 +439,11 @@ export type ProductDetail = ProductSummary & {
   eligibility: string | null
   notes: string[]
   subscribable: boolean
+  paymentTypes: PaymentType[]
+  terms: ProductTerm[]
 }
+/** 상품에 적용되는 약관 (특약 · 예금 종류 약관 · 예금거래기본약관) — 본문은 getProductTerm */
+export type ProductTerm = { id: string; title: string }
 /** 가입 기간 — 월 단위 상품은 months, 일 단위 상품(표지어음·CD)은 days */
 export type Period = { months: number; days?: number }
 export type Estimate = {
@@ -435,6 +459,7 @@ export type Subscription = {
   productId: string
   productName: string
   productType: ProductType
+  paymentType: PaymentType | null
   accountNumber: string
   principal: number
   monthlyAmount: number | null
@@ -469,6 +494,8 @@ type DetailRaw = SummaryRaw & {
   eligibility: string | null
   notes: string[]
   subscribable: boolean
+  payment_types: PaymentType[]
+  terms: ProductTerm[]
 }
 type EstimateRaw = {
   rate: string
@@ -483,6 +510,7 @@ type SubscriptionRaw = {
   product_id: string
   product_name: string
   product_type: ProductType
+  payment_type: PaymentType | null
   account_number: string
   principal: string
   monthly_amount: string | null
@@ -516,6 +544,7 @@ const toSubscription = (s: SubscriptionRaw): Subscription => ({
   productId: s.product_id,
   productName: s.product_name,
   productType: s.product_type,
+  paymentType: s.payment_type,
   accountNumber: s.account_number,
   principal: Number(s.principal),
   monthlyAmount: num(s.monthly_amount),
@@ -550,7 +579,18 @@ export async function getProduct(id: string): Promise<ApiResult<ProductDetail>> 
     eligibility: p.eligibility,
     notes: p.notes,
     subscribable: p.subscribable,
+    paymentTypes: p.payment_types,
+    terms: p.terms,
   }))
+}
+
+/** GET /products/{productId}/terms/{termId} — 상품 약관 본문 (로그인 없이) */
+export async function getProductTerm(productId: string, termId: string): Promise<ApiResult<TermDetail>> {
+  const r = await call<{ id: string; title: string; source: string | null; content: string | null }>(
+    'GET',
+    `/products/${encodeURIComponent(productId)}/terms/${encodeURIComponent(termId)}`,
+  )
+  return map(r, (t) => ({ ...t, required: null, version: null, effectiveAt: null }))
 }
 
 /** POST /products/{productId}/estimate — amount: 예금은 예치금, 적금은 월 납입액 */
@@ -558,9 +598,16 @@ export async function estimateInterest(id: string, amount: number, term: Period)
   return map(await call<EstimateRaw>('POST', `/products/${encodeURIComponent(id)}/estimate`, { amount: String(amount), ...term }), toEstimate)
 }
 
-/** POST /products/{productId}/validate — 로그인 필요. 가입 직전과 같은 검사(계좌·잔액·한도) */
-export async function validateSubscription(id: string, accountId: string, amount: number, term: Period): Promise<ApiResult<Estimate>> {
-  const r = await call<EstimateRaw>('POST', `/products/${encodeURIComponent(id)}/validate`, { account_id: accountId, amount: String(amount), ...term })
+/** POST /products/{productId}/validate — 로그인 필요. 가입 직전과 같은 검사(계좌·잔액·한도·납입 방식) */
+export async function validateSubscription(
+  id: string,
+  accountId: string,
+  amount: number,
+  term: Period,
+  paymentType: PaymentType | null = null,
+): Promise<ApiResult<Estimate>> {
+  const body = { account_id: accountId, amount: String(amount), ...term, ...(paymentType ? { payment_type: paymentType } : {}) }
+  const r = await call<EstimateRaw>('POST', `/products/${encodeURIComponent(id)}/validate`, body)
   return map(r, toEstimate)
 }
 
@@ -578,6 +625,8 @@ export type StepUpAction =
   | 'PIN_ENROLL'
   | 'PIN_CHANGE'
   | 'PIN_RESET'
+  | 'ACCOUNT_OPEN'
+  | 'POINT_CASHOUT'
 /** 간편 비밀번호(PIN)를 등록한 회원은 { pin }, 아직이면 { password } — PIN 등록·재설정은 언제나 { password } (AUTH-F12) */
 export async function stepUp(action: StepUpAction, credential: { password: string } | { pin: string }): Promise<ApiResult<string>> {
   return map(await call<{ step_up_challenge_id: string }>('POST', '/auth/step-up', { action, ...credential }), (d) => d.step_up_challenge_id)
@@ -585,10 +634,17 @@ export async function stepUp(action: StepUpAction, credential: { password: strin
 
 /** POST /subscriptions — 같은 idempotencyKey 로 다시 보내면 새 계약 없이 처음 결과를 돌려준다 */
 export async function subscribe(
-  b: { productId: string; accountId: string; amount: number; term: Period; stepUpChallengeId: string },
+  b: { productId: string; accountId: string; amount: number; term: Period; stepUpChallengeId: string; paymentType?: PaymentType | null },
   idempotencyKey: string,
 ): Promise<ApiResult<Subscription>> {
-  const body = { product_id: b.productId, account_id: b.accountId, amount: String(b.amount), ...b.term, step_up_challenge_id: b.stepUpChallengeId }
+  const body = {
+    product_id: b.productId,
+    account_id: b.accountId,
+    amount: String(b.amount),
+    ...b.term,
+    step_up_challenge_id: b.stepUpChallengeId,
+    ...(b.paymentType ? { payment_type: b.paymentType } : {}),
+  }
   return map(await call<SubscriptionRaw>('POST', '/subscriptions', body, { 'Idempotency-Key': idempotencyKey }), toSubscription)
 }
 
@@ -602,8 +658,12 @@ export type SubscriptionDetail = Subscription & {
   accountStatus: string
   payments: { amount: number; paidAt: string }[]
   payable: boolean
+  /** 이번 회차에 넣을 수 있는 최대 — 정액은 월 납입액, 자유는 상품 월 한도 */
   monthlyMax: number | null
+  /** 이번 회차(가입일 기준 한 달)에 넣은 돈 */
   paidThisMonth: number
+  /** 다음 회차 시작일 YYYYMMDD — 적금만 */
+  nextPeriodStart: string | null
 }
 type DetailSubRaw = SubscriptionRaw & {
   early_termination_allowed: boolean
@@ -612,6 +672,7 @@ type DetailSubRaw = SubscriptionRaw & {
   payable: boolean
   monthly_max: string | null
   paid_this_month: string
+  next_period_start: string | null
 }
 const toSubDetail = (s: DetailSubRaw): SubscriptionDetail => ({
   ...toSubscription(s),
@@ -621,6 +682,7 @@ const toSubDetail = (s: DetailSubRaw): SubscriptionDetail => ({
   payable: s.payable,
   monthlyMax: num(s.monthly_max),
   paidThisMonth: Number(s.paid_this_month),
+  nextPeriodStart: s.next_period_start,
 })
 
 /** GET /users/me/subscriptions/{subscriptionId} */
@@ -628,7 +690,7 @@ export async function getMySubscription(id: string): Promise<ApiResult<Subscript
   return map(await call<DetailSubRaw>('GET', `/users/me/subscriptions/${encodeURIComponent(id)}`), toSubDetail)
 }
 
-/** POST /subscriptions/{subscriptionId}/payments — 적금 추가 납입(본인 확인 필요) */
+/** POST /subscriptions/{subscriptionId}/payments — 적금 추가 납입(본인 확인 필요). 정액은 회차마다 정한 금액 한 번, 자유는 회차 한도 안에서 */
 export async function payInstallment(id: string, amount: number, stepUpChallengeId: string): Promise<ApiResult<SubscriptionDetail>> {
   const body = { amount: String(amount), step_up_challenge_id: stepUpChallengeId }
   return map(await call<DetailSubRaw>('POST', `/subscriptions/${encodeURIComponent(id)}/payments`, body), toSubDetail)
@@ -652,8 +714,7 @@ export type AccountDetail = Account & {
   notificationsEnabled: boolean
   closeBlockers: CloseBlocker[]
 }
-// backend 상세는 목록과 같은 AccountOut 이다. 알림 설정·해지 막힘 사유는 backend 에 아직 없어 기본값으로 둔다
-// (알림 켜기·해지는 쓰기 API 라 지금은 NOT_IMPLEMENTED 로 막힌다).
+// backend 상세는 목록 한 줄(AccountOut) + 해지 막힘 사유(close_blockers, ACCT-F05) + 입출금 알림 켬(notifications_enabled, ACCT-F06)
 const toAccountDetail = (a: AccountRaw): AccountDetail => ({
   ...toAccount(a),
   defaultName: a.resAccountName,
@@ -661,8 +722,8 @@ const toAccountDetail = (a: AccountRaw): AccountDetail => ({
   startDate: a.resAccountStartDate,
   closedAt: a.closed_at,
   balanceAsOf: a.balance_as_of,
-  notificationsEnabled: false,
-  closeBlockers: [],
+  notificationsEnabled: a.notifications_enabled ?? false,
+  closeBlockers: a.close_blockers ?? [],
 })
 const acct = (id: string) => `/accounts/${encodeURIComponent(id)}`
 
@@ -674,9 +735,9 @@ export async function getAccounts(): Promise<ApiResult<Account[]>> {
   return { success: true, data: [...open.data, ...closed.data].map(toAccount) }
 }
 
-/** POST /accounts — 같은 idempotencyKey 로 다시 보내면 새 계좌 없이 처음 결과를 돌려준다 */
-export async function openAccount(type: 'CHECKING' | 'SAVINGS', idempotencyKey: string): Promise<ApiResult<AccountDetail>> {
-  const body = { account_type: type, consents: ['required_terms'] }
+/** POST /accounts — 본인 확인(ACCOUNT_OPEN) 필요. 같은 idempotencyKey 로 다시 보내면 새 계좌 없이 처음 결과를 돌려준다 */
+export async function openAccount(type: 'CHECKING' | 'SAVINGS', idempotencyKey: string, stepUpChallengeId: string): Promise<ApiResult<AccountDetail>> {
+  const body = { account_type: type, consents: ['required_terms'], step_up_challenge_id: stepUpChallengeId }
   return map(await call<AccountRaw>('POST', '/accounts', body, { 'Idempotency-Key': idempotencyKey }), toAccountDetail)
 }
 
@@ -712,13 +773,24 @@ type AccountTransactionRaw = {
   created_at: string
 }
 
-/** GET /accounts/{accountId}/transactions — 입출금 내역, 최신이 먼저. direction 을 주면 입금만·출금만.
+/** GET /accounts/{accountId}/transactions — 입출금 내역, 최신이 먼저. direction 을 주면 입금만·출금만,
+ *  period(YYYY-MM-DD) 를 주면 그 기간만 (Part 5 10장 조회 조건).
  *  backend 는 { items, next_cursor } 로 100건씩 나눠 주므로 끝까지 이어 부른다(화면은 한 번에 다 그림) */
-export async function getAccountTransactions(id: string, direction?: 'IN' | 'OUT'): Promise<ApiResult<AccountTransaction[]>> {
+export async function getAccountTransactions(
+  id: string,
+  direction?: 'IN' | 'OUT',
+  period: { startDate?: string; endDate?: string } = {},
+): Promise<ApiResult<AccountTransaction[]>> {
   const all: AccountTransactionRaw[] = []
   let cursor: string | null = null
   for (let page = 0; page < 50; page++) {
-    const q = new URLSearchParams({ limit: '100', ...(direction ? { direction } : {}), ...(cursor ? { cursor } : {}) })
+    const q = new URLSearchParams({
+      limit: '100',
+      ...(direction ? { direction } : {}),
+      ...(period.startDate ? { start_date: period.startDate } : {}),
+      ...(period.endDate ? { end_date: period.endDate } : {}),
+      ...(cursor ? { cursor } : {}),
+    })
     const r: ApiResult<{ items: AccountTransactionRaw[]; next_cursor: string | null }> = await call('GET', `${acct(id)}/transactions?${q}`)
     if (!r.success) return r
     all.push(...r.data.items)
@@ -750,17 +822,21 @@ export async function changeAccountStatus(id: string, op: 'suspend' | 'resume' |
   return map(await call<AccountRaw>('POST', `${acct(id)}/${op}`, { step_up_challenge_id: stepUpChallengeId }), toAccountDetail)
 }
 
-/** PATCH /accounts/{accountId}/notification-settings — 입출금 알림 켜기·끄기 */
+/** PATCH /accounts/{accountId}/notification-settings — 입출금 알림 켜기·끄기. 응답은 설정이라 계좌 상세를 다시 읽는다 */
 export async function setAccountNotifications(id: string, enabled: boolean): Promise<ApiResult<AccountDetail>> {
-  return map(await call<AccountRaw>('PATCH', `${acct(id)}/notification-settings`, { enabled }), toAccountDetail)
+  const r = await call<{ enabled: boolean }>('PATCH', `${acct(id)}/notification-settings`, { enabled })
+  return r.success ? getAccount(id) : r
 }
 
-export type AppNotification = { id: string; type: string; title: string; body: string; createdAt: string; read: boolean }
+export type AppNotification = { id: string; type: string; title: string; body: string; createdAt: string; read: boolean; accountId: string | null; cardId: string | null; eventId: string | null }
 
 /** GET /notifications — 최근 100개 */
 export async function getNotifications(): Promise<ApiResult<AppNotification[]>> {
-  const r = await call<{ id: string; type: string; title: string; body: string; created_at: string; read: boolean }[]>('GET', '/notifications')
-  return map(r, (ns) => ns.map((n) => ({ id: n.id, type: n.type, title: n.title, body: n.body, createdAt: n.created_at, read: n.read })))
+  type Raw = { id: string; type: string; title: string; body: string; created_at: string; read: boolean; account_id: string | null; user_card_id: string | null; event_id: string | null }
+  const r = await call<Raw[]>('GET', '/notifications')
+  return map(r, (ns) =>
+    ns.map((n) => ({ id: n.id, type: n.type, title: n.title, body: n.body, createdAt: n.created_at, read: n.read, accountId: n.account_id, cardId: n.user_card_id, eventId: n.event_id })),
+  )
 }
 
 /** POST /notifications/read-all */
@@ -771,15 +847,35 @@ export const BANK = '두린은행' // 우리 은행 (기본값)
 // 보낼 수 있는 은행 — 서버 backend/app/rules.py BANK_ACCOUNT_DIGITS 와 같은 목록. 다른 은행은 가상 타행(Part 5 11장)
 export const BANKS = [BANK, '우리은행', 'KB국민은행', '신한은행', '하나은행', 'NH농협은행', 'IBK기업은행', '카카오뱅크', '토스뱅크', '케이뱅크', '새마을금고']
 
-export type TransferWarning = 'FIRST_LARGE' | 'LARGE_VS_USUAL' | 'RECENT_SAME'
-export type TransferTarget = { accountNo: string; accountDisplay: string; holderName: string; isMine: boolean; warnings: TransferWarning[] }
+export type TransferWarning = 'FIRST_LARGE' | 'LARGE_VS_USUAL' | 'RECENT_SAME' | 'PENDING_SAME'
+export type TransferTarget = {
+  accountNo: string
+  accountDisplay: string
+  holderName: string
+  isMine: boolean
+  warnings: TransferWarning[]
+  pending: { amount: number; requestedAt: string } | null // 같은 받는 분에게 아직 처리중인 이체 (Part 5 9장)
+}
 
-/** GET /transfer-targets/verify — 받는 계좌 확인. amount 를 주면 재확인 화면 경고도 온다 */
+/** GET /transfer-targets/verify — 받는 계좌 확인. amount 를 주면 재확인 화면 경고(Part 5 4장)도 온다 */
 export async function verifyTransferTarget(accountNo: string, fromAccountId: string, amount?: number, bank = BANK): Promise<ApiResult<TransferTarget>> {
   const q = new URLSearchParams({ bank, account_no: accountNo, from_account_id: fromAccountId, ...(amount ? { amount: String(amount) } : {}) })
-  // backend(TransferTargetOut)는 표시용 번호·재확인 경고를 아직 주지 않는다 → 번호 그대로, 경고 없음
-  const r = await call<{ bank: string; account_no: string; holder_name: string; account_status: string; is_mine: boolean }>('GET', `/transfer-targets/verify?${q}`)
-  return map(r, (t) => ({ accountNo: t.account_no, accountDisplay: t.account_no, holderName: t.holder_name, isMine: t.is_mine, warnings: [] }))
+  const r = await call<{
+    account_no: string
+    account_display: string
+    holder_name: string
+    is_mine: boolean
+    warnings: TransferWarning[]
+    pending_transfer: { amount: string; requested_at: string } | null
+  }>('GET', `/transfer-targets/verify?${q}`)
+  return map(r, (t) => ({
+    accountNo: t.account_no,
+    accountDisplay: t.account_display,
+    holderName: t.holder_name,
+    isMine: t.is_mine,
+    warnings: t.warnings,
+    pending: t.pending_transfer && { amount: Number(t.pending_transfer.amount), requestedAt: t.pending_transfer.requested_at },
+  }))
 }
 
 /** 간편 송금 목록 한 줄 (Part 5 6장) — 최근 보낸 계좌는 id 가 null */
@@ -793,20 +889,19 @@ const toSaved = (t: SavedTargetRaw): SavedTarget => ({
   nickname: t.nickname,
 })
 
-/** GET /transfer-targets/recent — 성공한 이체의 받는 계좌, 같은 계좌는 한 번, 최근 20개 */
+/** GET /transfer-targets/recent — 성공한 이체의 받는 계좌, 같은 계좌는 한 번, 최근 10개 */
 export async function getRecentTargets(): Promise<ApiResult<SavedTarget[]>> {
   return map(await call<SavedTargetRaw[]>('GET', '/transfer-targets/recent'), (l) => l.map(toSaved))
 }
 
-/** GET /favorite-accounts — 자주 쓰는 계좌 (backend FavoriteAccountOut: 표시용 번호가 없어 번호 그대로 보여 준다) */
+/** GET /favorite-accounts — 자주 쓰는 계좌 (최대 20개, sort_order 순) */
 export async function getFavorites(): Promise<ApiResult<SavedTarget[]>> {
-  const r = await call<{ id: string; bank: string; account_no: string; holder_name: string; nickname: string | null; sort_order: number }[]>('GET', '/favorite-accounts')
-  return map(r, (l) => l.map((f) => toSaved({ id: f.id, account_no: f.account_no, account_display: f.account_no, holder_name: f.holder_name, nickname: f.nickname })))
+  return map(await call<SavedTargetRaw[]>('GET', '/favorite-accounts'), (l) => l.map(toSaved))
 }
 
-/** POST /favorite-accounts — 이미 있으면 그 줄을 그대로 돌려준다 */
-export async function addFavorite(accountNo: string): Promise<ApiResult<SavedTarget>> {
-  return map(await call<SavedTargetRaw>('POST', '/favorite-accounts', { bank: BANK, account_no: accountNo }), toSaved)
+/** POST /favorite-accounts — 이미 있으면 그 줄을 그대로 돌려준다 (최대 20개) */
+export async function addFavorite(accountNo: string, bank = BANK): Promise<ApiResult<SavedTarget>> {
+  return map(await call<SavedTargetRaw>('POST', '/favorite-accounts', { bank, account_no: accountNo }), toSaved)
 }
 
 /** PATCH /favorite-accounts/{id} — 별칭(null 이면 지움)·순서(0 = 맨 위). 바뀐 전체 목록이 온다 */
@@ -915,10 +1010,57 @@ export async function sendTransfer(
   return map(await call<TransferRaw>('POST', '/transfers', body, { 'Idempotency-Key': idempotencyKey }), toTransfer)
 }
 
-/** GET /transfers — 내가 보낸 이체 결과, 최신이 먼저 */
-export async function getTransfers(): Promise<ApiResult<Transfer[]>> {
-  const [r, displays] = await Promise.all([call<TransferOutRaw[]>('GET', '/transfers'), myAccountDisplays()])
+/** GET /transfers — 내가 보낸 이체 결과, 최신이 먼저. accountId 를 주면 그 출금 계좌의 이체만(계좌 상세),
+ *  startDate·endDate(YYYY-MM-DD) 로 기간 조건 */
+export async function getTransfers(f: { accountId?: string; startDate?: string; endDate?: string } = {}): Promise<ApiResult<Transfer[]>> {
+  const q = new URLSearchParams({
+    ...(f.accountId ? { account_id: f.accountId } : {}),
+    ...(f.startDate ? { start_date: f.startDate } : {}),
+    ...(f.endDate ? { end_date: f.endDate } : {}),
+  })
+  const [r, displays] = await Promise.all([call<TransferOutRaw[]>('GET', `/transfers${q.size ? `?${q}` : ''}`), myAccountDisplays()])
   return map(r, (ts) => ts.map((t) => fromBackendTransfer(t, displays)))
+}
+
+export type TransferReceipt = {
+  transferId: string
+  completedAt: string
+  senderName: string
+  fromAccount: string // 일부 가림
+  toBank: string
+  toHolderName: string
+  toAccount: string // 일부 가림
+  amount: number
+  fee: number
+  status: string
+}
+
+/** GET /transfers/{transferId}/receipt — 이체확인증 (TRX-F06, 성공한 이체만) */
+export async function getTransferReceipt(id: string): Promise<ApiResult<TransferReceipt>> {
+  const r = await call<{
+    transfer_id: string
+    completed_at: string
+    sender_name: string
+    from_account: string
+    to_bank: string
+    to_holder_name: string
+    to_account: string
+    amount: string
+    fee: string
+    status: string
+  }>('GET', `/transfers/${encodeURIComponent(id)}/receipt`)
+  return map(r, (x) => ({
+    transferId: x.transfer_id,
+    completedAt: x.completed_at,
+    senderName: x.sender_name,
+    fromAccount: x.from_account,
+    toBank: x.to_bank,
+    toHolderName: x.to_holder_name,
+    toAccount: x.to_account,
+    amount: Number(x.amount),
+    fee: Number(x.fee),
+    status: x.status,
+  }))
 }
 
 /** GET /transfers/{transferId} */
@@ -979,13 +1121,136 @@ export async function cancelScheduledTransfer(id: string, stepUpChallengeId: str
   return map(r, toScheduled)
 }
 
+/** 예약 시각 — ONCE 는 executeAt(10분 단위, 10분 뒤 ~ 1년 안, ISO +09:00),
+ *  MONTHLY 는 dayOfMonth(1~28, 99 = 말일, 실행 06:00) · startYm·endYm(YYYYMM, endYm 없으면 해지할 때까지) */
+export type ScheduleWhen = { type: 'ONCE'; executeAt: string } | { type: 'MONTHLY'; dayOfMonth: number; startYm?: string; endYm?: string | null }
+
+/** POST /scheduled-transfers — 예약 송금·자동이체 등록 (TRX-F10·F11, 본인 확인 SCHEDULED_TRANSFER). 잔액은 실행할 때 본다 */
+export async function createScheduledTransfer(
+  b: { fromAccountId: string; toBank?: string; toAccountNo: string; amount: number; myDisplayName: string; theirDisplayName: string; stepUpChallengeId: string },
+  when: ScheduleWhen,
+): Promise<ApiResult<ScheduledTransfer>> {
+  const body = {
+    from_account_id: b.fromAccountId,
+    to_bank: b.toBank ?? BANK,
+    to_account_no: b.toAccountNo,
+    amount: String(b.amount),
+    my_display_name: b.myDisplayName || null,
+    their_display_name: b.theirDisplayName || null,
+    step_up_challenge_id: b.stepUpChallengeId,
+    ...(when.type === 'ONCE'
+      ? { type: 'ONCE', execute_at: when.executeAt }
+      : { type: 'MONTHLY', day_of_month: when.dayOfMonth, start_ym: when.startYm ?? null, end_ym: when.endYm ?? null }),
+  }
+  return map(await call<ScheduledTransferRaw>('POST', '/scheduled-transfers', body), toScheduled)
+}
+
+/** PATCH /scheduled-transfers/{id} — 금액·날짜(시각)·지정일·종료 월 바꾸기 (실행 10분 전까지, 본인 확인 SCHEDULED_TRANSFER) */
+export async function updateScheduledTransfer(
+  id: string,
+  b: { amount?: number; executeAt?: string; dayOfMonth?: number; endYm?: string | null },
+  stepUpChallengeId: string,
+): Promise<ApiResult<ScheduledTransfer>> {
+  const body = {
+    step_up_challenge_id: stepUpChallengeId,
+    ...(b.amount === undefined ? {} : { amount: String(b.amount) }),
+    ...(b.executeAt === undefined ? {} : { execute_at: b.executeAt }),
+    ...(b.dayOfMonth === undefined ? {} : { day_of_month: b.dayOfMonth }),
+    ...(b.endYm === undefined ? {} : { end_ym: b.endYm }),
+  }
+  return map(await call<ScheduledTransferRaw>('PATCH', `/scheduled-transfers/${encodeURIComponent(id)}`, body), toScheduled)
+}
+
+// ---- 다른 은행 내역 (Part 5 10장 · TRX-F09 이체내역 · TRX-F14 예적금 내역, 읽기 전용) ----
+// 연결된 다른 은행 계좌 — backend app/routers/external.py LINKED 와 같음 (지금은 user_001 에게만, 사용자 결정 2026-11-10)
+export const EXTERNAL_TRANSFER_ACCOUNT = { organization: '0020', bank: '우리은행', accountNo: '1002440000000' }
+export const EXTERNAL_DEPOSIT_ACCOUNT = { organization: '0004', bank: 'KB국민은행', accountNo: '54780300000000' }
+
+export type ExternalTransfer = {
+  requestedAt: string
+  status: 'SUCCESS' | 'FAILED' | 'PENDING'
+  channel: 'APP' | 'SCHEDULED' | 'AUTO'
+  transType: string // CODEF 거래구분 그대로 (오픈뱅킹 = 내 계좌로 옮기기)
+  toBank: string
+  toAccountNo: string
+  toHolderName: string
+  amount: number
+  fee: number
+  myDisplayName: string | null
+}
+
+/** GET /external-transfers — 다른 은행 이체내역 (YYYYMMDD) */
+export async function getExternalTransfers(startDate: string, endDate: string): Promise<ApiResult<{ items: ExternalTransfer[]; commStartDate: string }>> {
+  const a = EXTERNAL_TRANSFER_ACCOUNT
+  const q = new URLSearchParams({ organization: a.organization, withdrawAccountNo: a.accountNo, startDate, endDate })
+  type Raw = {
+    requested_at: string
+    status: ExternalTransfer['status']
+    channel: ExternalTransfer['channel']
+    trans_type: string
+    to_bank: string
+    to_account_no: string
+    to_holder_name: string
+    amount: string
+    fee: string
+    my_display_name: string | null
+  }
+  const r = await call<{ items: Raw[]; comm_start_date: string }>('GET', `/external-transfers?${q}`)
+  return map(r, (d) => ({
+    commStartDate: d.comm_start_date,
+    items: d.items.map((x) => ({
+      requestedAt: x.requested_at,
+      status: x.status,
+      channel: x.channel,
+      transType: x.trans_type,
+      toBank: x.to_bank,
+      toAccountNo: x.to_account_no,
+      toHolderName: x.to_holder_name,
+      amount: Number(x.amount),
+      fee: Number(x.fee),
+      myDisplayName: x.my_display_name,
+    })),
+  }))
+}
+
+/** CODEF 예적금거래내역 응답 data (이름 그대로, Part 5 15장 대응표) */
+export type ExternalDeposit = {
+  resAccountName: string
+  resAccountNickName: string
+  resAccountDisplay: string
+  resRate: string
+  resAccountStartDate: string
+  resAccountEndDate: string
+  resAccountBalance: string
+  resMonthlyPayment: string
+  resFinalRoundNo: string
+  resValidPeriod: string
+  resTrHistoryList: {
+    resRoundNo: string
+    resMonth: string
+    resAccountTrDate: string
+    resAccountTrTime?: string
+    resAccountIn: string
+    resAfterTranBalance: string
+    resAccountDesc1: string
+    resAccountDesc3: string
+  }[]
+}
+
+/** GET /external-deposit-accounts/{accountNo}/transactions — 다른 은행 예적금 내역 (CODEF 샌드박스) */
+export async function getExternalDeposit(startDate: string, endDate: string): Promise<ApiResult<ExternalDeposit>> {
+  const a = EXTERNAL_DEPOSIT_ACCOUNT
+  const q = new URLSearchParams({ organization: a.organization, startDate, endDate })
+  return call<ExternalDeposit>('GET', `/external-deposit-accounts/${a.accountNo}/transactions?${q}`)
+}
+
 // ---- 챗봇 (Part 3 7장 POST /agent/chat) — 대화 맥락(context)은 서버가 준 것을 다음 요청에 그대로 돌려보낸다 ----
-export type ChatContext = { pending: 'TRANSFER_AMOUNT' | null }
+export type ChatContext = { history: { role: 'user' | 'assistant'; text: string }[] } // 최근 대화 (backend/app/routers/agent.py)
 export type ChatReply = { reply: string; links: { label: string; href: string }[]; suggestions: string[]; context: ChatContext }
 
 /** POST /agent/chat — 빈 message 는 대화 시작 인사 */
 export async function sendChat(message: string, context: ChatContext | null): Promise<ApiResult<ChatReply>> {
-  return call<ChatReply>('POST', '/agent/chat', { message, ...(context ? { context } : {}) })
+  return call<ChatReply>('POST', '/agent/chat', { message, ...(context ? { context } : {}) }, undefined, CHAT_TIMEOUT_MS)
 }
 
 // ---- 카드 (Part 4 1차: CARD-F01~F05 · 결제 계좌 바꾸기 · 해지) ----
@@ -995,6 +1260,7 @@ export type Card = {
   id: string
   name: string
   productName: string
+  productSummary: string | null // 한 줄 혜택 요약
   companyName: string
   cardType: CardType
   number: string
@@ -1024,16 +1290,32 @@ export type CardBill = {
   status: 'SCHEDULED' | 'CONFIRMED' | 'PAID' | 'OVERDUE'
   accountNumber: string | null
   lowBalance: boolean
+  accountId: string | null // 결제 계좌 (잔액 채우기 송금의 받는 계좌, TRX-F12)
+  shortfall: number // 그 결제일까지 결제 계좌에 모자란 돈 (0 = 충분)
 }
 export type Benefit = { category: string; rate: string; monthlyLimit: number | null }
+/** 카드 상세의 혜택 한 줄 (backend app/card_benefits.py) — title 「카페 55% 할인」, conditions 는 사람 말로 된 조건 */
+export type CardBenefit = {
+  id: string
+  category: string
+  benefitType: 'DISCOUNT' | 'CASHBACK' | 'POINT' | 'MILEAGE' | 'FEE_WAIVER'
+  title: string
+  conditions: string[]
+  monthlyLimit: number | null // 이 혜택만의 월 한도
+  limitGroup: { name: string; monthlyLimit: number } | null // 여러 혜택이 함께 쓰는 통합 월 한도
+  achieved: boolean // 지난달(분기) 실적으로 지금 받을 수 있는지
+}
+/** 실적 — MONTH 지난달, QUARTER 지난 분기 */
+export type CardPerformance = { period: 'MONTH' | 'QUARTER'; spent: number; tierLevel: number | null; tierMinSpend: number; nextMinSpend: number | null }
 export type CardDetail = Card & {
   issuedAt: string
-  expiresAt: string
+  expiresAt: string | null // 더미 카드는 유효기간이 비어 있다
   paymentDay: number | null
   annualFee: number
   nextAnnualFeeDate: string | null
   usedAmount: number | null
-  benefits: Benefit[]
+  benefits: CardBenefit[]
+  performance: CardPerformance[]
   bills: CardBill[]
   paymentDayLocked: boolean
 }
@@ -1043,6 +1325,7 @@ export type CardTransaction = {
   transactedAt: string
   merchant: string
   category: string
+  categoryCode: string
   amount: number
   canceledAmount: number
   status: 'APPROVED' | 'PARTIAL_CANCELED' | 'CANCELED'
@@ -1090,6 +1373,7 @@ type CardRaw = {
   id: string
   name: string
   product_name: string
+  product_summary: string | null
   company_name: string
   card_type: CardType
   number: string
@@ -1119,16 +1403,30 @@ type CardBillRaw = {
   status: CardBill['status']
   account_number: string | null
   low_balance: boolean
+  account_id: string | null
+  shortfall: string
 }
 type BenefitRaw = { category: string; rate: string; monthly_limit: string | null }
+type CardBenefitRaw = {
+  id: string
+  category: string
+  benefit_type: CardBenefit['benefitType']
+  title: string
+  conditions: string[]
+  monthly_limit: string | null
+  limit_group: { name: string; monthly_limit: string } | null
+  achieved: boolean
+}
+type CardPerformanceRaw = { period: CardPerformance['period']; spent: string; tier_level: number | null; tier_min_spend: string; next_min_spend: string | null }
 type CardDetailRaw = CardRaw & {
   issued_at: string
-  expires_at: string
+  expires_at: string | null
   payment_day: number | null
   annual_fee: string
   next_annual_fee_date: string | null
   used_amount: string | null
-  benefits: BenefitRaw[]
+  benefits: CardBenefitRaw[]
+  performance: CardPerformanceRaw[]
   bills: CardBillRaw[]
   payment_day_locked: boolean
 }
@@ -1138,6 +1436,7 @@ type CardTransactionRaw = {
   transacted_at: string
   merchant: string
   category: string
+  category_code: string
   amount: string
   canceled_amount: string
   status: CardTransaction['status']
@@ -1162,6 +1461,7 @@ const toCard = (c: CardRaw): Card => ({
   id: c.id,
   name: c.name,
   productName: c.product_name,
+  productSummary: c.product_summary,
   companyName: c.company_name,
   cardType: c.card_type,
   number: c.number,
@@ -1191,8 +1491,20 @@ const toBill = (b: CardBillRaw): CardBill => ({
   status: b.status,
   accountNumber: b.account_number,
   lowBalance: b.low_balance,
+  accountId: b.account_id,
+  shortfall: Number(b.shortfall),
 })
 const toBenefit = (b: BenefitRaw): Benefit => ({ category: b.category, rate: b.rate, monthlyLimit: num(b.monthly_limit) })
+const toCardBenefit = (b: CardBenefitRaw): CardBenefit => ({
+  id: b.id,
+  category: b.category,
+  benefitType: b.benefit_type,
+  title: b.title,
+  conditions: b.conditions,
+  monthlyLimit: num(b.monthly_limit),
+  limitGroup: b.limit_group && { name: b.limit_group.name, monthlyLimit: Number(b.limit_group.monthly_limit) },
+  achieved: b.achieved,
+})
 const toCardDetail = (c: CardDetailRaw): CardDetail => ({
   ...toCard(c),
   issuedAt: c.issued_at,
@@ -1201,7 +1513,14 @@ const toCardDetail = (c: CardDetailRaw): CardDetail => ({
   annualFee: Number(c.annual_fee),
   nextAnnualFeeDate: c.next_annual_fee_date,
   usedAmount: num(c.used_amount),
-  benefits: c.benefits.map(toBenefit),
+  benefits: c.benefits.map(toCardBenefit),
+  performance: c.performance.map((p) => ({
+    period: p.period,
+    spent: Number(p.spent),
+    tierLevel: p.tier_level,
+    tierMinSpend: Number(p.tier_min_spend),
+    nextMinSpend: num(p.next_min_spend),
+  })),
   bills: c.bills.map(toBill),
   paymentDayLocked: c.payment_day_locked,
 })
@@ -1211,6 +1530,7 @@ const toCardTx = (t: CardTransactionRaw): CardTransaction => ({
   transactedAt: t.transacted_at,
   merchant: t.merchant,
   category: t.category,
+  categoryCode: t.category_code,
   amount: Number(t.amount),
   canceledAmount: Number(t.canceled_amount),
   status: t.status,
@@ -1299,6 +1619,45 @@ export async function payCard(id: string, stepUpChallengeId: string): Promise<Ap
   return map(await call<CardDetailRaw>('POST', `${card(id)}/payments`, { step_up_challenge_id: stepUpChallengeId }), toCardDetail)
 }
 
+// ---- 카드 포인트 (Part 4 CARD-F12, 1-1-7) — backend/app/routers/card_points.py ----
+export type CardPoint = { id: string; companyName: string; pointName: string; balance: number; expiringAmount: number; expiringDate: string | null; syncedAt: string }
+export type PointCashout = { id: string; pointName: string; amount: number; status: 'REQUESTED' | 'COMPLETED' | 'FAILED'; accountId: string; accountNumber: string; requestedAt: string; completedAt: string | null }
+export type CardPoints = { points: CardPoint[]; cashouts: PointCashout[] }
+type PointRaw = { id: string; company_name: string; point_name: string; balance: string; expiring_amount: string; expiring_date: string | null; synced_at: string }
+type CashoutRaw = { id: string; point_name: string; amount: string; status: PointCashout['status']; account_id: string; account_number: string; requested_at: string; completed_at: string | null }
+const toCashout = (c: CashoutRaw): PointCashout => ({
+  id: c.id,
+  pointName: c.point_name,
+  amount: Number(c.amount),
+  status: c.status,
+  accountId: c.account_id,
+  accountNumber: c.account_number,
+  requestedAt: c.requested_at,
+  completedAt: c.completed_at,
+})
+
+/** GET /card-points — 내 카드사별 포인트와 현금화 내역 */
+export async function getCardPoints(): Promise<ApiResult<CardPoints>> {
+  return map(await call<{ points: PointRaw[]; cashouts: CashoutRaw[] }>('GET', '/card-points'), (d) => ({
+    points: d.points.map((p) => ({
+      id: p.id,
+      companyName: p.company_name,
+      pointName: p.point_name,
+      balance: Number(p.balance),
+      expiringAmount: Number(p.expiring_amount),
+      expiringDate: p.expiring_date,
+      syncedAt: p.synced_at,
+    })),
+    cashouts: d.cashouts.map(toCashout),
+  }))
+}
+
+/** POST /card-points/{pointId}/cashout — 전액 현금화 (본인 확인 POINT_CASHOUT). 입금 계좌는 내 정상 입출금 계좌 */
+export async function cashOutPoints(pointId: string, accountId: string, stepUpChallengeId: string): Promise<ApiResult<PointCashout>> {
+  const body = { account_id: accountId, step_up_challenge_id: stepUpChallengeId }
+  return map(await call<CashoutRaw>('POST', `/card-points/${encodeURIComponent(pointId)}/cashout`, body), toCashout)
+}
+
 /** GET /cards/{cardId}/termination-check — 해지 전에 확인할 것 */
 export async function getTerminationCheck(id: string): Promise<ApiResult<TerminationCheck>> {
   return map(await call<TerminationRaw>('GET', `${card(id)}/termination-check`), toTermination)
@@ -1330,6 +1689,16 @@ export async function applyCard(
 ): Promise<ApiResult<CardApplication>> {
   const body = { card_product_id: b.productId, linked_account_id: b.accountId, delivery_address: b.address, agreed_term_ids: b.agreedTermIds, step_up_challenge_id: b.stepUpChallengeId }
   return map(await call<CardApplicationRaw>('POST', '/card-applications', body, { 'Idempotency-Key': idempotencyKey }), toApplication)
+}
+
+/** POST /card-applications/{id}/cancel — 배송 시작 전(승인까지)만 취소할 수 있다 */
+export async function cancelCardApplication(id: string): Promise<ApiResult<CardApplication>> {
+  return map(await call<CardApplicationRaw>('POST', `/card-applications/${encodeURIComponent(id)}/cancel`), toApplication)
+}
+
+/** POST /card-applications/{id}/ship — 시연용 「배송 시작」 (승인 → 배송 중, 운송장 번호가 붙는다) */
+export async function shipCard(id: string): Promise<ApiResult<CardApplication>> {
+  return map(await call<CardApplicationRaw>('POST', `/card-applications/${encodeURIComponent(id)}/ship`), toApplication)
 }
 
 /** POST /card-applications/{id}/deliver — 시연용 「배송 완료」 (1차는 실제 배송이 없다) */

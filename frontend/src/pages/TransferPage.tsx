@@ -6,6 +6,7 @@ import {
   BANK,
   BANKS,
   addFavorite,
+  createScheduledTransfer,
   getAccounts,
   getFavorites,
   getRecentTargets,
@@ -33,6 +34,7 @@ const WARNING_TEXT: Record<TransferWarning, string> = {
   FIRST_LARGE: '처음 보내는 분에게 큰돈을 보내요. 금액을 한 번 더 확인해 주세요.',
   LARGE_VS_USUAL: '이 분께 평소 보내던 금액보다 훨씬 커요. 금액을 한 번 더 확인해 주세요.',
   RECENT_SAME: '방금 같은 분께 같은 금액을 보냈어요. 한 번 더 보낼까요?',
+  PENDING_SAME: '이 분께 아직 처리중인 이체가 있어요. 결과가 나오기 전에 또 보내면 두 번 나갈 수 있어요.',
 }
 const NAME_MAX = 10 // 통장 표시 이름 (7장) — 서버도 다시 확인한다
 const PICK_TABS = [
@@ -45,6 +47,19 @@ type Pick = SavedTarget & { mine?: boolean }
 
 // 같은 송금을 두 번 보내도 한 번만 나가게 하는 번호 (재확인 화면에 들어올 때 한 번 만든다)
 const newKey = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`)
+
+// 재확인 화면에서 고르는 보내는 방법 (5·8장) — 지금 · 예약 송금(1회) · 매달 자동이체
+type SendMode = 'now' | 'once' | 'monthly'
+const pad = (v: number) => String(v).padStart(2, '0')
+/** 예약 시각 기본값: at(주소로 받은 ISO)이 10분 뒤 이후면 그것, 아니면 지금부터 20분 뒤를 10분 단위로 올림 */
+function defaultWhen(at: string | null): { date: string; time: string } {
+  const min = Date.now() + 10 * 60_000
+  const t = new Date(at && Date.parse(at) >= min ? Date.parse(at) : Date.now() + 20 * 60_000)
+  t.setMinutes(Math.ceil(t.getMinutes() / 10) * 10, 0, 0)
+  return { date: `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`, time: `${pad(t.getHours())}:${pad(t.getMinutes())}` }
+}
+const TIMES = Array.from({ length: 144 }, (_, i) => `${pad(Math.floor(i / 6))}:${pad((i % 6) * 10)}`) // 10분 단위
+const DAYS = [...Array.from({ length: 28 }, (_, i) => i + 1), 99] // 29~31일은 없는 달이 있어 「말일」(99)
 
 export default function TransferPage({ query }: { query: URLSearchParams }) {
   const [accounts, setAccounts] = useState<Account[] | 'guest' | null>(null)
@@ -62,6 +77,10 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
   const auth = useStepUp()
   const [key, setKey] = useState('')
   const [busy, setBusy] = useState(false)
+  const [mode, setMode] = useState<SendMode>(query.get('at') ? 'once' : 'now')
+  const [when, setWhen] = useState(() => defaultWhen(query.get('at')))
+  const [day, setDay] = useState(25)
+  const [endYm, setEndYm] = useState('') // YYYY-MM, 비우면 해지할 때까지
   // 간편 송금 (6장) — 최근 보낸 계좌 · 자주 쓰는 계좌 · 내 다른 계좌에서 고르기
   const [tab, setTab] = useState<PickTab>('recent')
   const [recent, setRecent] = useState<SavedTarget[]>([])
@@ -80,14 +99,22 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
     })
   }, [])
 
+  const fillId = query.get('toAccount') // 카드 결제 계좌 채우기 (TRX-F12)
   useEffect(() => {
     void getAccounts().then((r) => {
       if (!r.success) return r.error.code === 'UNAUTHENTICATED' ? setAccounts('guest') : setError(r.error.message)
       const usable = r.data.filter((a) => a.status === 'ACTIVE') // 정상 계좌만 (서버도 다시 확인한다)
       setAccounts(usable)
+      // ?toAccount=<내 계좌 id> (카드 결제 계좌 채우기, TRX-F12): 받는 계좌 = 그 계좌, 출금 = 잔액이 가장 많은 다른 내 계좌
+      const fill = usable.find((a) => a.id === fillId)
+      if (fill) {
+        setToNo(fill.accountNo)
+        setFromId([...usable].filter((a) => a.id !== fill.id).sort((a, b) => b.balance - a.balance)[0]?.id ?? '')
+        return
+      }
       setFromId((cur) => (usable.some((a) => a.id === cur) ? cur : (usable[0]?.id ?? '')))
     })
-  }, [])
+  }, [fillId])
 
   const title = '송금'
   if (error || accounts === null)
@@ -159,7 +186,6 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
     e.preventDefault()
     if (!target) return setToError('받는 계좌를 먼저 확인해 주세요.')
     if (!n) return setFormError('1원 이상 입력해 주세요.')
-    if (from && n > from.balance) return setFormError('잔액이 부족해요.')
     if (myName.trim().length > NAME_MAX || theirName.trim().length > NAME_MAX) return setFormError(`통장 표시 이름은 ${NAME_MAX}자까지예요.`)
     setBusy(true)
     const r = await verifyTransferTarget(target.accountNo, fromId, n, bank) // 재확인 화면 경고를 받는다
@@ -171,10 +197,33 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
     setStep('confirm')
   }
 
+  // 예약 송금·자동이체 등록 (TRX-F10·F11) — 본인 확인은 등록 때 한 번, 실행 때는 다시 받지 않는다(4장)
+  async function onSchedule() {
+    if (!target) return
+    setBusy(true)
+    const ch = await auth.verify('SCHEDULED_TRANSFER')
+    if (!ch.success) {
+      setBusy(false)
+      return setFormError(ch.error.message)
+    }
+    const r = await createScheduledTransfer(
+      { fromAccountId: fromId, toBank: bank, toAccountNo: target.accountNo, amount: n, stepUpChallengeId: ch.data, myDisplayName: myName, theirDisplayName: theirName },
+      mode === 'once'
+        ? { type: 'ONCE', executeAt: `${when.date}T${when.time}:00+09:00` }
+        : { type: 'MONTHLY', dayOfMonth: day, endYm: endYm ? endYm.replace('-', '') : null },
+    )
+    setBusy(false)
+    auth.setValue('')
+    if (!r.success) return setFormError(r.error.message)
+    location.hash = '#/scheduled-transfers'
+  }
+
   async function onSend(e: FormEvent) {
     e.preventDefault()
     if (!target) return
     if (auth.missing) return setFormError(auth.missing)
+    if (mode !== 'now') return onSchedule()
+    if (from && n > from.balance) return setFormError('잔액이 부족해요. 예약하면 보낼 때 잔액을 봐요.')
     setBusy(true)
     const ch = await auth.verify('TRANSFER')
     if (!ch.success) {
@@ -194,7 +243,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
   const warned = (target?.warnings.length ?? 0) > 0
   const mine: Pick[] = accounts
     .filter((a) => a.id !== fromId) // 출금 계좌는 빼고 (6장)
-    .map((a) => ({ id: null, accountNo: digitsOnly(a.number), accountDisplay: a.number, holderName: a.name, nickname: null, mine: true }))
+    .map((a) => ({ id: null, accountNo: a.accountNo, accountDisplay: a.number, holderName: a.name, nickname: null, mine: true }))
   const found = matchTargets([recent, favs], toNo)
   const shown: Pick[] = found.length ? found : tab === 'recent' ? recent : tab === 'fav' ? favs : mine
   const EMPTY: Record<PickTab, string> = {
@@ -545,7 +594,12 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
               <span className="trf-amount-unit">원</span>
             </div>
             <p id="trf-amount-msg" className={formError ? 'field-msg is-error' : 'trf-amount-ko'} role={formError ? 'alert' : undefined}>
-              {formError ?? (n > 0 ? koreanWon(n) : from ? `출금 가능 ${won(from.balance)} · ${from.name}에서` : '')}
+              {formError ??
+                (n > 0
+                  ? `${koreanWon(n)}${from && n > from.balance ? ' · 잔액보다 많아요(예약만 할 수 있어요)' : ''}`
+                  : from
+                    ? `출금 가능 ${won(from.balance)} · ${from.name}에서`
+                    : '')}
             </p>
             <div className="trf-quick">
               {QUICK.map((v) => (
@@ -617,6 +671,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
               {target.warnings.map((w) => (
                 <p key={w} className="prod-warn" role="alert">
                   {WARNING_TEXT[w]}
+                  {w === 'PENDING_SAME' && target.pending && ` (${won(target.pending.amount)} · ${new Date(target.pending.requestedAt).toLocaleString('ko-KR')})`}
                 </p>
               ))}
               <dl className="prod-info trf-confirm-info">
@@ -644,6 +699,56 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
                 </div>
               </dl>
             </div>
+            <fieldset className="panel trf-when">
+              <legend>언제 보낼까요?</legend>
+              <div className="trf-when-modes" role="group" aria-label="보내는 방법">
+                {(['now', 'once', 'monthly'] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    aria-pressed={mode === m}
+                    className="prod-chip"
+                    onClick={() => {
+                      setMode(m)
+                      setFormError(null)
+                    }}
+                  >
+                    {m === 'now' ? '지금 보내기' : m === 'once' ? '예약하기' : '매달 자동이체'}
+                  </button>
+                ))}
+              </div>
+              {mode === 'once' && (
+                <div className="trf-when-row">
+                  <Field id="trf-date" label="날짜">
+                    <input id="trf-date" className="input" type="date" value={when.date} onChange={(e) => setWhen({ ...when, date: e.target.value })} />
+                  </Field>
+                  <Field id="trf-time" label="시각 (10분 단위)">
+                    <select id="trf-time" className="input" value={when.time} onChange={(e) => setWhen({ ...when, time: e.target.value })}>
+                      {TIMES.map((t) => (
+                        <option key={t}>{t}</option>
+                      ))}
+                    </select>
+                  </Field>
+                </div>
+              )}
+              {mode === 'monthly' && (
+                <div className="trf-when-row">
+                  <Field id="trf-day" label="매달 (오전 6시에 보내요)">
+                    <select id="trf-day" className="input" value={day} onChange={(e) => setDay(Number(e.target.value))}>
+                      {DAYS.map((d) => (
+                        <option key={d} value={d}>
+                          {d === 99 ? '말일' : `${d}일`}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field id="trf-end" label="끝나는 달 (비우면 해지할 때까지)">
+                    <input id="trf-end" className="input" type="month" value={endYm} onChange={(e) => setEndYm(e.target.value)} />
+                  </Field>
+                </div>
+              )}
+              {mode !== 'now' && <p className="prod-fine">잔액은 보낼 때 확인해요. 그때 잔액이 모자라면 보내지 못하고 알림을 드려요.</p>}
+            </fieldset>
             <div className="panel trf-auth">
               <StepUpField auth={auth} id="trf-password" message={formError ? { tone: 'error', text: formError } : null} />
             </div>
@@ -660,7 +765,7 @@ export default function TransferPage({ query }: { query: URLSearchParams }) {
                 고치기
               </button>
               <button className="btn-primary" type="submit" disabled={busy}>
-                {busy ? '보내는 중…' : `${won(n)} 보내기`}
+                {busy ? '처리 중…' : mode === 'now' ? `${won(n)} 보내기` : mode === 'once' ? '예약하기' : '자동이체 등록'}
               </button>
             </div>
           </form>

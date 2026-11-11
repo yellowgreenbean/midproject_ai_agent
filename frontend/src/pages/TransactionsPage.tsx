@@ -1,8 +1,10 @@
-// 거래내역 (docs/기획서.md Part 5 TRX-F03 · 10장) — 메뉴 「거래내역」. 계좌를 골라 입출금 내역을 보고, 「이체 결과」 탭은 이체 결과 화면으로
-// shortcut: 기간(1·3·6개월) 거르기와 20건씩 더 불러오기는 아직 없다 — 더미가 10월 한 달치뿐이라 지금은 전부 보여 준다. 거래가 쌓이면 서버에 기간·페이지를 붙인다.
+// 거래내역 (docs/기획서.md Part 5 TRX-F03 · 10장) — 메뉴 「거래내역」. 탭: 입출금 내역(계좌별, 기간·입금/출금) · 이체 결과(이체 결과 화면으로)
+// · 다른 은행 이체내역(TRX-F09) · 다른 은행 예적금(TRX-F14)
+// shortcut: 20건씩 더 불러오기(무한 스크롤) 대신 고른 기간을 한 번에 다 그린다 — 서버는 20건 페이지(cursor)를 이미 준다
 import { useEffect, useState } from 'react'
 import AppShell from '../components/AppShell'
 import AccountTransactions from './AccountTransactions'
+import ExternalHistory from './ExternalHistory'
 import { getAccounts, type Account } from '../api'
 import { won } from '../productRules'
 import './ProductPages.css'
@@ -12,6 +14,7 @@ export default function TransactionsPage() {
   const [accounts, setAccounts] = useState<Account[] | 'guest' | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [id, setId] = useState('')
+  const [tab, setTab] = useState<'mine' | 'transfer' | 'deposit'>('mine')
   useEffect(() => {
     void getAccounts().then((r) => {
       if (!r.success) return r.error.code === 'UNAUTHENTICATED' ? setAccounts('guest') : setError(r.error.message)
@@ -27,12 +30,18 @@ export default function TransactionsPage() {
       <section className="prod-head">
         <h2 className="prod-title">거래내역</h2>
         <div className="prod-tabs" role="group" aria-label="내역 종류">
-          <button type="button" className="prod-chip" aria-pressed="true">
+          <button type="button" className="prod-chip" aria-pressed={tab === 'mine'} onClick={() => setTab('mine')}>
             입출금 내역
           </button>
           <a className="prod-chip" href="#/transfers">
             이체 결과
           </a>
+          <button type="button" className="prod-chip" aria-pressed={tab === 'transfer'} onClick={() => setTab('transfer')}>
+            다른 은행 이체
+          </button>
+          <button type="button" className="prod-chip" aria-pressed={tab === 'deposit'} onClick={() => setTab('deposit')}>
+            다른 은행 예적금
+          </button>
         </div>
       </section>
       {error && (
@@ -49,7 +58,9 @@ export default function TransactionsPage() {
           </a>
         </div>
       )}
-      {Array.isArray(accounts) &&
+      {tab !== 'mine' && accounts !== 'guest' && <ExternalHistory key={tab} kind={tab} />}
+      {tab === 'mine' &&
+        Array.isArray(accounts) &&
         (accounts.length === 0 ? (
           <div className="panel empty">
             <p className="empty-title">아직 계좌가 없어요</p>

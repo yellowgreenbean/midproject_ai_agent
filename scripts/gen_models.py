@@ -47,7 +47,8 @@ CLASS = {
     "product_documents": "ProductDocument", "subscriptions": "Subscription",
     "subscription_payments": "SubscriptionPayment",
     "card_companies": "CardCompany", "categories": "Category", "card_products": "CardProduct",
-    "card_performance_tiers": "CardPerformanceTier", "card_benefits": "CardBenefit", "terms": "Terms",
+    "card_performance_tiers": "CardPerformanceTier", "card_benefit_limit_groups": "CardBenefitLimitGroup",
+    "card_benefits": "CardBenefit", "terms": "Terms",
     "user_consents": "UserConsent", "promotions": "Promotion", "card_recommendations": "CardRecommendation",
     "card_recommendation_details": "CardRecommendationDetail", "card_applications": "CardApplication",
     "application_status_histories": "ApplicationStatusHistory",
@@ -104,6 +105,9 @@ def type_code(t):
     if n == "TIMESTAMP":
         assert t.precision == 0, t
         return "TS", "datetime"
+    if n == "TIME":
+        assert t.precision == 0, t
+        return "TM", "time"
     if n == "NUMERIC":
         return f"Numeric({t.precision}, {t.scale})", "Decimal"
     if n == "JSONB":
@@ -221,7 +225,7 @@ tests/test_models_schema.py 가 DB 와 칸·타입·NULL·기본값·키·제약
 """
 '''
 
-# 보기(view)는 표가 아니므로 ViewBase 에 둔다 → Base.metadata(표 60개)에 섞이지 않는다.
+# 보기(view)는 표가 아니므로 ViewBase 에 둔다 → Base.metadata(표 61개)에 섞이지 않는다.
 VIEWS = {
     "transactions": '''class AccountBalanceView(ViewBase):
     """잔액 읽기용 보기 account_balance_view — 계좌 파트와 다른 파트는 잔액을 이것으로만 읽는다(기획서 C-5).
@@ -239,7 +243,7 @@ VIEWS = {
 
 # 모듈 맨 위 import 후보 — 본문에 실제로 나온 이름만 넣는다
 IMPORTS = [
-    ("from datetime import {}", ["date", "datetime"]),
+    ("from datetime import {}", ["date", "datetime", "time"]),
     ("from decimal import {}", ["Decimal"]),
     ("from typing import {}", ["Any"]),
     ("", None),
@@ -248,7 +252,7 @@ IMPORTS = [
     ("from sqlalchemy.dialects.postgresql import {}", ["JSONB"]),
     ("from sqlalchemy.orm import {}", ["Mapped", "mapped_column"]),
     ("", None),
-    ("from app.models._base import {}", ["FALSE", "NOW", "TRUE", "TS", "Base", "ViewBase", "one_of"]),
+    ("from app.models._base import {}", ["FALSE", "NOW", "TRUE", "TM", "TS", "Base", "ViewBase", "one_of"]),
 ]
 
 
@@ -285,7 +289,7 @@ for fname, mod, title in FILES:
     total += len(tables)
     print(f"{mod}.py: 표 {len(tables)}")
 
-init = '''"""기획서 스키마(docs/sql/01~07) 표 60개 + 보기 1개의 SQLAlchemy 모델.
+init = '''"""기획서 스키마(docs/sql/01~07) 표 61개 + 보기 1개의 SQLAlchemy 모델.
 
 scripts/gen_models.py 가 만든 파일이다. 손으로 고치지 말 것.
 쓰는 법: from app.models import Account, Transaction ...

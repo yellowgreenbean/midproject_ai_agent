@@ -189,7 +189,8 @@ def test_verify_our_bank_account(client):
     r = client.get("/transfer-targets/verify", headers=U1,
                    params={"bank": "두린은행", "account_no": "11000000000007"})
     assert r.json() == {"bank": "두린은행", "account_no": "11000000000007", "holder_name": "이서연",
-                        "account_status": "ACTIVE", "is_mine": False}
+                        "account_status": "ACTIVE", "is_mine": False, "account_display": "110-00-000007",
+                        "warnings": [], "pending_transfer": None}
     mine = client.get("/transfer-targets/verify", headers=U1,
                       params={"bank": "두린은행", "account_no": "11000000000002"}).json()
     assert mine["is_mine"] is True

@@ -75,10 +75,10 @@ export default function CardApplyPage() {
       <AppShell title="카드 신청" current="#/cards">
         <section className="panel acct-done card-done" aria-live="polite">
           <img src={cardArtOf(done.productName, done.cardType)} alt="" className="card-done-art" />
-          <h2 className="acct-done-title">{done.productName}를 보내기 시작했어요</h2>
-          <p className="acct-done-number">운송장 {done.trackingNo} · 출금 계좌 {done.linkedAccountNumber}</p>
+          <h2 className="acct-done-title">{done.productName}를 신청했어요</h2>
+          <p className="acct-done-number">출금 계좌 {done.linkedAccountNumber}</p>
           <Steps app={done} />
-          <p className="prod-fine">카드를 받으면 「내 카드」에서 등록해 주세요. 등록하면 바로 쓸 수 있어요.</p>
+          <p className="prod-fine">카드를 만들고 있어요. 배송이 시작되기 전까지 「내 카드」에서 신청을 취소할 수 있고, 카드를 받으면 거기서 등록해 주세요.</p>
           <div className="acct-done-actions">
             <a className="btn-hero is-primary" href="#/cards">
               배송 조회

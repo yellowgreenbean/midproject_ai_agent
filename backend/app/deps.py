@@ -16,7 +16,7 @@ from fastapi import Depends, Header, Request, Response
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.db import get_db
+from app.common.db import get_db
 from app.errors import ApiError, unauthorized
 from app.models import AuthSession, User
 from app.rules import KST, SESSION_COOKIE, SESSION_IDLE, SESSION_TOUCH_INTERVAL, now_kst
@@ -99,6 +99,20 @@ def get_current_login(login: Annotated[Login, Depends(get_login)]) -> Login:
     return login
 
 
+def get_optional_user_id(
+    request: Request,
+    response: Response,
+    db: DB,
+    x_user_id: Annotated[str | None, Header(description="개발용 — AUTH_DEV_HEADER=true 일 때만 쓰임")] = None,
+) -> str | None:
+    """로그인 없이도 쓰는 API(챗봇) 용 — 쿠키(개발용 헤더)가 없으면 None(손님).
+    쿠키가 있으면 일반 보호 API 와 똑같이 검사한다: 끊긴 세션 401 · 가입 마무리 중 403 (손님으로 내려 주지 않음)."""
+    if not request.cookies.get(SESSION_COOKIE) and not (settings.auth_dev_header and x_user_id):
+        return None
+    return get_current_user_id(get_login(request, response, db, x_user_id))
+
+
 LoginUser = Annotated[User, Depends(get_login_user)]
 CurrentUserId = Annotated[str, Depends(get_current_user_id)]
 CurrentLogin = Annotated[Login, Depends(get_current_login)]
+OptionalUserId = Annotated[str | None, Depends(get_optional_user_id)]

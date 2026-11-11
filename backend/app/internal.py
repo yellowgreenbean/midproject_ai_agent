@@ -47,32 +47,43 @@ def account_readiness(db, user_id: str, lock: bool = False) -> list[AccountState
     return [AccountState(a, bal or 0) for a, bal in db.execute(q)]
 
 
-def transfer_blockers(db, user_id: str) -> tuple[list[Transfer], list[ScheduledTransfer]]:
-    """(① 처리중 이체, ③ 실행 대기 예약 송금·활성/일시정지 자동이체)."""
-    pending = list(db.scalars(select(Transfer).where(Transfer.user_id == user_id, Transfer.status == "PENDING")
-                              .order_by(Transfer.requested_at)))
-    scheduled = list(db.scalars(select(ScheduledTransfer).where(
-        ScheduledTransfer.user_id == user_id,
-        ScheduledTransfer.status.in_(("SCHEDULED", "PROCESSING", "ACTIVE", "PAUSED"))).order_by(ScheduledTransfer.id)))
+# 아래 세 점검은 회원 탈퇴(회원 전체)와 계좌 해지(ACCT-F05, account_id 를 주면 그 계좌만)가 같은 기준으로 쓴다.
+
+def transfer_blockers(db, user_id: str, account_id: str | None = None) -> tuple[list[Transfer], list[ScheduledTransfer]]:
+    """(① 처리중 이체, ③ 실행 대기 예약 송금·활성/일시정지 자동이체). account_id: 그 계좌에서 나가는 것만."""
+    pending_q = select(Transfer).where(Transfer.user_id == user_id, Transfer.status == "PENDING")
+    scheduled_q = select(ScheduledTransfer).where(
+        ScheduledTransfer.user_id == user_id, ScheduledTransfer.status.in_(("SCHEDULED", "PROCESSING", "ACTIVE", "PAUSED")))
+    if account_id is not None:
+        pending_q = pending_q.where(Transfer.from_account_id == account_id)
+        scheduled_q = scheduled_q.where(ScheduledTransfer.from_account_id == account_id)
+    pending = list(db.scalars(pending_q.order_by(Transfer.requested_at)))
+    scheduled = list(db.scalars(scheduled_q.order_by(ScheduledTransfer.id)))
     return pending, scheduled
 
 
-def subscription_blockers(db, user_id: str) -> list[tuple[Subscription, str]]:
-    """만기·해지 전인 예금·적금 가입과 상품 이름."""
-    return list(db.execute(select(Subscription, Product.name).join(Product, Product.id == Subscription.product_id)
-                           .where(Subscription.user_id == user_id, Subscription.status == "ACTIVE")
-                           .order_by(Subscription.id)))
+def subscription_blockers(db, user_id: str, account_id: str | None = None) -> list[tuple[Subscription, str]]:
+    """만기·해지 전인 예금·적금 가입과 상품 이름. account_id: 그 계좌가 출금 계좌인 것만."""
+    q = (select(Subscription, Product.name).join(Product, Product.id == Subscription.product_id)
+         .where(Subscription.user_id == user_id, Subscription.status == "ACTIVE"))
+    if account_id is not None:
+        q = q.where(Subscription.source_account_id == account_id)
+    return list(db.execute(q.order_by(Subscription.id)))
 
 
-def card_blockers(db, user_id: str) -> list[tuple[UserCard, str, int]]:
+def card_blockers(db, user_id: str, account_id: str | None = None) -> list[tuple[UserCard, str, int]]:
     """(카드, 상품 이름, 아직 낼 돈) — 해지 안 된 우리 발급 카드, 그리고 해지했어도 낼 대금이 남은 카드.
     마이데이터로 연동만 한 타사 카드(MYDATA)는 막지 않는다(Part 4 1-3).
-    해지 뒤 남은 대금도 막는 것은 사용자 결정 2026-11-09(Q5): 탈퇴로 결제 계좌가 해지되면 청구할 곳이 없어지므로."""
+    해지 뒤 남은 대금도 막는 것은 사용자 결정 2026-11-09(Q5): 탈퇴로 결제 계좌가 해지되면 청구할 곳이 없어지므로.
+    account_id: 그 계좌가 결제·출금 계좌(linked_account_id)인 카드만."""
     from app.routers.cards import card_money  # 카드 파트의 계산을 그대로 쓴다
 
-    rows = db.execute(select(UserCard, CardProduct.name, CardProduct.card_type)
-                      .join(CardProduct, CardProduct.id == UserCard.card_product_id)
-                      .where(UserCard.user_id == user_id, UserCard.source == "TOSS_ISSUED").order_by(UserCard.id))
+    q = (select(UserCard, CardProduct.name, CardProduct.card_type)
+         .join(CardProduct, CardProduct.id == UserCard.card_product_id)
+         .where(UserCard.user_id == user_id, UserCard.source == "TOSS_ISSUED"))
+    if account_id is not None:
+        q = q.where(UserCard.linked_account_id == account_id)
+    rows = db.execute(q.order_by(UserCard.id))
     out = []
     for card, name, card_type in rows:
         owed = card_money(db, card, card_type).owed

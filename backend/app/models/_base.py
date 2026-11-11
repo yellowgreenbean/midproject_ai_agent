@@ -4,12 +4,12 @@
 """
 
 from sqlalchemy import CheckConstraint, text
-from sqlalchemy.dialects.postgresql import TIMESTAMP
+from sqlalchemy.dialects.postgresql import TIME, TIMESTAMP
 from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
-    """표 60개."""
+    """표 61개."""
 
 
 class ViewBase(DeclarativeBase):
@@ -18,6 +18,8 @@ class ViewBase(DeclarativeBase):
 
 # 시각: TIMESTAMP(0), 시간대 없이 한국 시각으로 저장 (DB 기본 시간대 Asia/Seoul)
 TS = TIMESTAMP(precision=0)
+# 하루 중 시각(혜택의 「저녁 6~11시」 등): TIME(0)
+TM = TIME(precision=0)
 
 # 기본값(server_default) — DB 가 채운다
 NOW = text("CURRENT_TIMESTAMP")

@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import text
 
 from app.config import settings
-from app.db import engine
+from app.common.db import engine
 from app.main import app
 from app.security import login_throttle
 from tests.conftest import seed_password

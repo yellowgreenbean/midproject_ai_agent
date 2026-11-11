@@ -4,8 +4,9 @@ import AppShell from '../components/AppShell'
 import Field from '../components/Field'
 import Icon from '../components/Icon'
 import { estimateInterest, getProduct, type Estimate, type ProductDetail } from '../api'
-import { defaultMonths, digitsOnly, isDayUnit, monthOptions, won, ymd } from '../productRules'
+import { defaultMonths, digitsOnly, isDayUnit, monthOptions, PAYMENT_TYPE_HINT, PAYMENT_TYPE_LABEL, won, ymd } from '../productRules'
 import { PRODUCT_ART, TYPE_CLASS, TYPE_LABEL } from './productArt'
+import ProductTerms from './ProductTerms'
 import './ProductPages.css'
 
 export default function ProductDetailPage({ id }: { id: string }) {
@@ -146,6 +147,12 @@ export default function ProductDetailPage({ id }: { id: string }) {
               <dt>가입 대상</dt>
               <dd>{p.eligibility ?? '확인 필요'}</dd>
             </div>
+            {p.paymentTypes.length > 0 && (
+              <div>
+                <dt>납입 방식</dt>
+                <dd>{p.paymentTypes.map((t) => `${PAYMENT_TYPE_LABEL[t]}(${PAYMENT_TYPE_HINT[t]})`).join(' · ')}</dd>
+              </div>
+            )}
             <div>
               <dt>{what}</dt>
               <dd>
@@ -189,6 +196,20 @@ export default function ProductDetailPage({ id }: { id: string }) {
             ))}
             {!deposit && <li>가입하는 날 첫 달 돈만 빠져요. 다음 달부터는 자동으로 빠지지 않으니 「내 가입 상품 → 돈 넣기」로 직접 넣어 주세요.</li>}
           </ul>
+        </section>
+      )}
+
+      {p.terms.length > 0 && (
+        <section aria-labelledby="terms">
+          <h2 id="terms" className="section-title">
+            <span className="section-icon">
+              <Icon name="list" size={18} />
+            </span>
+            상품 약관
+          </h2>
+          <div className="panel">
+            <ProductTerms productId={p.id} terms={p.terms} />
+          </div>
         </section>
       )}
 

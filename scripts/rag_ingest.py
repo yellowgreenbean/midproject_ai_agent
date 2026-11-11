@@ -5,6 +5,7 @@
     backend/.venv/Scripts/python scripts/rag_ingest.py --save                   # 실험 'pc-1000' 으로 저장 (있으면 바꿔 씀)
     backend/.venv/Scripts/python scripts/rag_ingest.py --save --experiment pc-500   # CHILD_MAX 를 바꾼 뒤 다른 이름으로
     backend/.venv/Scripts/python scripts/rag_ingest.py --query "정기예금 중도해지 이율" --experiment pc-1000
+    backend/.venv/Scripts/python scripts/rag_ingest.py --query "예금거래기본약관 제12조" --mode bm25   # vector | bm25 | hybrid(기본)
 저장: 같은 글의 벡터가 이미 DB 에 있으면(다른 실험 포함) 다시 쓰고 없는 것만 임베딩한다. child 는 100개씩 저장·커밋하므로
       중간에 끊겨도 다시 돌리면 이미 만든 벡터를 재사용해 이어 간다.
 
@@ -27,13 +28,13 @@ import hashlib
 import json
 import re
 import sys
-import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "backend"))
+from app.rag import embed, search  # noqa: E402  임베딩·검색은 챗봇 서버와 같은 코드
+
 RAG = REPO / "data" / "rag"
-EMBED_MODEL = "gemini-embedding-2"  # 지난 미니 프로젝트와 같은 모델 — 바꾸면 docs/sql/08_rag.sql 의 vector(768) 와 표 전체를 다시
-EMBED_DIM = 768
 BATCH = 100
 PARENT_MAX = 4000
 CHILD_MAX = 1000
@@ -179,7 +180,7 @@ def _selftest():
 
 # ───────────────────────── 임베딩 · 저장 · 검색 ─────────────────────────
 def connect():
-    import psycopg
+    """(DB 주소, Gemini 클라이언트) — 둘 다 backend/.env 에서."""
     from dotenv import dotenv_values
 
     env = dotenv_values(REPO / "backend" / ".env")
@@ -188,32 +189,14 @@ def connect():
         sys.exit("backend/.env 에 GEMINI_API_KEY 가 없습니다")
     from google import genai
 
-    return psycopg.connect(url.replace("postgresql+psycopg://", "postgresql://", 1)), genai.Client(api_key=env["GEMINI_API_KEY"])
-
-
-def embed(client, texts: list[str], task: str) -> list[str]:
-    """벡터를 pgvector 글자 형식('[0.1,0.2,…]')으로 돌려준다. 요청 한도(429)에 걸리면 기다렸다 다시."""
-    from google.genai import errors, types
-
-    cfg = types.EmbedContentConfig(task_type=task, output_dimensionality=EMBED_DIM)
-    for attempt in range(8):
-        try:
-            # 글 목록을 그대로 주면 gemini-embedding-2 는 한 콘텐츠로 합쳐 벡터 1개만 준다(2026-11-09 실측) → 글마다 Content 로 감싼다
-            contents = [types.Content(parts=[types.Part(text=t)]) for t in texts]
-            res = client.models.embed_content(model=EMBED_MODEL, contents=contents, config=cfg)
-            assert len(res.embeddings) == len(texts), f"벡터 {len(res.embeddings)}개 ≠ 글 {len(texts)}개"
-            return ["[" + ",".join(map(str, e.values)) + "]" for e in res.embeddings]
-        except errors.APIError as e:
-            if e.code not in (429, 500, 503) or attempt == 7:
-                raise
-            wait = 2**attempt * 5
-            print(f"  ! Gemini {e.code} — {wait}초 뒤 다시", file=sys.stderr)
-            time.sleep(wait)
-    raise AssertionError("unreachable")
+    return url, genai.Client(api_key=env["GEMINI_API_KEY"])
 
 
 def save(records: list[dict], experiment: str):
-    conn, client = connect()
+    import psycopg
+
+    url, client = connect()
+    conn = psycopg.connect(url.replace("postgresql+psycopg://", "postgresql://", 1))
     parents = [r for r in records if r["metadata"]["level"] == "parent"]
     children = [r for r in records if r["metadata"]["level"] == "child"]
     for c in children:
@@ -255,29 +238,23 @@ def save(records: list[dict], experiment: str):
     print("저장 완료")
 
 
-def search(query: str, experiment: str, k: int = 4):
-    """child 로 찾고, 같은 parent 는 한 번만 — 가까운 순서로 parent 글을 돌려준다."""
-    conn, client = connect()
-    with conn:
-        rows = conn.execute(
-            "SELECT c.parent_id, min(c.embedding <=> %s::vector) AS dist, p.content, p.metadata"
-            " FROM rag_chunks c JOIN rag_parents p ON p.experiment = c.experiment AND p.chunk_id = c.parent_id"
-            " WHERE c.experiment = %s GROUP BY c.parent_id, p.content, p.metadata ORDER BY dist LIMIT %s",
-            (embed(client, [query], "RETRIEVAL_QUERY")[0], experiment, k),
-        ).fetchall()
-    return rows
-
-
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description="data/rag md → parent-child 청크 → pgvector")
     ap.add_argument("--experiment", default=f"pc-{CHILD_MAX}", help="실험 이름 (기본: pc-<CHILD_MAX>)")
     ap.add_argument("--save", action="store_true", help="임베딩해서 DB 에 저장")
     ap.add_argument("--query", help="저장된 실험에서 검색해 보기")
+    ap.add_argument("--mode", choices=["vector", "bm25", "hybrid"], default="hybrid", help="--query 의 검색 방식 (기본 hybrid = 둘을 RRF 로)")
     args = ap.parse_args()
     if args.query:
-        for parent_id, dist, content, meta in search(args.query, args.experiment):
-            print(f"\n── {1 - dist:.3f}  {parent_id}  ({meta['source']})\n{content[:300]}")
+        from sqlalchemy import create_engine
+        from sqlalchemy.orm import Session
+
+        url, client = connect()
+        with Session(create_engine(url)) as db:
+            found = search(db, client, args.query, args.experiment, mode=args.mode)
+        for parent_id, score, content, meta in found:
+            print(f"\n── RRF {score:.4f}  {parent_id}  ({meta['source']})\n{content[:300]}")
         return
     _selftest()
     records = chunk_all()

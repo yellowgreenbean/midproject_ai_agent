@@ -10,7 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.db import engine
+from app.common.db import engine
 from app.jobs import one_month_before, purge_withdrawn_users
 from app.main import app
 from app.rules import WITHDRAWAL_DATA_REVIEW_VERSION

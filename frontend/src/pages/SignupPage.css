@@ -281,6 +281,23 @@ select.input {
   font-weight: var(--weight-bold);
   margin-right: var(--space-2);
 }
+.terms li { display: flex; align-items: center; gap: var(--space-2); }
+.terms li .check { flex: 1; min-width: 0; }
+.terms-view {
+  flex: none;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--text-xs);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.terms-view:hover { color: var(--color-text); }
+.terms-view:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
 .tag-required { color: var(--color-primary); }
 .tag-optional { color: var(--color-text-muted); }
 

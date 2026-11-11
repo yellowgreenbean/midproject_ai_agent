@@ -1,4 +1,4 @@
-// 내 가입 상품 상세 — 납입 내역 · 추가 납입(적금) · 중도 해지 (docs/기획서.md Part 3 PROD-F09·F10)
+// 내 가입 상품 상세 — 납입 내역 · 추가 납입(적금, PROD-F12) · 중도 해지 (docs/기획서.md Part 3 PROD-F09·F10·F12)
 import { useEffect, useState, type FormEvent } from 'react'
 import AppShell from '../components/AppShell'
 import Field from '../components/Field'
@@ -6,7 +6,7 @@ import Icon from '../components/Icon'
 import { getMySubscription, payInstallment, terminateSubscription, type SubscriptionDetail } from '../api'
 import { StepUpField } from './StepUp'
 import { useStepUp } from './useStepUp'
-import { digitsOnly, won, ymd } from '../productRules'
+import { digitsOnly, PAYMENT_TYPE_LABEL, won, ymd } from '../productRules'
 import { PRODUCT_ART, STATUS_LABEL, TYPE_LABEL } from './productArt'
 import './ProductPages.css'
 
@@ -43,12 +43,17 @@ export default function SavingDetailPage({ id }: { id: string }) {
     )
 
   const left = s.monthlyMax === null ? null : Math.max(s.monthlyMax - s.paidThisMonth, 0)
+  const fixed = s.paymentType === 'FIXED'
+  const savingsActive = s.productType === 'INSTALLMENT_SAVINGS' && s.status === 'ACTIVE'
+  // 다음 회차 시작일 — "12월 10일부터"
+  const nextDay = s.nextPeriodStart ? `${Number(s.nextPeriodStart.slice(4, 6))}월 ${Number(s.nextPeriodStart.slice(6, 8))}일` : ''
 
   function open(a: Action) {
     setAction(a)
     setFormError(null)
     auth.setValue('')
     setNotice(null)
+    setAmount(a === 'pay' && fixed && s?.monthlyAmount ? String(s.monthlyAmount) : '') // 정액은 정한 금액만 넣을 수 있다
   }
 
   async function onSubmit(e: FormEvent) {
@@ -102,6 +107,15 @@ export default function SavingDetailPage({ id }: { id: string }) {
       )}
 
       <dl className="panel prod-dl">
+        {s.paymentType && (
+          <div>
+            <dt>납입 방식</dt>
+            <dd>
+              {PAYMENT_TYPE_LABEL[s.paymentType]}
+              {fixed && s.monthlyAmount !== null && ` · 매달 ${won(s.monthlyAmount)}`}
+            </dd>
+          </div>
+        )}
         <div>
           <dt>적용 금리</dt>
           <dd>연 {s.appliedRate}% (세전)</dd>
@@ -121,11 +135,17 @@ export default function SavingDetailPage({ id }: { id: string }) {
             {s.accountStatus === 'SUSPENDED' && ' · 일시정지'}
           </dd>
         </div>
-        {s.payable && left !== null && (
+        {savingsActive && (
           <div>
-            <dt>이번 달</dt>
+            <dt>이번 회차</dt>
             <dd>
-              {won(s.paidThisMonth)} 넣음 · {won(left)} 더 넣을 수 있어요
+              {fixed
+                ? s.paidThisMonth > 0
+                  ? `넣었어요 · 다음 회차는 ${nextDay}부터`
+                  : `아직 안 넣었어요 · ${nextDay} 전까지 넣어 주세요`
+                : left === null
+                  ? `${won(s.paidThisMonth)} 넣음`
+                  : `${won(s.paidThisMonth)} 넣음 · ${won(left)} 더 넣을 수 있어요 (${nextDay}부터 새 회차)`}
             </dd>
           </div>
         )}
@@ -151,7 +171,7 @@ export default function SavingDetailPage({ id }: { id: string }) {
           {action && (
             <form className="panel prod-pad prod-form prod-narrow" onSubmit={onSubmit} noValidate>
               {action === 'pay' ? (
-                <Field id="pay-amount" label="넣을 돈">
+                <Field id="pay-amount" label={fixed ? '이번 회차에 넣을 돈 (정액)' : '넣을 돈'}>
                   <div className="input-wrap">
                     <input
                       id="pay-amount"
@@ -159,6 +179,7 @@ export default function SavingDetailPage({ id }: { id: string }) {
                       inputMode="numeric"
                       value={amount ? Number(amount).toLocaleString('ko-KR') : ''}
                       onChange={(e) => setAmount(digitsOnly(e.target.value).slice(0, 13))}
+                      readOnly={fixed}
                     />
                     <span className="timer prod-suffix">원</span>
                   </div>

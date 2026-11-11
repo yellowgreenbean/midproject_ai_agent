@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react'
 import AppShell from '../components/AppShell'
 import Icon from '../components/Icon'
 import { getMySubscriptions, type Subscription } from '../api'
-import { won, ymd } from '../productRules'
-import { PRODUCT_ART, STATUS_LABEL } from './productArt'
+import SavingCard from './SavingCard'
 import './ProductPages.css'
 
 
@@ -52,26 +51,14 @@ export default function MySavingsPage() {
             </a>
           </div>
         ) : (
-          <ul className="panel rows">
-            {list.map((s) => (
-              <li key={s.id}>
-                <a href={`#/my/savings/${s.id}`}>
-                  <img src={PRODUCT_ART[s.productType]} alt="" className="row-art" />
-                  <span className="row-main">
-                    <strong>{s.productName}</strong>
-                    <small>
-                      연 {s.appliedRate}% · 만기 {ymd(s.maturityDate)} · {s.accountNumber}
-                      {s.monthlyAmount !== null && ` · 매달 ${won(s.monthlyAmount)}`}
-                    </small>
-                  </span>
-                  <span className="rate">
-                    <strong>{won(s.principal)}</strong>
-                    <small>{STATUS_LABEL[s.status] ?? s.status}</small>
-                  </span>
-                  <Icon name="chevron" size={18} />
-                </a>
-              </li>
-            ))}
+          <ul className="sav-grid">
+            {[...list]
+              .sort((a, b) => Number(b.status === 'ACTIVE') - Number(a.status === 'ACTIVE')) // 진행 중인 것 먼저
+              .map((s) => (
+                <li key={s.id}>
+                  <SavingCard s={s} />
+                </li>
+              ))}
           </ul>
         ))}
     </AppShell>

@@ -1,16 +1,16 @@
-"""5. 카드 — 상품·발급·보유 — docs/sql/05_card_products.sql 의 표 18개.
+"""5. 카드 — 상품·발급·보유 — docs/sql/05_card_products.sql 의 표 19개.
 
 scripts/gen_models.py 가 만든 파일이다. 손으로 고치지 말 것 — docs/sql 을 고치고 다시 만든다.
 tests/test_models_schema.py 가 DB 와 칸·타입·NULL·기본값·키·제약·인덱스가 같은지 검사한다.
 """
 
-from datetime import date, datetime
+from datetime import date, datetime, time
 from decimal import Decimal
 
 from sqlalchemy import CHAR, BigInteger, Boolean, Date, ForeignKey, Index, Integer, Numeric, SmallInteger, String, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models._base import FALSE, NOW, TRUE, TS, Base, one_of
+from app.models._base import FALSE, NOW, TRUE, TM, TS, Base, one_of
 
 
 class CardCompany(Base):
@@ -71,28 +71,48 @@ class CardProduct(Base):
 
 
 class CardPerformanceTier(Base):
-    """전월 실적 구간"""
+    """전월 실적 구간 (period = QUARTER 는 분기 실적 구간, 2026-11-10 추가)"""
 
     __tablename__ = "card_performance_tiers"
+    PERIOD_VALUES = ("MONTH", "QUARTER")
     __table_args__ = (
-        UniqueConstraint("card_product_id", "tier_level", name="uk_tiers_product_level"),
+        one_of("period", PERIOD_VALUES, "ck_card_performance_tiers_period"),
+        UniqueConstraint("card_product_id", "period", "tier_level", name="uk_tiers_product_level"),
     )
 
     id: Mapped[str] = mapped_column(String(40), primary_key=True)
     card_product_id: Mapped[str] = mapped_column(String(40), ForeignKey("card_products.id"))
-    tier_level: Mapped[int] = mapped_column(SmallInteger)  # 1부터, 클수록 높은 구간
-    min_spend: Mapped[int] = mapped_column(BigInteger)  # 구간 진입 전월 실적(이상)
+    period: Mapped[str] = mapped_column(String(10), server_default="MONTH")  # MONTH = 전월 실적, QUARTER = 지난 분기 실적
+    tier_level: Mapped[int] = mapped_column(SmallInteger)  # 1부터, 클수록 높은 구간 (period 마다 따로 센다)
+    min_spend: Mapped[int] = mapped_column(BigInteger)  # 구간 진입 실적(이상)
     max_spend: Mapped[int | None] = mapped_column(BigInteger)  # 구간 상한(미만), NULL = 상한 없음
 
 
+class CardBenefitLimitGroup(Base):
+    """혜택 통합 월 한도 — 여러 혜택이 함께 쓰는 통합 월 한도 (예: 「칼퇴 4개 업종 통합 월 4천 원」, 2026-11-10 추가)"""
+
+    __tablename__ = "card_benefit_limit_groups"
+    __table_args__ = (
+        Index("idx_limit_groups_product", "card_product_id"),
+    )
+
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    card_product_id: Mapped[str] = mapped_column(String(40), ForeignKey("card_products.id"))
+    tier_id: Mapped[str | None] = mapped_column(String(40), ForeignKey("card_performance_tiers.id"))  # 이 실적 구간일 때의 한도 (구간마다 한 행), NULL = 실적 조건 없음
+    name: Mapped[str] = mapped_column(String(50))
+    monthly_limit_amount: Mapped[int] = mapped_column(Integer)
+
+
 class CardBenefit(Base):
-    """카드 혜택 규칙"""
+    """카드 혜택 규칙 (조건 칸 limit_group_id ~ daily_limit_count 는 2026-11-10 추가 — 실제 카드 혜택 조건을 담으려고)"""
 
     __tablename__ = "card_benefits"
     BENEFIT_TYPE_VALUES = ("DISCOUNT", "CASHBACK", "POINT", "MILEAGE", "FEE_WAIVER")
-    VALUE_TYPE_VALUES = ("PERCENT", "FIXED")
+    PAYMENT_CHANNEL_VALUES = ("ONLINE", "OFFLINE")
+    VALUE_TYPE_VALUES = ("PERCENT", "FIXED", "PER_LITER")
     __table_args__ = (
         one_of("benefit_type", BENEFIT_TYPE_VALUES, "ck_card_benefits_benefit_type"),
+        one_of("payment_channel", PAYMENT_CHANNEL_VALUES, "ck_card_benefits_payment_channel"),
         one_of("value_type", VALUE_TYPE_VALUES, "ck_card_benefits_value_type"),
         Index("idx_benefits_category", "category_id"),
         Index("idx_benefits_product", "card_product_id"),
@@ -100,16 +120,26 @@ class CardBenefit(Base):
 
     id: Mapped[str] = mapped_column(String(40), primary_key=True)
     card_product_id: Mapped[str] = mapped_column(String(40), ForeignKey("card_products.id"))
-    tier_id: Mapped[str | None] = mapped_column(String(40), ForeignKey("card_performance_tiers.id"))  # NULL = 실적 조건 없음
-    category_id: Mapped[str] = mapped_column(String(40), ForeignKey("categories.id"))
+    tier_id: Mapped[str | None] = mapped_column(String(40), ForeignKey("card_performance_tiers.id"))  # 이 실적 구간일 때의 규칙 (한도가 구간마다 달라 구간마다 한 행), NULL = 실적 조건 없음
+    category_id: Mapped[str | None] = mapped_column(String(40), ForeignKey("categories.id"))  # NULL = 모든 가맹점. 상위 업종이면 하위 업종도 포함 (교통 → 택시)
     benefit_type: Mapped[str] = mapped_column(String(30))
     value_type: Mapped[str] = mapped_column(String(30))
-    benefit_value: Mapped[Decimal] = mapped_column(Numeric(10, 2))  # PERCENT면 %, FIXED면 원
+    benefit_value: Mapped[Decimal] = mapped_column(Numeric(10, 2))  # PERCENT면 %, FIXED면 원, PER_LITER면 리터당 원
     min_payment_amount: Mapped[int | None] = mapped_column(Integer)  # 건당 최소 결제 금액
-    monthly_limit_amount: Mapped[int | None] = mapped_column(Integer)  # 월 혜택 한도(원)
+    monthly_limit_amount: Mapped[int | None] = mapped_column(Integer)  # 이 혜택만의 월 혜택 한도(원). 통합 한도는 limit_group_id
     monthly_limit_count: Mapped[int | None] = mapped_column(Integer)  # 월 적용 횟수 한도
     is_instant: Mapped[bool] = mapped_column(Boolean, server_default=FALSE)  # 즉시 캐시백 여부
-    description: Mapped[str | None] = mapped_column(String(255))
+    description: Mapped[str | None] = mapped_column(String(255))  # 칸으로 못 담은 조건 (원문 요약)
+    limit_group_id: Mapped[str | None] = mapped_column(String(40), ForeignKey("card_benefit_limit_groups.id"))  # 같은 그룹끼리 통합 월 한도를 함께 씀
+    merchant_names: Mapped[str | None] = mapped_column(String(255))  # 이 가맹점에서만 (쉼표로 구분), NULL = 업종 전체
+    payment_channel: Mapped[str | None] = mapped_column(String(10))  # ONLINE = 온라인 결제만, OFFLINE = 매장 결제만, NULL = 둘 다
+    pay_methods: Mapped[str | None] = mapped_column(String(100))  # 이 간편결제로 결제할 때만 (쉼표로 구분), NULL = 결제 수단 무관
+    days_of_week: Mapped[str | None] = mapped_column(String(30))  # 이 요일만 (MON~SUN 쉼표로 구분), NULL = 매일
+    time_start: Mapped[time | None] = mapped_column(TM)  # 이 시각부터 (time_end 와 함께), NULL = 종일
+    time_end: Mapped[time | None] = mapped_column(TM)  # 이 시각까지 (포함하지 않음)
+    max_eligible_amount: Mapped[int | None] = mapped_column(Integer)  # 건당 혜택 계산에 쓰는 결제 금액 상한 (예: 5만 원까지만 10%)
+    per_payment_max_benefit: Mapped[int | None] = mapped_column(Integer)  # 건당 최대 혜택 금액(원)
+    daily_limit_count: Mapped[int | None] = mapped_column(SmallInteger)  # 하루 적용 횟수 한도
 
 
 class Terms(Base):
@@ -332,10 +362,10 @@ class UserCardStatusHistory(Base):
 
 
 class CardManagementLog(Base):
-    """카드 관리 기록 (결제 차단, 한도, 비밀번호 — 비밀번호 값은 저장하지 않음)"""
+    """카드 관리 기록 (결제 차단, 한도, 비밀번호, 결제·출금 계좌 바꾸기 — 비밀번호 값은 저장하지 않음)"""
 
     __tablename__ = "card_management_logs"
-    ACTION_TYPE_VALUES = ("BLOCK_OVERSEAS", "UNBLOCK_OVERSEAS", "BLOCK_ONLINE", "UNBLOCK_ONLINE", "LIMIT_CHANGE", "PIN_CHANGE")
+    ACTION_TYPE_VALUES = ("BLOCK_OVERSEAS", "UNBLOCK_OVERSEAS", "BLOCK_ONLINE", "UNBLOCK_ONLINE", "LIMIT_CHANGE", "PIN_CHANGE", "LINKED_ACCOUNT_CHANGE")
     RESULT_VALUES = ("SUCCESS", "FAILED")
     __table_args__ = (
         one_of("action_type", ACTION_TYPE_VALUES, "ck_card_management_logs_action_type"),

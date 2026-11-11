@@ -83,6 +83,9 @@
 .set-terms-main strong { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-weight: var(--weight-medium); }
 .set-terms-main .set-chip { margin: 0; }
 .set-terms-main small { color: var(--color-text-muted); font-size: var(--text-xs); }
+.set-terms-more { display: inline-flex; align-self: flex-start; align-items: center; gap: 2px; margin-top: var(--space-1); color: var(--color-primary); font-size: var(--text-xs); font-weight: var(--weight-bold); }
+.set-terms-more:hover { text-decoration: underline; text-underline-offset: 2px; }
+.set-terms-more:focus-visible { outline: none; border-radius: var(--radius-xs); box-shadow: var(--shadow-focus); }
 .set-state { flex: none; color: var(--color-text-muted); font-size: var(--text-sm); font-weight: var(--weight-bold); }
 .set-state.is-ok { color: var(--color-success); }
 .set-switch-btn { display: flex; flex: none; padding: var(--space-1); border: 0; border-radius: var(--radius-full); background: none; cursor: pointer; }

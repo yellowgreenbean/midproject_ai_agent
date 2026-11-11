@@ -108,6 +108,19 @@ for k, v in rr.items():
     v.sort()
     for x, y in zip(v, v[1:]):
         if y[0] <= x[1]: E(f"금리 구간 겹침 {k} {x[2]} {y[2]}")
+# 적금 납입 방식: 적금은 payment_types(FIXED·FREE 중 하나 이상), 예금은 없음. 계약의 월 납입액이 있으면 정액, 없으면 자유 (Part 3 PROD-F12)
+ptype = {p["id"]: p["type"] for p in prod["products"]}
+pay_types = {r["product_id"]: (r.get("rules_json") or {}).get("payment_types") for r in prod["product_rules"]}
+for pid, t in ptype.items():
+    v = pay_types.get(pid)
+    if t == "INSTALLMENT_SAVINGS" and (not v or not set(v) <= {"FIXED", "FREE"}): E(f"{pid} 적금인데 payment_types 이상: {v}")
+    if t == "TIME_DEPOSIT" and v: E(f"{pid} 예금인데 payment_types 있음")
+for s in subs:
+    if ptype.get(s["product_id"]) != "INSTALLMENT_SAVINGS":
+        if s["monthly_amount"] is not None: E(f"{s['id']} 예금인데 monthly_amount 있음")
+        continue
+    kind = "FREE" if s["monthly_amount"] is None else "FIXED"
+    if kind not in (pay_types.get(s["product_id"]) or []): E(f"{s['id']} 상품이 {kind} 납입을 받지 않음")
 
 # 5. 회원
 for u in users.values():

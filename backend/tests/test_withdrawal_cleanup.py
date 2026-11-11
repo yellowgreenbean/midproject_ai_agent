@@ -11,7 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.db import engine
+from app.common.db import engine
 from app.jobs import pay_due_card_bills, settle_pending_transfers
 from app.main import app
 from app.rules import WITHDRAWAL_DATA_REVIEW_VERSION
@@ -253,7 +253,9 @@ def test_user_001_everything_cleaned_up_then_withdraws(browser):
         r = browser.post(f"/cards/{card}/terminate", json={"reason_code": "OTHER", "reason_detail": "탈퇴",
                                                            "step_up_challenge_id": ch(browser, "CARD_TERMINATION")})
         assert r.status_code == 200, r.text
-    sql("UPDATE scheduled_transfers SET execute_at = now() - interval '1 hour' WHERE user_id = 'user_001' AND status = 'SCHEDULED'")
+    # 시드의 「곧 실행」 예약(sch_002)은 10분 안이라 취소가 막힌다(8장) — 내일로 미뤄 두고 취소한다
+    sql("UPDATE scheduled_transfers SET execute_at = now() + interval '1 day', next_run_at = now() + interval '1 day' "
+        "WHERE user_id = 'user_001' AND status = 'SCHEDULED'")
     for s in sql("SELECT id FROM scheduled_transfers WHERE user_id = 'user_001' AND status IN ('SCHEDULED','ACTIVE','PAUSED')").scalars():
         r = browser.request("DELETE", f"/scheduled-transfers/{s}", json={"step_up_challenge_id": ch(browser, "SCHEDULED_TRANSFER")})
         assert r.status_code == 200, r.text

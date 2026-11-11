@@ -60,52 +60,94 @@ COMMENT ON COLUMN card_products.min_age IS '발급 가능 최소 나이';
 COMMENT ON COLUMN card_products.summary IS '한 줄 혜택 요약';
 COMMENT ON COLUMN card_products.is_active IS 'FALSE = 단종 (보유는 가능, 신규 발급 불가)';
 
--- 전월 실적 구간
+-- 전월 실적 구간 (period = QUARTER 는 분기 실적 구간, 2026-11-10 추가)
 CREATE TABLE card_performance_tiers (
   id               VARCHAR(40)  NOT NULL,
   card_product_id  VARCHAR(40)  NOT NULL,
+  period           VARCHAR(10)  NOT NULL DEFAULT 'MONTH',
   tier_level       SMALLINT     NOT NULL,
   min_spend        BIGINT       NOT NULL,
   max_spend        BIGINT       NULL,
   PRIMARY KEY (id),
-  CONSTRAINT uk_tiers_product_level UNIQUE (card_product_id, tier_level),
-  CONSTRAINT fk_tiers_product FOREIGN KEY (card_product_id) REFERENCES card_products (id)
+  CONSTRAINT uk_tiers_product_level UNIQUE (card_product_id, period, tier_level),
+  CONSTRAINT fk_tiers_product FOREIGN KEY (card_product_id) REFERENCES card_products (id),
+  CONSTRAINT ck_card_performance_tiers_period CHECK (period IN ('MONTH', 'QUARTER'))
 );
 COMMENT ON TABLE card_performance_tiers IS '전월 실적 구간';
-COMMENT ON COLUMN card_performance_tiers.tier_level IS '1부터, 클수록 높은 구간';
-COMMENT ON COLUMN card_performance_tiers.min_spend IS '구간 진입 전월 실적(이상)';
+COMMENT ON COLUMN card_performance_tiers.period IS 'MONTH = 전월 실적, QUARTER = 지난 분기 실적';
+COMMENT ON COLUMN card_performance_tiers.tier_level IS '1부터, 클수록 높은 구간 (period 마다 따로 센다)';
+COMMENT ON COLUMN card_performance_tiers.min_spend IS '구간 진입 실적(이상)';
 COMMENT ON COLUMN card_performance_tiers.max_spend IS '구간 상한(미만), NULL = 상한 없음';
 
--- 카드 혜택 규칙
+-- 여러 혜택이 함께 쓰는 통합 월 한도 (예: 「칼퇴 4개 업종 통합 월 4천 원」, 2026-11-10 추가)
+CREATE TABLE card_benefit_limit_groups (
+  id                    VARCHAR(40)  NOT NULL,
+  card_product_id       VARCHAR(40)  NOT NULL,
+  tier_id               VARCHAR(40)  NULL,
+  name                  VARCHAR(50)  NOT NULL,
+  monthly_limit_amount  INT          NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_limit_groups_product FOREIGN KEY (card_product_id) REFERENCES card_products (id),
+  CONSTRAINT fk_limit_groups_tier FOREIGN KEY (tier_id) REFERENCES card_performance_tiers (id)
+);
+CREATE INDEX idx_limit_groups_product ON card_benefit_limit_groups (card_product_id);
+COMMENT ON TABLE card_benefit_limit_groups IS '혜택 통합 월 한도';
+COMMENT ON COLUMN card_benefit_limit_groups.tier_id IS '이 실적 구간일 때의 한도 (구간마다 한 행), NULL = 실적 조건 없음';
+
+-- 카드 혜택 규칙 (조건 칸 limit_group_id ~ daily_limit_count 는 2026-11-10 추가 — 실제 카드 혜택 조건을 담으려고)
 CREATE TABLE card_benefits (
-  id                    VARCHAR(40)    NOT NULL,
-  card_product_id       VARCHAR(40)    NOT NULL,
-  tier_id               VARCHAR(40)    NULL,
-  category_id           VARCHAR(40)    NOT NULL,
-  benefit_type          VARCHAR(30)    NOT NULL,
-  value_type            VARCHAR(30)    NOT NULL,
-  benefit_value         DECIMAL(10,2)  NOT NULL,
-  min_payment_amount    INT            NULL,
-  monthly_limit_amount  INT            NULL,
-  monthly_limit_count   INT            NULL,
-  is_instant            BOOLEAN        NOT NULL DEFAULT FALSE,
-  description           VARCHAR(255)   NULL,
+  id                       VARCHAR(40)    NOT NULL,
+  card_product_id          VARCHAR(40)    NOT NULL,
+  tier_id                  VARCHAR(40)    NULL,
+  category_id              VARCHAR(40)    NULL,
+  benefit_type             VARCHAR(30)    NOT NULL,
+  value_type               VARCHAR(30)    NOT NULL,
+  benefit_value            DECIMAL(10,2)  NOT NULL,
+  min_payment_amount       INT            NULL,
+  monthly_limit_amount     INT            NULL,
+  monthly_limit_count      INT            NULL,
+  is_instant               BOOLEAN        NOT NULL DEFAULT FALSE,
+  description              VARCHAR(255)   NULL,
+  limit_group_id           VARCHAR(40)    NULL,
+  merchant_names           VARCHAR(255)   NULL,
+  payment_channel          VARCHAR(10)    NULL,
+  pay_methods              VARCHAR(100)   NULL,
+  days_of_week             VARCHAR(30)    NULL,
+  time_start               TIME(0)        NULL,
+  time_end                 TIME(0)        NULL,
+  max_eligible_amount      INT            NULL,
+  per_payment_max_benefit  INT            NULL,
+  daily_limit_count        SMALLINT       NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_benefits_product FOREIGN KEY (card_product_id) REFERENCES card_products (id),
   CONSTRAINT fk_benefits_tier FOREIGN KEY (tier_id) REFERENCES card_performance_tiers (id),
   CONSTRAINT fk_benefits_category FOREIGN KEY (category_id) REFERENCES categories (id),
+  CONSTRAINT fk_benefits_limit_group FOREIGN KEY (limit_group_id) REFERENCES card_benefit_limit_groups (id),
   CONSTRAINT ck_card_benefits_benefit_type CHECK (benefit_type IN ('DISCOUNT', 'CASHBACK', 'POINT', 'MILEAGE', 'FEE_WAIVER')),
-  CONSTRAINT ck_card_benefits_value_type CHECK (value_type IN ('PERCENT', 'FIXED'))
+  CONSTRAINT ck_card_benefits_value_type CHECK (value_type IN ('PERCENT', 'FIXED', 'PER_LITER')),
+  CONSTRAINT ck_card_benefits_payment_channel CHECK (payment_channel IN ('ONLINE', 'OFFLINE'))
 );
 CREATE INDEX idx_benefits_product ON card_benefits (card_product_id);
 CREATE INDEX idx_benefits_category ON card_benefits (category_id);
 COMMENT ON TABLE card_benefits IS '카드 혜택 규칙';
-COMMENT ON COLUMN card_benefits.tier_id IS 'NULL = 실적 조건 없음';
-COMMENT ON COLUMN card_benefits.benefit_value IS 'PERCENT면 %, FIXED면 원';
+COMMENT ON COLUMN card_benefits.tier_id IS '이 실적 구간일 때의 규칙 (한도가 구간마다 달라 구간마다 한 행), NULL = 실적 조건 없음';
+COMMENT ON COLUMN card_benefits.category_id IS 'NULL = 모든 가맹점. 상위 업종이면 하위 업종도 포함 (교통 → 택시)';
+COMMENT ON COLUMN card_benefits.benefit_value IS 'PERCENT면 %, FIXED면 원, PER_LITER면 리터당 원';
 COMMENT ON COLUMN card_benefits.min_payment_amount IS '건당 최소 결제 금액';
-COMMENT ON COLUMN card_benefits.monthly_limit_amount IS '월 혜택 한도(원)';
+COMMENT ON COLUMN card_benefits.monthly_limit_amount IS '이 혜택만의 월 혜택 한도(원). 통합 한도는 limit_group_id';
 COMMENT ON COLUMN card_benefits.monthly_limit_count IS '월 적용 횟수 한도';
 COMMENT ON COLUMN card_benefits.is_instant IS '즉시 캐시백 여부';
+COMMENT ON COLUMN card_benefits.description IS '칸으로 못 담은 조건 (원문 요약)';
+COMMENT ON COLUMN card_benefits.limit_group_id IS '같은 그룹끼리 통합 월 한도를 함께 씀';
+COMMENT ON COLUMN card_benefits.merchant_names IS '이 가맹점에서만 (쉼표로 구분), NULL = 업종 전체';
+COMMENT ON COLUMN card_benefits.payment_channel IS 'ONLINE = 온라인 결제만, OFFLINE = 매장 결제만, NULL = 둘 다';
+COMMENT ON COLUMN card_benefits.pay_methods IS '이 간편결제로 결제할 때만 (쉼표로 구분), NULL = 결제 수단 무관';
+COMMENT ON COLUMN card_benefits.days_of_week IS '이 요일만 (MON~SUN 쉼표로 구분), NULL = 매일';
+COMMENT ON COLUMN card_benefits.time_start IS '이 시각부터 (time_end 와 함께), NULL = 종일';
+COMMENT ON COLUMN card_benefits.time_end IS '이 시각까지 (포함하지 않음)';
+COMMENT ON COLUMN card_benefits.max_eligible_amount IS '건당 혜택 계산에 쓰는 결제 금액 상한 (예: 5만 원까지만 10%)';
+COMMENT ON COLUMN card_benefits.per_payment_max_benefit IS '건당 최대 혜택 금액(원)';
+COMMENT ON COLUMN card_benefits.daily_limit_count IS '하루 적용 횟수 한도';
 
 -- 약관 (회원 파트 1장, card_product_id NULL = 공통 약관)
 CREATE TABLE terms (
@@ -350,7 +392,7 @@ CREATE TABLE user_card_status_histories (
 CREATE INDEX idx_card_histories_card ON user_card_status_histories (user_card_id, changed_at);
 COMMENT ON TABLE user_card_status_histories IS '카드 상태 이력';
 
--- 카드 관리 기록 (결제 차단, 한도, 비밀번호 — 비밀번호 값은 저장하지 않음)
+-- 카드 관리 기록 (결제 차단, 한도, 비밀번호, 결제·출금 계좌 바꾸기 — 비밀번호 값은 저장하지 않음)
 CREATE TABLE card_management_logs (
   id            VARCHAR(40)   NOT NULL,
   user_card_id  VARCHAR(40)   NOT NULL,
@@ -361,7 +403,7 @@ CREATE TABLE card_management_logs (
   requested_at  TIMESTAMP(0)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   CONSTRAINT fk_mgmt_logs_card FOREIGN KEY (user_card_id) REFERENCES user_cards (id),
-  CONSTRAINT ck_card_management_logs_action_type CHECK (action_type IN ('BLOCK_OVERSEAS', 'UNBLOCK_OVERSEAS', 'BLOCK_ONLINE', 'UNBLOCK_ONLINE', 'LIMIT_CHANGE', 'PIN_CHANGE')),
+  CONSTRAINT ck_card_management_logs_action_type CHECK (action_type IN ('BLOCK_OVERSEAS', 'UNBLOCK_OVERSEAS', 'BLOCK_ONLINE', 'UNBLOCK_ONLINE', 'LIMIT_CHANGE', 'PIN_CHANGE', 'LINKED_ACCOUNT_CHANGE')),
   CONSTRAINT ck_card_management_logs_result CHECK (result IN ('SUCCESS', 'FAILED'))
 );
 CREATE INDEX idx_mgmt_logs_card ON card_management_logs (user_card_id, requested_at);

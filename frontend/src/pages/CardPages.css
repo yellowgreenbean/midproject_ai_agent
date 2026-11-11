@@ -51,6 +51,9 @@
 .card-canceled { color: var(--color-danger); }
 
 .card-benefits li { padding: var(--space-3) var(--space-4); }
+.card-benefits .row-main small { display: block; }
+.card-benefits li.is-locked strong { color: var(--color-text-muted); }
+.card-benefits .acct-badge { margin-left: var(--space-2); }
 .card-reasons { display: grid; gap: 0; margin: 0; padding: 0; border: 0; min-width: 0; }
 .btn-primary.is-danger { background: var(--color-danger); }
 .btn-primary.is-danger:hover:not(:disabled) { background: var(--color-danger); filter: brightness(0.92); }

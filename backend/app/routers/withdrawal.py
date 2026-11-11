@@ -46,9 +46,10 @@ from app.models import (
     UserConsent,
     WithdrawalCheck,
 )
-from app.routers.auth import _audit, _clear_session_cookie, consume_step_up
+from app.common.step_up import consume_step_up
+from app.routers.auth import _audit, _clear_session_cookie
 from app.rules import WITHDRAWAL_DATA_REVIEW_VERSION, now_kst
-from app.schemas import KstDatetime
+from app.common.naming import KstDatetime
 from app.security import new_id
 
 router = APIRouter(prefix="/users/me", tags=["withdrawal"])

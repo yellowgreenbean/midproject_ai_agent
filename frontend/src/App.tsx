@@ -20,6 +20,7 @@ import CardsPage from './pages/CardsPage'
 import CardDetailPage from './pages/CardDetailPage'
 import CardBillPage from './pages/CardBillPage'
 import CardApplyPage from './pages/CardApplyPage'
+import CardPointsPage from './pages/CardPointsPage'
 import TransferPage from './pages/TransferPage'
 import TransfersPage from './pages/TransfersPage'
 import ScheduledTransfersPage from './pages/ScheduledTransfersPage'
@@ -31,12 +32,13 @@ import ProfilePage from './pages/ProfilePage'
 import PasswordChangePage from './pages/PasswordChangePage'
 import PinPage from './pages/PinPage'
 import ConsentsPage from './pages/ConsentsPage'
+import TermsDetailPage from './pages/TermsDetailPage'
 import WithdrawPage from './pages/WithdrawPage'
 import TransferLimitsPage from './pages/TransferLimitsPage'
 
-const TITLES = { signup: '회원가입', login: '로그인', findId: '아이디 찾기', resetPassword: '비밀번호 재설정', home: '홈', products: '금융상품', product: '상품 상세', subscribe: '상품 가입', savings: '내 가입 상품', saving: '내 가입 상품', accounts: '내 계좌', accountOpen: '계좌 개설', account: '계좌 상세', notifications: '알림', transfer: '송금', transfers: '이체 결과', scheduled: '예약·자동이체', transferResult: '이체 결과', transactions: '거래내역', chat: '두린 챗봇', settings: '마이페이지', profile: '내 정보', password: '비밀번호 변경', pin: '간편 비밀번호', consents: '약관 및 동의 내역', withdraw: '회원 탈퇴', limits: '이체 한도', cards: '내 카드', card: '카드 상세', cardBill: '카드 청구서', cardApply: '카드 신청', soon: '준비 중' }
+const TITLES = { signup: '회원가입', login: '로그인', findId: '아이디 찾기', resetPassword: '비밀번호 재설정', home: '홈', products: '금융상품', product: '상품 상세', subscribe: '상품 가입', savings: '내 가입 상품', saving: '내 가입 상품', accounts: '내 계좌', accountOpen: '계좌 개설', account: '계좌 상세', notifications: '알림', transfer: '송금', transfers: '이체 결과', scheduled: '예약·자동이체', transferResult: '이체 결과', transactions: '거래내역', chat: '두린 챗봇', settings: '마이페이지', profile: '내 정보', password: '비밀번호 변경', pin: '간편 비밀번호', consents: '약관 및 동의 내역', termsDetail: '약관 보기', withdraw: '회원 탈퇴', limits: '이체 한도', cards: '내 카드', card: '카드 상세', cardBill: '카드 청구서', cardApply: '카드 신청', cardPoints: '카드 포인트', soon: '준비 중' }
 type Page = keyof typeof TITLES
-const PAGES: Record<string, Page> = { '/signup': 'signup', '/login': 'login', '/find-id': 'findId', '/reset-password': 'resetPassword', '/home': 'home', '/products': 'products', '/my/savings': 'savings', '/accounts': 'accounts', '/accounts/new': 'accountOpen', '/notifications': 'notifications', '/transfer': 'transfer', '/transfers': 'transfers', '/scheduled-transfers': 'scheduled', '/transactions': 'transactions', '/chat': 'chat', '/settings': 'settings', '/settings/profile': 'profile', '/settings/password': 'password', '/settings/pin': 'pin', '/settings/terms': 'consents', '/settings/withdraw': 'withdraw', '/settings/limits': 'limits', '/cards': 'cards', '/cards/apply': 'cardApply' }
+const PAGES: Record<string, Page> = { '/signup': 'signup', '/login': 'login', '/find-id': 'findId', '/reset-password': 'resetPassword', '/home': 'home', '/products': 'products', '/my/savings': 'savings', '/accounts': 'accounts', '/accounts/new': 'accountOpen', '/notifications': 'notifications', '/transfer': 'transfer', '/transfers': 'transfers', '/scheduled-transfers': 'scheduled', '/transactions': 'transactions', '/chat': 'chat', '/settings': 'settings', '/settings/profile': 'profile', '/settings/password': 'password', '/settings/pin': 'pin', '/settings/terms': 'consents', '/settings/withdraw': 'withdraw', '/settings/limits': 'limits', '/cards': 'cards', '/cards/apply': 'cardApply', '/cards/points': 'cardPoints' }
 
 export default function App() {
   const [hash, setHash] = useState(location.hash)
@@ -56,7 +58,8 @@ export default function App() {
   const transfer = path.match(/^\/transfers\/([\w-]+)$/)
   const card = path.match(/^\/cards\/([\w-]+)$/)
   const bill = path.match(/^\/card-bills\/([\w-]+)$/)
-  const page: Page = PAGES[path] ?? (product ? (product[2] ? 'subscribe' : 'product') : saving ? 'saving' : account ? 'account' : transfer ? 'transferResult' : card ? 'card' : bill ? 'cardBill' : 'soon')
+  const terms = path.match(/^\/settings\/terms\/([\w-]+)$/)
+  const page: Page = PAGES[path] ?? (product ? (product[2] ? 'subscribe' : 'product') : saving ? 'saving' : account ? 'account' : transfer ? 'transferResult' : card ? 'card' : bill ? 'cardBill' : terms ? 'termsDetail' : 'soon')
   useEffect(() => {
     document.title = `두린뱅크 · ${TITLES[page]}`
   }, [page])
@@ -81,11 +84,13 @@ export default function App() {
   if (page === 'password') return <PasswordChangePage />
   if (page === 'pin') return <PinPage />
   if (page === 'consents') return <ConsentsPage />
+  if (page === 'termsDetail' && terms) return <TermsDetailPage key={terms[1]} id={terms[1]} />
   if (page === 'withdraw') return <WithdrawPage />
   if (page === 'limits') return <TransferLimitsPage />
   if (page === 'transferResult' && transfer) return <TransferResultPage key={transfer[1]} id={transfer[1]} />
   if (page === 'cards') return <CardsPage />
   if (page === 'cardApply') return <CardApplyPage />
+  if (page === 'cardPoints') return <CardPointsPage />
   if (page === 'card' && card) return <CardDetailPage key={card[1]} id={card[1]} />
   if (page === 'cardBill' && bill) return <CardBillPage key={bill[1]} id={bill[1]} />
   if (page === 'saving' && saving) return <SavingDetailPage key={saving[1]} id={saving[1]} />

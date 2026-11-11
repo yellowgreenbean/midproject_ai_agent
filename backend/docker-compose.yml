@@ -6,7 +6,7 @@
 #
 # 첫 기동(빈 볼륨) 때 db/init 의 파일을 이름 순서로 한 번만 실행한다.
 #   01_test_db.sql  테스트 전용 DB midproject_test 만들기 (표는 테스트가 직접 만듦)
-#   02_schema.sh    기획서 스키마 ../docs/sql/00~07 (표 60개 + 보기 1개)을 midproject 에 만들기
+#   02_schema.sh    기획서 스키마 ../docs/sql/00~07 (표 61개 + 보기 1개)을 midproject 에 만들기
 # 데이터는 넣지 않는다(표만 생김). 더미 데이터는 ../data/dummy 에서 따로 넣는다.
 #
 #   docker compose up -d --wait     # 띄우기 (healthy = 스키마까지 다 만들어짐)

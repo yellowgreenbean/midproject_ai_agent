@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import AppShell from '../components/AppShell'
 import Icon from '../components/Icon'
 import CardApplications from './CardApplications'
-import { getCardApplications, getCardBills, getMyCards, type Card, type CardApplication, type CardBill } from '../api'
+import { getCardApplications, getCardBills, getCardPoints, getMyCards, type Card, type CardApplication, type CardBill, type CardPoint } from '../api'
 import { won } from '../productRules'
 import { BILL_STATUS_LABEL, CARD_STATUS_LABEL, CARD_TYPE_LABEL, groupByPaymentDate, md } from '../cardRules'
 import { cardArtOf } from './cardArt'
@@ -56,6 +56,7 @@ export default function CardsPage() {
   const [cards, setCards] = useState<Card[] | 'guest' | null>(null)
   const [bills, setBills] = useState<CardBill[]>([])
   const [apps, setApps] = useState<CardApplication[]>([])
+  const [points, setPoints] = useState<CardPoint[]>([])
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
 
@@ -68,6 +69,7 @@ export default function CardsPage() {
     // 청구서·신청은 곁들이는 정보 — 못 불러오면 그 구역만 빈다
     void getCardBills().then((r) => r.success && setBills(r.data))
     void getCardApplications().then((r) => r.success && setApps(r.data))
+    void getCardPoints().then((r) => r.success && setPoints(r.data.points))
   }
   useEffect(load, [])
 
@@ -80,6 +82,8 @@ export default function CardsPage() {
 
   const { upcoming, past } = groupByPaymentDate(bills)
   const nextDue = upcoming.find((g) => g.due > 0)
+  const pointTotal = points.reduce((n, p) => n + p.balance, 0)
+  const expiring = points.find((p) => p.expiringAmount > 0 && p.expiringDate)
   const working = apps.filter((a) => a.status !== 'ACTIVATED' && a.status !== 'CANCELED' && a.status !== 'REJECTED')
 
   return (
@@ -129,6 +133,22 @@ export default function CardsPage() {
         <p className="prod-ok" role="status">
           {notice}
         </p>
+      )}
+
+      {/* 숨은 카드 포인트 (CARD-F12) — 포인트가 있는 회원에게만 */}
+      {Array.isArray(cards) && points.length > 0 && (
+        <ul className="panel rows">
+          <li>
+            <a href="#/cards/points">
+              <span className="row-main">
+                <strong>숨은 카드 포인트 {pointTotal.toLocaleString('ko-KR')}P</strong>
+                <small>{pointTotal > 0 ? `현금 ${won(pointTotal)}으로 바꿔 내 계좌로 받을 수 있어요` : '바꿀 포인트가 없어요 · 현금화 내역 보기'}</small>
+                {expiring && pointTotal > 0 && <small className="card-warn">{md(expiring.expiringDate!)}에 사라지는 포인트가 있어요</small>}
+              </span>
+              <Icon name="chevron" size={18} />
+            </a>
+          </li>
+        </ul>
       )}
 
       {working.length > 0 && (

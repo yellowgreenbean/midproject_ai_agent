@@ -49,7 +49,7 @@ from app.rules import (
     USERNAME_RE,
     now_kst,
 )
-from app.schemas import KstDatetime
+from app.common.naming import KstDatetime
 from app.security import digest, hash_password, new_email_code, new_id
 
 router = APIRouter(tags=["signup"])

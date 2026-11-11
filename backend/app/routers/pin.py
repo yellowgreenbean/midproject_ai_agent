@@ -30,9 +30,10 @@ from sqlalchemy import update
 from app.deps import DB, Login, get_current_login
 from app.errors import ApiError
 from app.models import Notification, PinCredential, StepUpChallenge
-from app.routers.auth import _audit, consume_step_up, pin_not_set
+from app.common.step_up import consume_step_up
+from app.routers.auth import _audit, pin_not_set
 from app.rules import now_kst, pin_error
-from app.schemas import KstDatetime
+from app.common.naming import KstDatetime
 from app.security import hash_password, new_id, verify_password
 
 router = APIRouter(prefix="/auth/pin", tags=["pin"])

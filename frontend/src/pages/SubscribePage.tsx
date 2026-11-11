@@ -10,13 +10,25 @@ import {
   validateSubscription,
   type Account,
   type Estimate,
+  type PaymentType,
   type ProductDetail,
   type Subscription,
 } from '../api'
 import { StepUpField } from './StepUp'
 import { useStepUp } from './useStepUp'
-import { defaultMonths, digitsOnly, isDayUnit, monthOptions, won, ymd } from '../productRules'
+import {
+  defaultMonths,
+  defaultPaymentType,
+  digitsOnly,
+  isDayUnit,
+  monthOptions,
+  PAYMENT_TYPE_HINT,
+  PAYMENT_TYPE_LABEL,
+  won,
+  ymd,
+} from '../productRules'
 import { TYPE_LABEL } from './productArt'
+import ProductTerms from './ProductTerms'
 import './ProductPages.css'
 
 type Step = 'form' | 'confirm' | 'done'
@@ -33,6 +45,7 @@ export default function SubscribePage({ id, query }: { id: string; query: URLSea
   const [amount, setAmount] = useState(digitsOnly(query.get('amount') ?? ''))
   const [months, setMonths] = useState(Number(query.get('months')) || 0)
   const [days, setDays] = useState(digitsOnly(query.get('days') ?? ''))
+  const [paymentType, setPaymentType] = useState<PaymentType | null>(null) // 적금만 — 정액·자유 둘 다 되는 상품은 직접 고른다
   const [est, setEst] = useState<Estimate | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const auth = useStepUp()
@@ -51,6 +64,7 @@ export default function SubscribePage({ id, query }: { id: string; query: URLSea
       setLoad({ p: prod.data, accounts: usable })
       setAccountId((cur) => cur || usable[0]?.id || '')
       setMonths((cur) => (monthOptions(prod.data).includes(cur) ? cur : defaultMonths(monthOptions(prod.data))))
+      setPaymentType(defaultPaymentType(prod.data.paymentTypes))
     })()
   }, [id])
 
@@ -85,13 +99,16 @@ export default function SubscribePage({ id, query }: { id: string; query: URLSea
   const account = accounts.find((a) => a.id === accountId)
   const byDay = isDayUnit(p)
   const period = byDay ? { months: 0, days: Number(days) } : { months }
+  const fixed = paymentType === 'FIXED'
+  const amountLabel = deposit ? '맡길 돈' : fixed ? '매달 넣을 돈' : '오늘 넣을 돈 (첫 납입)'
 
   async function onCheck(e: FormEvent) {
     e.preventDefault()
     if (!accountId) return setFormError('출금할 입출금 계좌가 없어요. 먼저 계좌를 만들어 주세요.')
-    if (!amount) return setFormError(`${deposit ? '예치금' : '월 납입액'}을 입력해 주세요.`)
+    if (!deposit && !paymentType) return setFormError('납입 방식을 골라 주세요.')
+    if (!amount) return setFormError(`${amountLabel}을 입력해 주세요.`)
     setBusy(true)
-    const r = await validateSubscription(p.id, accountId, Number(amount), period)
+    const r = await validateSubscription(p.id, accountId, Number(amount), period, paymentType)
     setBusy(false)
     if (!r.success) return setFormError(r.error.message)
     setFormError(null)
@@ -109,7 +126,7 @@ export default function SubscribePage({ id, query }: { id: string; query: URLSea
       setBusy(false)
       return setFormError(ch.error.message)
     }
-    const r = await subscribe({ productId: p.id, accountId, amount: Number(amount), term: period, stepUpChallengeId: ch.data }, key)
+    const r = await subscribe({ productId: p.id, accountId, amount: Number(amount), term: period, stepUpChallengeId: ch.data, paymentType }, key)
     setBusy(false)
     auth.setValue('')
     if (!r.success) return setFormError(r.error.message)
@@ -159,7 +176,27 @@ export default function SubscribePage({ id, query }: { id: string; query: URLSea
               </select>
             )}
           </Field>
-          <Field id="sub-amount" label={deposit ? '맡길 돈' : '첫 달에 넣을 돈'} message={formError ? { tone: 'error', text: formError } : null}>
+          {!deposit && (
+            <fieldset className="prod-pay-type">
+              <legend className="field-label">납입 방식</legend>
+              {p.paymentTypes.map((t) => (
+                <label key={t} className="check">
+                  <input
+                    type="radio"
+                    name="payment-type"
+                    value={t}
+                    checked={paymentType === t}
+                    onChange={() => setPaymentType(t)}
+                    disabled={p.paymentTypes.length === 1}
+                  />
+                  <span>
+                    <strong>{PAYMENT_TYPE_LABEL[t]}</strong> · {PAYMENT_TYPE_HINT[t]}
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+          )}
+          <Field id="sub-amount" label={amountLabel} message={formError ? { tone: 'error', text: formError } : null}>
             <div className="input-wrap">
               <input
                 id="sub-amount"
@@ -217,11 +254,14 @@ export default function SubscribePage({ id, query }: { id: string; query: URLSea
               <dt>오늘 출금</dt>
               <dd>{won(est.firstPayment)}</dd>
             </div>
-            {!deposit && (
+            {!deposit && paymentType && (
               <div>
-                <dt>매달 직접 넣을 돈</dt>
+                <dt>납입 방식</dt>
                 <dd>
-                  {won(est.firstPayment)} × {months}개월 (다음 달부터는 자동으로 빠지지 않아요)
+                  {PAYMENT_TYPE_LABEL[paymentType]} ·{' '}
+                  {fixed
+                    ? `매달 ${won(est.firstPayment)}씩 ${months}회 (다음 회차부터는 가입 상세에서 직접 넣어요)`
+                    : '다음 회차부터는 한 달 한도 안에서 가입 상세에서 자유롭게 넣어요'}
                 </dd>
               </div>
             )}
@@ -244,6 +284,12 @@ export default function SubscribePage({ id, query }: { id: string; query: URLSea
             <p className="prod-warn" role="note">
               중도 해지할 수 없는 상품이에요.
             </p>
+          )}
+          {p.terms.length > 0 && (
+            <div className="prod-terms-box">
+              <p className="prod-fine">이 가입에는 아래 약관이 적용돼요. 가입 전에 확인해 주세요.</p>
+              <ProductTerms productId={p.id} terms={p.terms} />
+            </div>
           )}
           <StepUpField auth={auth} id="sub-password" message={formError ? { tone: 'error', text: formError } : null} />
           <div className="prod-actions">

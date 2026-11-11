@@ -19,7 +19,7 @@ import {
 import { StepUpField } from './StepUp'
 import { useStepUp } from './useStepUp'
 import { won } from '../productRules'
-import { BILL_STATUS_LABEL, CARD_STATUS_LABEL, CARD_TYPE_LABEL, dots, expiry, md } from '../cardRules'
+import { BILL_STATUS_LABEL, CARD_STATUS_LABEL, CARD_TYPE_LABEL, dots, expiry, md, performanceText } from '../cardRules'
 import { cardArtOf } from './cardArt'
 import './ProductPages.css'
 import './AccountPages.css'
@@ -154,7 +154,8 @@ export default function CardDetailPage({ id }: { id: string }) {
           </span>
           <h2 id="card-name">{c.name}</h2>
           <p className="prod-sub">
-            {c.companyName} · {c.number} · 유효기간 {expiry(c.expiresAt)}
+            {c.companyName} · {c.number}
+            {c.expiresAt && ` · 유효기간 ${expiry(c.expiresAt)}`}
           </p>
         </div>
         <div className="acct-hero-bal">
@@ -245,7 +246,7 @@ export default function CardDetailPage({ id }: { id: string }) {
               </div>
               <div>
                 <dt>유효기간</dt>
-                <dd>{expiry(c.expiresAt)}</dd>
+                <dd>{c.expiresAt ? expiry(c.expiresAt) : '정보 없음'}</dd>
               </div>
               <div>
                 <dt>연회비</dt>
@@ -262,14 +263,27 @@ export default function CardDetailPage({ id }: { id: string }) {
                 </span>
                 혜택
               </h2>
+              {c.performance.map((p) => (
+                <p key={p.period} className={p.tierLevel === null ? 'prod-warn' : 'prod-ok'}>
+                  {performanceText(p)}
+                </p>
+              ))}
               <ul className="panel rows card-benefits">
                 {c.benefits.map((b) => (
-                  <li key={b.category}>
+                  <li key={b.id} className={b.achieved ? undefined : 'is-locked'}>
                     <span className="row-main">
                       <strong>
-                        {b.category} {b.rate}% 할인
+                        {b.title}
+                        {!b.achieved && <span className="acct-badge">실적 미달</span>}
                       </strong>
-                      {b.monthlyLimit !== null && <small>한 달 {won(b.monthlyLimit)}까지</small>}
+                      {b.conditions.length > 0 && <small>{b.conditions.join(' · ')}</small>}
+                      {(b.monthlyLimit !== null || b.limitGroup) && (
+                        <small>
+                          {[b.monthlyLimit !== null && `한 달 ${won(b.monthlyLimit)}까지`, b.limitGroup && `${b.limitGroup.name} 한 달 ${won(b.limitGroup.monthlyLimit)}까지`]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </small>
+                      )}
                     </span>
                   </li>
                 ))}

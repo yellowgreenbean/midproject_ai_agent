@@ -107,8 +107,8 @@ function LimitForm({ limit, onSaved, onCancel }: { limit: TransferLimit; onSaved
     if (raising && auth.missing) return setFormError(auth.missing)
     setBusy(true)
     setFormError(null)
-    const ch = raising ? await auth.verify('PROFILE_CHANGE') : null
-    const r = ch && !ch.success ? ch : await setTransferLimit(id, p, d, ch?.data)
+    const ch = raising ? await auth.verify('TRANSFER') : null
+    const r = ch && !ch.success ? ch : await setTransferLimit(limit, p, d, ch?.data)
     setBusy(false)
     if (r.success) onSaved(r.data)
     else setFormError(r.error.message)

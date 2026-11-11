@@ -1,4 +1,4 @@
-"""기획서 스키마(docs/sql/01~07) 표 60개 + 보기 1개의 SQLAlchemy 모델.
+"""기획서 스키마(docs/sql/01~07) 표 61개 + 보기 1개의 SQLAlchemy 모델.
 
 scripts/gen_models.py 가 만든 파일이다. 손으로 고치지 말 것.
 쓰는 법: from app.models import Account, Transaction ...
@@ -47,6 +47,7 @@ from app.models.card_products import (  # docs/sql/05_card_products.sql
     Category,
     CardProduct,
     CardPerformanceTier,
+    CardBenefitLimitGroup,
     CardBenefit,
     Terms,
     UserConsent,
@@ -117,6 +118,7 @@ __all__ = [
     "Category",
     "CardProduct",
     "CardPerformanceTier",
+    "CardBenefitLimitGroup",
     "CardBenefit",
     "Terms",
     "UserConsent",

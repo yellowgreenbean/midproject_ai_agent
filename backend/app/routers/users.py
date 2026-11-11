@@ -10,7 +10,8 @@ from datetime import date
 from fastapi import APIRouter
 
 from app.deps import LoginUser
-from app.schemas import ORM, KstDatetime
+from app.common.naming import KstDatetime
+from app.schemas import ORM
 
 router = APIRouter(tags=["users"])
 

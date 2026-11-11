@@ -6,6 +6,11 @@ KST = timezone(timedelta(hours=9))
 
 OUR_BANK = "두린은행"
 
+# Part 2 ACCT-F01 계좌 개설 — 유형별 기본 계좌 이름(resAccountName, 더미 accounts.json 과 같음)과 계좌번호 모양
+ACCOUNT_PRODUCT_NAMES = {"CHECKING": "입출금통장", "SAVINGS": "저축예금"}
+ACCOUNT_NUMBER_PREFIX = "110"  # 더미 계좌번호가 모두 110 으로 시작하는 14자리 (BANK_ACCOUNT_DIGITS[OUR_BANK])
+ACCOUNT_OPEN_CONSENT = "required_terms"  # 예금거래기본약관 · 입출금이 자유로운 예금 약관 (data/rag/terms/) 묶음 동의 (Part 2 9.1)
+
 # Part 5 3장 「거래 유형」: 내역 표시 + (입금) 인 type. 나머지는 − (출금)
 INCOMING_TYPES = ("TRANSFER_IN", "POINT_CASHOUT", "SUBSCRIPTION_PAYOUT")
 
@@ -44,6 +49,26 @@ TRANSFER_FAILURE_MESSAGES = {  # Part 5 9장 실패 사유 코드 → 사용자 
     "ACCOUNT_NOT_ACTIVE": "거래할 수 없는 계좌예요.",
     "SYSTEM_ERROR": "이체가 완료되지 않았어요. 잠시 후 다시 시도해 주세요.",
 }
+
+# Part 5 4장 「금액 오입력 방지」 재확인 화면 경고 — 기획서 예시 값 그대로(사용자 결정 2026-11-10)
+WARN_FIRST_LARGE = 1_000_000  # 처음 보내는 받는 분에게 이 금액 이상
+WARN_USUAL_MULTIPLE = 10  # 같은 받는 분에게 보낸 이전 금액 평균의 이 배수 이상
+WARN_RECENT_SAME = timedelta(minutes=10)  # 같은 받는 분·같은 금액을 이 시간 안에 또
+
+# Part 5 6장 간편 송금 목록 크기
+RECENT_TARGETS_MAX = 10
+FAVORITE_ACCOUNTS_MAX = 20
+
+# Part 5 8장 예약 송금·자동이체
+SCHEDULE_STEP_MINUTES = 10  # 실행 시각은 10분 단위
+SCHEDULE_MIN_AHEAD = timedelta(minutes=10)  # 지금부터 10분 이후 ~
+SCHEDULE_MAX_AHEAD = timedelta(days=365)  # ~ 1년 이내. 변경·취소도 실행 10분 전까지
+AUTO_TRANSFER_HOUR = 6  # 자동이체는 지정일 06:00 (사용자 결정 2026-11-10: 재시도·연속 실패 정지 없음)
+LAST_DAY_OF_MONTH = 99  # day_of_month 99 = 말일
+
+# Part 5 4장 TRX-F13 한도 변경 상한 — 모의 값(사용자 결정 2026-11-10). 올릴 때만 본인 확인(TRANSFER), 1만 원 단위(화면 안내)
+MAX_PER_TRANSFER_LIMIT = 100_000_000
+MAX_DAILY_LIMIT = 500_000_000
 
 
 # --- 로그인 세션 (Part 1 AUTH-F05 「세션 만료(유휴/최대)」, 12장 「세션」) ---------------------------
@@ -111,6 +136,16 @@ USERNAME_VISIBLE = 3  # 아이디 찾기 결과에서 보여 줄 앞 글자 수 
 # ② 「삭제될 데이터」 안내문 버전. 화면(frontend/src/pages/WithdrawPage.tsx 의 DATA_GROUPS)을 바꾸면 같이 올린다 → 예전 확인은 무효
 WITHDRAWAL_DATA_REVIEW_VERSION = "2026-11-09"
 WITHDRAWN_NAME = "탈퇴회원"  # 탈퇴 1개월 뒤 가명 처리 때 이름 (아이디는 다른 사람이 못 쓰게 그대로 둔다)
+
+
+# --- 카드 포인트 · 연회비 (Part 4 1-1-7 · 1-1-8, CARD-F12·F13) — 사용자 결정 2026-11-11 --------------------------
+POINT_EXPIRY_ALERT_DAYS = 30  # 포인트 소멸 며칠 전에 알릴지 (한 번)
+ANNUAL_FEE_ALERT_DAYS = 30  # 연회비 청구 며칠 전에 알릴지 (한 번, 기획서 「D-30」)
+
+
+def next_year(d: date) -> date:
+    """1년 뒤 같은 날 (2월 29일은 2월 28일) — 연회비 청구일은 발급일 기준 매년 (1-1-8)."""
+    return d.replace(year=d.year + 1, day=28) if (d.month, d.day) == (2, 29) else d.replace(year=d.year + 1)
 
 
 def now_kst() -> datetime:

@@ -10,7 +10,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Path, Query
 from sqlalchemy import and_, or_, select
 
-from app.crud import get_owned_account_or_404
+from app.common.ownership import get_owned_account_or_404
 from app.deps import DB, CurrentUserId
 from app.errors import ApiError, not_found
 from app.models import Account, Transaction

@@ -223,3 +223,11 @@ button.trf-pick { flex-direction: row; align-items: center; gap: var(--space-3);
   .trf-layout .trf-step { flex: 1; margin: 0; }
   .trf-receipt { position: sticky; top: var(--space-6); flex: none; width: 320px; margin-top: var(--space-6); }
 }
+
+/* 재확인 화면 「언제 보낼까요?」 — 지금 · 예약 · 매달 (Part 5 5·8장) */
+.trf-when { display: grid; gap: var(--space-3); padding: var(--space-5); border: 0; margin: 0; }
+.trf-when legend { font-weight: 700; padding: 0; margin-bottom: var(--space-2); }
+.trf-when-modes { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.trf-when-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-3); }
+/* 이체확인증 (TRX-F06) */
+.trf-receipt-doc { border-top: 1px dashed var(--color-border); padding-top: var(--space-4); }

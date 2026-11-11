@@ -29,7 +29,7 @@ import psycopg  # noqa: E402
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
 
-from app.db import engine  # noqa: E402
+from app.common.db import engine  # noqa: E402
 from app.main import app  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]

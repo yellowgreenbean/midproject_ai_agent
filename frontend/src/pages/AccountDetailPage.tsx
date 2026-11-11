@@ -4,6 +4,7 @@ import AppShell from '../components/AppShell'
 import Field from '../components/Field'
 import Icon from '../components/Icon'
 import AccountTransactions from './AccountTransactions'
+import AccountTransfers from './AccountTransfers'
 import { changeAccountStatus, getAccount, getBalance, setAccountNotifications, updateAccountPreferences, type AccountDetail } from '../api'
 import { StepUpField } from './StepUp'
 import { useStepUp } from './useStepUp'
@@ -186,7 +187,10 @@ export default function AccountDetailPage({ id }: { id: string }) {
       {closed && <p className="prod-warn">해지한 계좌예요. 기록만 볼 수 있어요.</p>}
 
       <div className="acct-body">
-        <AccountTransactions id={id} />
+        <div>
+          <AccountTransactions id={id} />
+          <AccountTransfers id={id} />
+        </div>
         <div className="acct-side">
       <section aria-labelledby="acct-info">
         <h2 id="acct-info" className="section-title">

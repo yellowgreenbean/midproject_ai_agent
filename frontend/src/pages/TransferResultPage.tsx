@@ -1,7 +1,7 @@
-// 이체 결과 (docs/기획서.md Part 5 TRX-F02 · 5장 완료 화면 · 9장 상태) — 성공이면 받은 분·금액·거래 후 잔액, 실패면 사유 + 다시 보내기
+// 이체 결과 (docs/기획서.md Part 5 TRX-F02 · 5장 완료 화면 · 9장 상태) — 성공이면 받은 분·금액·거래 후 잔액 + 이체확인증(TRX-F06), 실패면 사유 + 다시 보내기
 import { useEffect, useState } from 'react'
 import AppShell from '../components/AppShell'
-import { addFavorite, getTransfer, type Transfer } from '../api'
+import { addFavorite, getTransfer, getTransferReceipt, type Transfer, type TransferReceipt } from '../api'
 import { won } from '../productRules'
 import { STATUS_LABEL, when } from './transferArt'
 import './ProductPages.css'
@@ -12,11 +12,12 @@ export default function TransferResultPage({ id }: { id: string }) {
   const [error, setError] = useState<string | null>(null)
   const [fav, setFav] = useState<'idle' | 'busy' | 'done'>('idle')
   const [favError, setFavError] = useState<string | null>(null)
+  const [receipt, setReceipt] = useState<TransferReceipt | null>(null)
   useEffect(() => {
     void getTransfer(id).then((r) => (r.success ? setT(r.data) : setError(r.error.message)))
   }, [id])
 
-  const resend = t && `#/transfer?${new URLSearchParams({ from: t.fromAccountId, to: t.toAccountNo, amount: String(t.amount) })}`
+  const resend = t && `#/transfer?${new URLSearchParams({ from: t.fromAccountId, bank: t.toBank, to: t.toAccountNo, amount: String(t.amount) })}`
   return (
     <AppShell title="이체 결과" current="#/transfer" busy={!t && !error}>
       {error && (
@@ -89,13 +90,22 @@ export default function TransferResultPage({ id }: { id: string }) {
                 disabled={fav !== 'idle'}
                 onClick={() => {
                   setFav('busy')
-                  void addFavorite(t.toAccountNo).then((r) => {
+                  void addFavorite(t.toAccountNo, t.toBank).then((r) => {
                     setFav(r.success ? 'done' : 'idle')
                     setFavError(r.success ? null : r.error.message)
                   })
                 }}
               >
                 {fav === 'done' ? '자주 쓰는 계좌에 담았어요' : '자주 쓰는 계좌에 추가'}
+              </button>
+            )}
+            {t.status === 'SUCCESS' && !receipt && (
+              <button
+                type="button"
+                className="btn-pill"
+                onClick={() => void getTransferReceipt(t.id).then((r) => (r.success ? setReceipt(r.data) : setFavError(r.error.message)))}
+              >
+                이체확인증 보기
               </button>
             )}
             {t.status === 'FAILED' && resend && (
@@ -110,6 +120,43 @@ export default function TransferResultPage({ id }: { id: string }) {
               내 계좌 보기
             </a>
           </div>
+          {receipt && (
+            <section className="trf-receipt-doc" aria-labelledby="receipt-title">
+              <h3 id="receipt-title">이체확인증</h3>
+              <dl className="prod-dl">
+                <div>
+                  <dt>이체 일시</dt>
+                  <dd>{when(receipt.completedAt)}</dd>
+                </div>
+                <div>
+                  <dt>보낸 분</dt>
+                  <dd>
+                    {receipt.senderName} · 두린은행 {receipt.fromAccount}
+                  </dd>
+                </div>
+                <div>
+                  <dt>받는 분</dt>
+                  <dd>
+                    {receipt.toHolderName} · {receipt.toBank} {receipt.toAccount}
+                  </dd>
+                </div>
+                <div>
+                  <dt>금액 · 수수료</dt>
+                  <dd>
+                    {won(receipt.amount)} · {won(receipt.fee)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>처리 결과</dt>
+                  <dd>{STATUS_LABEL[receipt.status as Transfer['status']]}</dd>
+                </div>
+                <div>
+                  <dt>이체 번호</dt>
+                  <dd>{receipt.transferId}</dd>
+                </div>
+              </dl>
+            </section>
+          )}
         </div>
       )}
     </AppShell>

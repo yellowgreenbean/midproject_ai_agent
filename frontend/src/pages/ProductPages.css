@@ -113,6 +113,17 @@
 .prod-dl > div { display: grid; grid-template-columns: 96px 1fr; gap: var(--space-3); font-size: var(--text-sm); }
 .prod-dl dt { color: var(--color-text-muted); }
 .prod-dl dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+/* 상품 약관 — 제목 + 「자세히 보기」 (상세 화면 · 가입 확인 화면) */
+.prod-terms { margin: 0; padding: 0; list-style: none; }
+.prod-terms > li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-4) var(--space-5); font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.prod-terms > li + li { border-top: 1px solid var(--color-border); }
+.prod-terms > li > span { min-width: 0; overflow-wrap: anywhere; }
+.prod-terms-more { display: inline-flex; flex: none; align-items: center; gap: 2px; padding: var(--space-1); border: 0; border-radius: var(--radius-xs); background: none; color: var(--color-primary); font: inherit; font-size: var(--text-xs); font-weight: var(--weight-bold); cursor: pointer; }
+.prod-terms-more:hover { text-decoration: underline; text-underline-offset: 2px; }
+.prod-terms-more:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.prod-terms-box { display: flex; flex-direction: column; gap: var(--space-2); }
+.prod-terms-box .prod-terms { border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.prod-terms-box .prod-terms > li { padding: var(--space-3) var(--space-4); }
 .prod-notes { margin: 0; padding: var(--space-5) var(--space-4) var(--space-5) var(--space-8); color: var(--color-text-sub); font-size: var(--text-sm); line-height: 1.6; }
 
 /* 계산 · 가입 폼 */
@@ -153,3 +164,39 @@
   .prod-hero-art { width: 96px; height: 96px; }
   .prod-info { grid-template-columns: 1fr 1fr; }
 }
+/* 내 예금·적금 — 통장 그림이 보이는 큰 카드, 768px 부터 한 줄에 2개 */
+.sav-grid { display: grid; gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+.sav-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  height: 100%;
+  padding: var(--space-6);
+  transition: transform 0.15s ease;
+}
+.sav-card:hover { transform: translateY(-2px); }
+.sav-card.is-done { opacity: 0.7; }
+.sav-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.sav-status { color: var(--color-text-sub); font-size: var(--text-sm); font-weight: var(--weight-medium); }
+.sav-art { align-self: center; width: 200px; height: 200px; margin: calc(-1 * var(--space-2)) 0; object-fit: contain; } /* 그림 파일 안에 여백이 있어 위아래를 조금 당긴다 */
+.sav-name { font-size: var(--text-lg); }
+.sav-label { margin-top: var(--space-3); color: var(--color-text-muted); font-size: var(--text-xs); }
+.sav-amount { font-size: var(--text-2xl); font-weight: var(--weight-bold); letter-spacing: -0.02em; }
+.sav-sub { color: var(--color-text-sub); font-size: var(--text-sm); }
+.sav-due { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-4); }
+.sav-due,
+.sav-card.is-done .sav-sub { padding-bottom: var(--space-4); } /* 아래 줄(출금 계좌)과 띄운다 — 줄은 카드 바닥에 붙는다 */
+.sav-due .sav-progress { max-width: none; height: 8px; margin: 0; } /* .acct-progress 의 240px 제한을 푼다 */
+.sav-due-text { display: flex; justify-content: space-between; color: var(--color-text-sub); font-size: var(--text-sm); }
+.sav-due-text strong { color: var(--color-primary); }
+.sav-card .pc-foot { margin-top: auto; padding-top: var(--space-4); }
+.sav-card .pc-foot > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (min-width: 768px) { .sav-grid { grid-template-columns: 1fr 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  .sav-card { transition: none; }
+  .sav-card:hover { transform: none; }
+}
+
+
+/* 가입 — 적금 납입 방식 고르기 (정액적립식 · 자유적립식) */
+.prod-pay-type { display: grid; gap: 0; margin: 0; padding: 0; border: 0; min-width: 0; }

@@ -1,8 +1,7 @@
 """API 응답 모양 — 기획서 Part 6 C-5 「이름·형식 규칙」을 따른다.
 
 - 이름: snake_case, 단 계좌·CODEF 에서 온 칸은 CODEF 이름 그대로(resAccount ...)
-- 금액: DB 는 원 단위 정수, API 응답은 문자열   → Money          "amount": "50000"
-- 시각: ISO 8601 한국 시간                      → KstDatetime    "2026-11-03T13:24:00+09:00"
+- 금액·시각 형식(Money · KstDatetime)은 app/common/naming
 - 빈 값: 우리가 만든 칸은 null, CODEF 의 res… 칸은 빈 문자열 ""  → CodefStr
 - 날짜 문자열(YYYYMMDD 등)은 DB 값 그대로
 """
@@ -12,18 +11,10 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, PlainSerializer, computed_field
 
-from app.rules import INCOMING_TYPES, KST
+from app.common.naming import KstDatetime, Money
+from app.rules import INCOMING_TYPES
 
 
-def _to_kst_iso(v: datetime) -> str:
-    # DB 에는 한국 시각이 시간대 없이 저장돼 있으므로 +09:00 을 붙여 내보낸다.
-    if v.tzinfo is None:
-        v = v.replace(tzinfo=KST)
-    return v.astimezone(KST).isoformat()
-
-
-KstDatetime = Annotated[datetime, PlainSerializer(_to_kst_iso, return_type=str)]
-Money = Annotated[int, PlainSerializer(str, return_type=str)]
 CodefStr = Annotated[str | None, PlainSerializer(lambda v: v or "", return_type=str)]
 
 
@@ -58,6 +49,14 @@ class AccountOut(ORM):
     resAccountCurrency: str
     resAccountBalance: Money
     balance_as_of: str
+
+
+class AccountDetailOut(AccountOut):
+    """계좌 상세 = 목록 한 줄 + 지금 해지를 막는 사유 (ACCT-F05, 9.3 사유 코드). 해지한 계좌는 빈 목록.
+    화면이 [계좌 해지]를 누르자마자(본인 확인 전에) 막힌 이유를 보여 주려고 상세에 같이 싣는다."""
+
+    close_blockers: list[str]
+    notifications_enabled: bool  # 입출금 알림 켬 (ACCT-F06, 설정 행이 없으면 켬)
 
 
 # --- 거래 (Part 5) ---------------------------------------------------------------
@@ -146,6 +145,7 @@ class FavoriteAccountOut(ORM):
     holder_name: str
     nickname: str | None
     sort_order: int
+    account_display: str  # 두린은행은 하이픈 넣은 번호, 타행은 번호 그대로
 
 
 class TransferTargetOut(BaseModel):

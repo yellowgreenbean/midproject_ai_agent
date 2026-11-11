@@ -7,6 +7,8 @@ import './ProductPages.css'
 import './AccountPages.css'
 import './SettingsPages.css'
 
+const MARKETING_TERMS_ID = 'trm_004' // 마케팅 정보 수신 동의 (선택) — scripts/seed_scenarios.py 가입 약관
+
 type Row = { icon: IconName; label: string; href?: string; value?: string; soon?: boolean }
 const GROUPS: { title: string; rows: Row[] }[] = [
   {
@@ -30,15 +32,15 @@ export default function SettingsPage() {
     void getProfile().then((r) => {
       if (!r.success) return r.error.code === 'UNAUTHENTICATED' ? setMe('guest') : setError(r.error.message)
       setMe(r.data)
-      void getConsents().then((c) => c.success && setMarketing(c.data.find((x) => x.termsId === 'marketing')?.agreed ?? false))
+      void getConsents().then((c) => c.success && setMarketing(c.data.find((x) => x.termsId === MARKETING_TERMS_ID)?.agreed ?? false))
     })
   }, [])
 
   async function toggleMarketing() {
     if (marketing === null) return
-    const r = await setConsent('marketing', !marketing)
+    const r = await setConsent(MARKETING_TERMS_ID, !marketing)
     if (!r.success) return setError(r.error.message)
-    setMarketing(r.data.find((x) => x.termsId === 'marketing')?.agreed ?? false)
+    setMarketing(r.data.find((x) => x.termsId === MARKETING_TERMS_ID)?.agreed ?? false)
   }
 
   async function onLogout() {

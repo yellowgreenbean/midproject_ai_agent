@@ -11,7 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 
-from app.db import engine
+from app.common.db import engine
 from app.main import app
 from app.rules import pin_error
 from app.security import login_throttle

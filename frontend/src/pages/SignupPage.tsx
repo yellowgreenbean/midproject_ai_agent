@@ -1,6 +1,7 @@
 // UI01 회원가입 (docs/기획서.md Part 1 3.1 흐름 · AUTH-F01 회원가입 · F02 아이디 중복 확인 · F03 이메일 인증 · F10 약관)
 import { useEffect, useState, type FormEvent } from 'react'
 import Field, { type FieldMessage } from '../components/Field'
+import { TermsDialog } from '../components/TermsViewer'
 import { checkUsername, confirmEmailCode, getTerms, register, sendEmailCode, type Term } from '../api'
 import {
   birthDateError,
@@ -43,6 +44,7 @@ export default function SignupPage() {
   const [gender, setGender] = useState<'M' | 'F' | ''>('')
   const [payday, setPayday] = useState('')
   const [terms, setTerms] = useState<Term[]>([])
+  const [viewing, setViewing] = useState<string | null>(null) // 본문을 보고 있는 약관 id (가입 정보를 지키려고 화면을 옮기지 않고 창으로)
   const [agreed, setAgreed] = useState<Record<string, boolean>>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -499,6 +501,9 @@ export default function SignupPage() {
                       {t.title}
                     </span>
                   </label>
+                  <button type="button" className="terms-view" onClick={() => setViewing(t.id)} aria-label={`${t.title} 보기`}>
+                    보기
+                  </button>
                 </li>
               ))}
             </ul>
@@ -519,6 +524,7 @@ export default function SignupPage() {
           </div>
         </form>
       </main>
+      {viewing && <TermsDialog termsId={viewing} onClose={() => setViewing(null)} />}
     </div>
   )
 }

@@ -51,6 +51,10 @@ export default function ConsentsPage() {
                 <small>
                   {c.version.replaceAll('-', '.')} 판 · {c.recordedAt ? `${dot(c.recordedAt)} ${c.agreed ? '동의' : '철회'}` : '기록 없음'}
                 </small>
+                <a className="set-terms-more" href={`#/settings/terms/${c.termsId}`} aria-label={`${c.title} 자세히 보기`}>
+                  자세히 보기
+                  <Icon name="chevron" size={12} />
+                </a>
               </span>
               {c.required ? (
                 <span className={`set-state ${c.agreed ? 'is-ok' : ''}`}>{c.agreed ? '동의함' : '동의 안 함'}</span>

@@ -1,0 +1,12 @@
+{"id": "ret-001", "query": "예금거래기본약관 제12조", "relevant": ["terms-004-article-12"], "note": "가이드북 1-6 — bm25·hybrid 1등, vector 는 4위 안에 없음"}
+{"id": "ret-002", "query": "적립식예금 약관에서 만기 전에 해지하면 이자는 어떻게 계산해?", "relevant": ["terms-006-article-7"], "note": "구어체 — 약관 이름은 있지만 조 번호 없음"}
+{"id": "ret-003", "query": "거치식예금 중도해지이율", "relevant": ["terms-010-article-3"], "note": "키워드 — 제3조(이자) ③항"}
+{"id": "ret-004", "query": "자동재예치된 예금을 중간에 해지하면 금리는?", "relevant": ["terms-001-article-5"], "note": "자동재예치 서비스 이용약관 제5조 중도해지"}
+{"id": "ret-005", "query": "예금자보호 한도가 얼마야?", "relevant": ["guides-009-section-1", "guides-010-section-1-part-1"], "note": "1억원 — 법제처 100문100답 · 예금보험공사 FAQ"}
+{"id": "ret-006", "query": "돈을 엉뚱한 계좌로 잘못 보냈어. 돌려받을 수 있어?", "relevant": ["guides-012-section-1", "guides-013-section-1", "guides-014-section-1"], "note": "구어체 — '착오송금' 이라는 말 없이"}
+{"id": "ret-007", "query": "오래 안 쓴 통장에 남은 돈은 어떻게 돼?", "relevant": ["guides-011-section-1"], "note": "구어체 — '휴면예금' 이라는 말 없이"}
+{"id": "ret-008", "query": "계좌 비밀번호 몇 번 틀리면 막혀?", "relevant": ["terms-005-article-11-47"], "note": "전자금융거래 기본약관 제11조 — 계좌비밀번호 연속 5회"}
+{"id": "ret-009", "query": "신용카드 분실 신고와 부정사용 보상", "relevant": ["cards-004-article-40", "cards-005-article-40"], "note": "키워드 — 회원약관·표준약관 같은 제40조"}
+{"id": "ret-010", "query": "다른 은행으로 이체하면 수수료 있어?", "relevant": ["guides-004-section-1"], "note": "이체수수료안내 — 개인은 무료"}
+{"id": "ret-011", "query": "체크카드로 할부 돼?", "relevant": ["cards-003-article-5"], "note": "체크카드 개인회원 약관 제5조 — 할부·현금서비스 불가"}
+{"id": "ret-012", "query": "하루에 최대 얼마까지 이체할 수 있어?", "relevant": ["guides-007-section-1", "guides-002-section-1-part-1"], "note": "1일 이체한도 — 이체한도안내 · FAQ Q1"}

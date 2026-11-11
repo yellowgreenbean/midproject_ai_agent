@@ -31,6 +31,8 @@ docker exec -i midproject-postgres psql -U app -d midproject -v ON_ERROR_STOP=1 
 ```
 - 순서: 더미 먼저, 시나리오 시드 나중(시드가 더미의 회원·계좌·카드를 가리킨다). 둘 다 여러 번 넣어도 결과가 같다.
 - 시나리오 시드는 예약 시각 등을 "지금" 기준으로 만든다. 다시 맞추려면 `seed_scenarios.py --reset`.
+- 신용카드 연회비 청구 예정일(`user_cards.next_annual_fee_date`)도 시드가 「지금」 기준으로 넣는다(더미에 발급일이 없어서, `docs/BACKLOG.md`) —
+  card_002 는 30일 뒤(D-30 알림), card_003 은 오늘(서버를 켜면 1분 안에 연회비 12,000원이 이용내역에 올라감), 나머지는 2~11개월 뒤. 값이 이미 있으면 그대로 둔다.
 - 만든 `.sql` 파일은 커밋하지 않는다.
 - 카드 혜택·실적 구간·연회비는 `data/dummy/cards/card_benefits.json`(실제 카드 참고, 출처 `docs/domain-rules.md` 7장)에서 같이 들어간다.
   INSERT 가 `ON CONFLICT DO NOTHING` 이라 **이미 있는 행은 바뀌지 않는다** — 혜택 파일의 연회비·요약을 고쳤으면 개발 DB 의
@@ -131,8 +133,11 @@ http://localhost:8010/docs 에서 호출 (화면 `frontend/` 가 8010 을 부른
 | 카드 상세 (혜택·지난달/분기 실적·청구서, 해지한 카드도 기록으로) | `GET /cards/{cardId}` | Part 4 CARD-F02 (1-1-2) | `routers/cards.py` + `app/card_benefits.py` |
 | 카드 이용 내역 (`month=YYYYMM`·`category=업종 code`(하위 업종 포함)·`installment=LUMP_SUM/INSTALLMENT`, 최신순) | `GET /cards/{cardId}/transactions` | Part 4 CARD-F03 (1-1-3) | `routers/cards.py` |
 | 결제 캘린더 (내 모든 카드 청구서 + 이번 기간, 결제 계좌 잔액 부족 `low_balance`) · 청구서 상세(든 이용 내역) | `GET /card-bills`, `GET /card-bills/{billId}` | Part 4 CARD-F04 (1-1-4) | `routers/card_bills.py` |
+| 카드 결제·출금 계좌 바꾸기 (본인 확인 `CARD_MANAGEMENT`, 내 정상 입출금 계좌이고 지금과 다른 계좌, 확정 청구서 결제일 당일 `409 PAYMENT_DAY_LOCKED`, 해지 카드 불가, 변경 전후는 `card_management_logs` `LINKED_ACCOUNT_CHANGE`) | `PATCH /cards/{cardId}/linked-account` | Part 4 CARD-F08 (1-2) | `routers/cards.py` |
 | 카드 해지 전 확인 · 해지 (본인 확인 `CARD_TERMINATION`) | `GET /cards/{cardId}/termination-check`, `POST /cards/{cardId}/terminate` | Part 4 CARD-F09 (1-3) | `routers/cards.py` |
+| **체크카드 신청 · 배송 조회** (판매 중 카드 목록, 신청은 본인 확인 `CARD_APPLICATION` + `Idempotency-Key` → 바로 승인·배송 시작, 승인에서 멈춤 → 시연용 [배송 시작]·[배송 완료], 받은 카드 등록 → `user_cards`. 배송 시작 전에만 신청 취소(본인 확인 없음). 신용카드 발급은 2차라 `422 CREDIT_NOT_SUPPORTED`) | `GET /card-products`, `GET`·`POST /card-applications`, `POST /card-applications/{applicationId}/cancel` · `/ship` · `/deliver` · `/activate` | Part 4 CARD-F05 (1-2) | `routers/card_applications.py` |
 | 카드 대금 지금 결제하기 (확정·연체 청구서, 해지한 카드는 이번 기간 사용액까지, 본인 확인 `CARD_MANAGEMENT`) | `POST /cards/{cardId}/payments` | Part 4 CARD-F07 (1-7) + 사용자 결정 | `routers/cards.py` |
+| 카드 포인트 조회 · 현금화 (카드사별 잔액·소멸 예정 + 현금화 내역. 현금화는 **전액만**(1포인트 = 1원), 본인 확인 `POINT_CASHOUT`, 입금은 내 정상 입출금 계좌 → 원장 `POINT_CASHOUT`. 404 `POINT_NOT_FOUND` · 422 `INVALID_CASHOUT_ACCOUNT` · 409 `NO_POINTS`) | `GET /card-points`, `POST /card-points/{pointId}/cashout` | Part 4 CARD-F12 (1-1-7) + 사용자 결정 2026-11-11 | `routers/card_points.py` |
 | 챗봇 (아래 「챗봇」) | `POST /agent/chat` | Part 3 5·7장 | `routers/agent.py` + `app/agent.py` + `app/rag.py` |
 
 **계좌 개설 (`POST /accounts`, ACCT-F01)** — 한 트랜잭션에 계좌 + 잔액 0원(`ledger.open_balance`) + 알림 기본값 + 개설 기록(`account_activity_logs.action = 'OPEN'`).
@@ -192,6 +197,9 @@ http://localhost:8010/docs 에서 호출 (화면 `frontend/` 가 8010 을 부른
   계약(가입 당시 적용 금리 저장) · 적금 첫 회차 납입 기록 · 원장 출금이 한 트랜잭션. 같은 `Idempotency-Key`(회원별)로 다시 오면 처음 결과, 내용이 다르면 409.
 - 상품설명서 연결(`product_documents`)은 `scripts/load_dummy.py` 가 `data/rag/products/*.md` 파일 이름에서 만든다. 상세 응답에 제목·RAG 문서 이름만 주고 파일은 내려주지 않는다
   (원본 문서에 실제 은행 이름이 있어서, 사용자 결정 2026-11-10). 이미 만든 개발 DB 에는 `load_dummy.py` 를 다시 넣으면 더해진다(ON CONFLICT DO NOTHING).
+- 상품 약관 「자세히 보기」: 상세 응답의 `terms`(특약 `rider` · 예금 종류 약관 `type` · 예금거래기본약관 `basic`)와 본문 `GET /products/{productId}/terms/{termId}`(로그인 없이).
+  DB 표 없이 파일에서 읽는다 — 특약은 `data/rag/riders/<상품 id>.md`(없는 상품 prod_009·011·013 은 목록에서 빠짐), 나머지는 `data/rag/terms/` 의 거치식·적립식예금 약관과 예금거래기본약관.
+  목록·창 제목만 두린 상품명이고 본문은 md 그대로 보여 준다 — 원본 상품명(`WON 적금` 등)을 본문에서 따로 바꾸지 않는다(사용자 결정 2026-11-11).
 
 응답 형식 (기획서 C-5): 금액은 **문자열**(`"resAccountBalance": "1250000"`), 시각은 `+09:00` ISO 8601,
 CODEF `res…` 빈 칸은 `""`, 우리가 만든 빈 칸은 `null`. 거래에는 `direction`(`IN`/`OUT`, Part 5 3장)이 붙는다.
@@ -199,7 +207,7 @@ CODEF `res…` 빈 칸은 `""`, 우리가 만든 빈 칸은 `null`. 거래에는
 오류 형식 (기획서 Part 1 7.1): `{"success": false, "error": {"code": "ACCOUNT_NOT_FOUND", "message": "계좌를 찾을 수 없어요."}}`
 — 남의 것과 없는 것은 똑같이 404(존재 여부를 숨김, Part 2 ACCT-F02). 기획서 업무 규칙 값(기본 한도, 은행별 자릿수 등)은 `app/rules.py`.
 
-아직 없는 것: 예약 등록·변경과 예약 실행 배치, 계좌 개설·설정·정지·해지, 카드 신청(1-2)·혜택 적용 계산(보여 주기만 함, `docs/BACKLOG.md`),
+아직 없는 것: 예약 등록·변경과 예약 실행 배치, 계좌 개설·설정·정지·해지, 신용카드 발급(1-7 모의 심사)·혜택 적용 계산(보여 주기만 함, `docs/BACKLOG.md`),
 적금 추가 납입·만기 처리(PROD-F11), Google 로그인.
 
 **예약 작업 (`app/jobs.py`)** — 서버가 켜져 있으면 서버 안 스케줄러(`app/main.py` lifespan 스레드)가 1분마다 `run_minutely()` 로 아래를 모두 돌린다
@@ -211,6 +219,11 @@ CODEF `res…` 빈 칸은 `""`, 우리가 만든 빈 칸은 `null`. 거래에는
 | `settle_pending_transfers` | 10분 넘게 처리중인 타행 이체를 잔액·상태를 다시 보고 SUCCESS/FAILED 로 확정 (예약으로 보낸 건이면 예약 상태·실패 알림도) | 몇 분마다 |
 | `notify_card_payments` | 카드 결제일 D-3·당일 `PAYMENT_DUE` 알림, 결제 계좌 잔액이 모자라면 `LOW_BALANCE` 알림(같은 계좌 청구서를 결제일 순으로 더해 봄). 카드 설정에서 알림을 끈 카드는 건너뜀, 같은 알림은 한 번만 | 하루 한 번(아침, 출금 전) |
 | `pay_due_card_bills` | 결제일이 된 확정 청구서를 결제 계좌에서 출금, 모자라면 연체(`OVERDUE`) + 알림 | 하루 한 번 |
+| `mature_subscriptions` | 만기일이 된 예금·적금에 원금 + 이자 지급(`MATURITY` 알림), 출금 계좌가 정지면 알림만 하고 미룸 | 하루 한 번 |
+| `notify_expiring_points` | 소멸 예정 포인트가 있고 소멸일이 30일 안이면 `POINT_EXPIRING` 알림 한 번 (CARD-F12) | 하루 한 번 |
+| `expire_points` | 소멸일이 지난 소멸 예정 포인트를 잔액에서 빼고 소멸 예정 칸을 비움(당일까지는 현금화 가능) | 하루 한 번 |
+| `notify_annual_fees` | 연회비 청구 예정일이 30일 안으로 들어온 신용카드에 `ANNUAL_FEE` 알림 한 번(해마다) (CARD-F13) | 하루 한 번 |
+| `charge_annual_fees` | 청구 예정일이 된 신용카드 연회비를 **이용내역 한 줄**(가맹점 「연회비」, 승인번호 `AF<날짜>`, 실적 제외)로 기록 → 이번 기간 사용액·다음 청구서에 포함. 청구 예정일은 1년 뒤로 | 하루 한 번 |
 
 **회원 탈퇴 전 정리 (사용자 결정 2026-11-09)** — 기존 회원도 모두 탈퇴할 수 있게 앞당겨 만든 것: 계좌 정지 해제, 적금 중도 해지, 이체(타행 포함), 예약·자동이체 취소, 카드 대금 선결제·해지.
 - 남은 돈은 회원마다 시드한 **본인 명의 타행 계좌**(`external_accounts.id = ext_<회원 id>`, 예금주 = 회원 이름)로 보낸다. 이용 제한(`RESTRICTED`) 회원은 본인 명의로만 보낼 수 있다.
@@ -261,6 +274,9 @@ cd frontend && npm ci && npm run dev        # http://localhost:5173
 - `tests/test_cards.py`: 카드 목록 조회 1차(CARD-F01~F04) — **로그인한 회원의 카드만**(쿠키 로그인, 남의 카드·청구서는 없는 것과 같은 404,
   로그아웃 즉시 401, 가입 마무리 중 403), 체크카드 이번 달 쓴 돈, 혜택(지난달 실적 구간에 따라 한도·조건, 분기 구간), 이용 내역 거르기
   (달·업종·상위 업종·할부, 잘못된 값 400/422), 결제 캘린더·같은 계좌 청구서를 더한 잔액 부족, 청구서 항목 합계, 결제일 알림(D-3·당일·한 번만·알림 끔).
+- `tests/test_points_fees.py`: 카드 포인트(CARD-F12) — 내 포인트만, 현금화(본인 확인 `POINT_CASHOUT` 필수·다른 작업 번호 거절, 남의 포인트 404, 남의 계좌·정지 계좌 422,
+  전액 입금·원장 `POINT_CASHOUT`·두 번째는 409), 소멸 30일 전 알림 한 번·소멸 처리. 연회비(CARD-F13) — 30일 전 알림 한 번, 청구일에 이용내역 한 줄·
+  이번 기간 사용액과 쓴 한도에 반영·같은 해 한 번만·청구일 1년 뒤(2월 29일 → 28일).
 - `tests/test_withdrawal.py`: 본인 확인(실패 횟수·영구 잠금·시드 user_027 잠김·세션 필요)과 탈퇴(AUTH-F09) — 새 회원 탈퇴 전체 흐름,
   잔액 0원 계좌(정지 포함) 일괄 해지·해지 사유, 잔액·자동이체·카드가 있는 user_001 차단, 최종 확인 직전 입금 시 중단(번호 재사용 가능),
   안내문 버전이 바뀌면 ② 다시, 1개월 뒤 가명 처리(아이디 유지).

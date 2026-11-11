@@ -13,10 +13,12 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
 class ApiError(Exception):
-    def __init__(self, status_code: int, code: str, message: str):
+    def __init__(self, status_code: int, code: str, message: str, **extra):
+        """extra: error 안에 같이 넣을 칸 (예: 계좌 해지 거절의 reasons — Part 2 9.3 「사유 코드를 함께 돌려준다」)."""
         self.status_code = status_code
         self.code = code
         self.message = message
+        self.extra = extra
 
 
 def _body(code: str, message: str, **extra) -> dict:
@@ -45,7 +47,7 @@ def account_not_found() -> ApiError:
 def install(app: FastAPI) -> None:
     @app.exception_handler(ApiError)
     async def _api_error(_: Request, exc: ApiError):
-        return JSONResponse(_body(exc.code, exc.message), status_code=exc.status_code)
+        return JSONResponse(_body(exc.code, exc.message, **exc.extra), status_code=exc.status_code)
 
     @app.exception_handler(StarletteHTTPException)
     async def _http_error(_: Request, exc: StarletteHTTPException):

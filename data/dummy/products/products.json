@@ -1,7 +1,8 @@
 {
   "meta": {
     "term_rule": "term_min·term_max 는 term_unit 단위(MONTH=개월, DAY=일)이며 양 끝을 포함한다. '12개월 이상 24개월 미만' 은 12~23. 일 단위 상품은 product_rules 의 rules_json 에 term_days(일수가 정해진 상품) 또는 term_days_min·term_days_max(범위가 있는 상품)도 적었다.",
-    "rate_unit": "연 %, 세전, 문자열. bonus_rate 는 우대금리의 최대치."
+    "rate_unit": "연 %, 세전, 문자열. bonus_rate 는 우대금리의 최대치.",
+    "payment_types": "적금의 납입 방식(product_rules.rules_json.payment_types): FIXED 정액적립식(가입 때 정한 월 납입액을 회차마다 한 번) / FREE 자유적립식(월 한도 안에서 자유롭게). 출처는 상품설명서의 '상품유형' 줄 (docs/domain-rules.md 5-1). 예금에는 없다."
   },
   "products": [
     {
@@ -1425,7 +1426,11 @@
         "eligibility": "실명의 개인",
         "bonus_condition": "최대 연 0.2%p: 두린통장/두린꿈통장에서 출금해 가입 0.1%p + 만기해지 시 두린 오픈뱅킹에 타행계좌 등록 0.1%p",
         "interest_payment": "만기일시지급식",
-        "tax_free": "비과세종합저축 가입 가능(본인 한도 내)"
+        "tax_free": "비과세종합저축 가입 가능(본인 한도 내)",
+        "payment_types": [
+          "FIXED",
+          "FREE"
+        ]
       }
     },
     {
@@ -1598,7 +1603,10 @@
           24,
           36
         ],
-        "bonus_note": "최대우대이율 연 1.4%p"
+        "bonus_note": "최대우대이율 연 1.4%p",
+        "payment_types": [
+          "FIXED"
+        ]
       }
     },
     {
@@ -1617,7 +1625,10 @@
           24,
           36
         ],
-        "bonus_note": "최대우대이율 연 1.4%p"
+        "bonus_note": "최대우대이율 연 1.4%p",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1632,7 +1643,10 @@
         "eligibility": "실명의 개인(1인 1계좌)",
         "monthly_min": "1",
         "monthly_max": "300000",
-        "bonus_note": "목록의 최고 9.00%에서 기본 3.50%를 뺀 값(세부 우대조건 미확인)"
+        "bonus_note": "목록의 최고 9.00%에서 기본 3.50%를 뺀 값(세부 우대조건 미확인)",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1647,7 +1661,10 @@
         "eligibility": "가입요건을 모두 충족한 실명의 개인 거주자(1인 1계좌, 세부 요건 미확인)",
         "monthly_max": "500000",
         "monthly_unit": "1000",
-        "bonus_note": "우대조건 충족 시 최대 연 3.0%"
+        "bonus_note": "우대조건 충족 시 최대 연 3.0%",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1661,7 +1678,10 @@
       "rules_json": {
         "eligibility": "사업자등록증을 보유한 개인사업자(1인 1계좌)",
         "monthly_max": "1000000",
-        "bonus_note": "우대금리 최고 연 4.00%p"
+        "bonus_note": "우대금리 최고 연 4.00%p",
+        "payment_types": [
+          "FIXED"
+        ]
       }
     },
     {
@@ -1676,7 +1696,10 @@
         "eligibility": "실명의 개인(1인 1계좌)",
         "monthly_min": "1",
         "monthly_max": "500000",
-        "bonus_note": "행운카드 당첨 1장당 연 2.0%p, 5번 당첨 시 최대 연 10.0%p"
+        "bonus_note": "행운카드 당첨 1장당 연 2.0%p, 5번 당첨 시 최대 연 10.0%p",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1694,7 +1717,10 @@
           6,
           12
         ],
-        "bonus_note": "목록의 최고 7.75%에서 기본 2.75%를 뺀 값(세부 우대조건 미확인)"
+        "bonus_note": "목록의 최고 7.75%에서 기본 2.75%를 뺀 값(세부 우대조건 미확인)",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1707,7 +1733,10 @@
       "max_per_user": 1,
       "rules_json": {
         "eligibility": "Npay 두린 통장을 가입한 17세 이상 실명의 개인(내국인, 1인 1계좌)",
-        "monthly_max": "300000"
+        "monthly_max": "300000",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1722,7 +1751,10 @@
         "eligibility": "실명의 개인(1인 1계좌)",
         "monthly_min": "1",
         "monthly_max": "200000",
-        "bonus_note": "두린모바일 가입 연 4.0%p + 통신비 자동이체 연 2.0%p"
+        "bonus_note": "두린모바일 가입 연 4.0%p + 통신비 자동이체 연 2.0%p",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1738,7 +1770,10 @@
         "term_days": 31,
         "daily_min": "1000",
         "daily_max": "30000",
-        "bonus_note": "우대조건 충족 시 최대 연 3.0%(두린은행 예적금 미보유 가입, 또는 일정기간 이상 납입 후 감정스탬프 선택)"
+        "bonus_note": "우대조건 충족 시 최대 연 3.0%(두린은행 예적금 미보유 가입, 또는 일정기간 이상 납입 후 감정스탬프 선택)",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1754,7 +1789,10 @@
         "term_days": 100,
         "daily_min": "1000",
         "daily_max": "30000",
-        "bonus_note": "우대조건 충족 시 최대 연 3.0%(두린은행 예적금 미보유 가입, 또는 일정기간 이상 납입 후 감정스탬프 선택)"
+        "bonus_note": "우대조건 충족 시 최대 연 3.0%(두린은행 예적금 미보유 가입, 또는 일정기간 이상 납입 후 감정스탬프 선택)",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1770,7 +1808,10 @@
         "term_days": 200,
         "daily_min": "1000",
         "daily_max": "30000",
-        "bonus_note": "우대조건 충족 시 최대 연 3.0%(두린은행 예적금 미보유 가입, 또는 일정기간 이상 납입 후 감정스탬프 선택)"
+        "bonus_note": "우대조건 충족 시 최대 연 3.0%(두린은행 예적금 미보유 가입, 또는 일정기간 이상 납입 후 감정스탬프 선택)",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1784,7 +1825,10 @@
       "rules_json": {
         "eligibility": "실명의 개인(1인 1계좌, 어린이 전용 여부 미확인)",
         "monthly_max": "500000",
-        "bonus_note": "조건 충족 시 최대 연 1.20%p"
+        "bonus_note": "조건 충족 시 최대 연 1.20%p",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1798,7 +1842,10 @@
       "rules_json": {
         "eligibility": "실명의 개인(1인 1계좌), 인증번호 필요",
         "monthly_max": "500000",
-        "variants": "1년 기본형 3.55% / 우대형 3.35%(최대 0.5%p 우대)"
+        "variants": "1년 기본형 3.55% / 우대형 3.35%(최대 0.5%p 우대)",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1812,7 +1859,10 @@
       "rules_json": {
         "eligibility": "실명의 개인(1인 1계좌), 인증번호 필요",
         "monthly_max": "500000",
-        "bonus_note": "가입자 수에 따라 최대 연 1.5%p"
+        "bonus_note": "가입자 수에 따라 최대 연 1.5%p",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1827,7 +1877,10 @@
         "eligibility": "현역병·상근예비역·의무경찰·해양의무경찰·의무소방대원·사회복무요원·대체복무요원",
         "monthly_min": "0",
         "monthly_max": "300000",
-        "bonus_note": "조건 충족 시 최대 연 1.0%p(계약기간 3개월 미만은 최대 0.4%p)"
+        "bonus_note": "조건 충족 시 최대 연 1.0%p(계약기간 3개월 미만은 최대 0.4%p)",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1842,7 +1895,10 @@
         "eligibility": "서민금융진흥원 추천서를 발급받은 성실상환자(1인 1계좌)",
         "monthly_min": "10000",
         "monthly_max": "200000",
-        "term_note": "1년 이상 5년 이하 연 단위"
+        "term_note": "1년 이상 5년 이하 연 단위",
+        "payment_types": [
+          "FREE"
+        ]
       }
     },
     {
@@ -1855,7 +1911,11 @@
       "max_per_user": null,
       "rules_json": {
         "eligibility": "기초생활수급자·만 65세 이상 차상위계층·소년소녀가장·결혼이민자·북한이탈주민·근로장려금수급자",
-        "monthly_max": "200000"
+        "monthly_max": "200000",
+        "payment_types": [
+          "FIXED",
+          "FREE"
+        ]
       }
     }
   ]

@@ -42,8 +42,9 @@ EXTERNAL_TEST = [("신한은행", 12, "110", "임처리", "PENDING 후 SUCCESS")
 SCENARIOS = """
 가입 약관 (AUTH-F10)
   - 공통 약관 4개: trm_001 서비스 이용약관 · trm_002 전자금융거래 이용약관 · trm_003 개인정보 수집·이용(이상 필수)
-    · trm_004 마케팅 정보 수신(선택). 본문 파일: trm_001 토스 원문(scripts/crawl_toss_terms.py) · trm_002 우리은행 PDF,
-    trm_003·004 의 content_url 은 아직 빈 자리
+    · trm_004 마케팅 정보 수신(선택). 본문 파일: trm_001 토스 원문(scripts/crawl_toss_terms.py) · trm_002 우리은행 PDF 의 .md 변환본
+    (화면이 Markdown 을 보여 주므로 PDF 가 아니라 .md — 이미 넣은 DB 는 UPDATE terms SET content_url 로 맞춘다),
+    trm_003·004 는 토스 원문이 웹에 없어 직접 쓴 본문(개인정보 보호법 제15조 제2항 형식, 사용자 결정 2026-11-11, docs/domain-rules.md 5-5)
 로그인 (3번)
   - 탈퇴(user_029)를 뺀 29명: auth_identities(LOCAL, username) + local_credentials. 탈퇴 회원은 해시를 지움(Part 1 즉시 삭제)
   - local_credentials.failed_attempts 는 본인 확인(step-up) 비밀번호 실패만 센다(기획서 6.3) — 로그인 실패는 세지 않음
@@ -66,6 +67,9 @@ SCENARIOS = """
   - trf_0001 잔액 부족 · trf_0002 1회 한도 초과(acc_007) · trf_0003 예약 실행 실패
 카드 포인트
   - 카드가 있는 15명: 한빛포인트 = 취소 뺀 승인 합계의 0.5%. user_001 은 이번 달 말 소멸 예정 1,200점
+연회비 청구 예정일 (user_cards.next_annual_fee_date — 더미에 발급일이 없어 여기서 넣음, 사용자 결정 2026-11-11, docs/BACKLOG.md)
+  - 연회비가 있는 신용카드만: card_002(user_001) 30일 뒤(D-30 알림) · card_003(user_001) 오늘(청구 → 이용내역 한 줄)
+    · 나머지는 카드 번호순으로 2~11개월 뒤. 이미 값이 있으면 건드리지 않는다(--reset 이면 다시 넣음)
 알림
   - user_001: 거래 알림(읽음) · 예약 실패(안 읽음) · 결제 예정(card_002) · 포인트 소멸 예정
   - 결제 계좌 잔액 부족(LOW_BALANCE)은 만들지 않음: 더미에 결제 예정액보다 잔액이 적은 계좌가 없어 알림이 데이터와 어긋남
@@ -137,9 +141,9 @@ def build(root, now, password, pin):
          "effective_at": "2026-11-01 00:00:00", "card_product_id": None}
         for tid, title, req, url in [
             ("trm_001", "서비스 이용약관", True, "data/rag/terms/service_terms.md"),
-            ("trm_002", "전자금융거래 이용약관", True, "data/rag/terms/electronic_financial_transactions_terms.pdf"),
-            ("trm_003", "개인정보 수집·이용 동의", True, "docs/terms/privacy_consent.md"),
-            ("trm_004", "마케팅 정보 수신 동의", False, "docs/terms/marketing_consent.md"),
+            ("trm_002", "전자금융거래 이용약관", True, "data/rag/terms/electronic_financial_transactions_terms.md"),
+            ("trm_003", "개인정보 수집·이용 동의", True, "data/rag/terms/privacy_consent.md"),
+            ("trm_004", "마케팅 정보 수신 동의", False, "data/rag/terms/marketing_consent.md"),
         ]
     ]
 
@@ -326,6 +330,30 @@ def build(root, now, password, pin):
     return t
 
 
+def annual_fee_dates(cards, now):
+    """연회비가 있는 카드의 청구 예정일 {카드 id: 날짜}. 체크카드는 연회비 0원이라 빠진다"""
+    today = now.date()
+    out, i = {}, 0
+    for c in sorted(cards, key=lambda c: c["id"]):
+        if not c["annual_fee_amount"] or c["status"] != "ACTIVE":
+            continue
+        if c["id"] == "card_002":
+            out[c["id"]] = today + datetime.timedelta(days=30)
+        elif c["id"] == "card_003":
+            out[c["id"]] = today
+        else:
+            y, m = divmod(today.year * 12 + today.month - 1 + 2 + i % 10, 12)
+            out[c["id"]] = datetime.date(y, m + 1, min(today.day, 28))
+            i += 1
+    return out
+
+
+def annual_fee_sql(dates, reset):
+    keep = "" if reset else " AND next_annual_fee_date IS NULL"
+    return ["\n-- user_cards.next_annual_fee_date (연회비 청구 예정일)"] + [
+        f"UPDATE user_cards SET next_annual_fee_date = '{d.isoformat()}' WHERE id = '{cid}'{keep};" for cid, d in dates.items()]
+
+
 PK = {"local_credentials": ("user_id",), "pin_credentials": ("user_id",), "transfer_limits": ("account_id",),
       "notification_preferences": ("user_id", "account_id")}
 
@@ -364,6 +392,12 @@ if __name__ == "__main__":
     head = "\n".join("-- " + line for line in SCENARIOS.splitlines())
     if args.reset:
         sql = sql.replace("BEGIN;", "BEGIN;\n" + "\n".join(reset_sql(tables)), 1)
+    fee_dates = annual_fee_dates(load_dummy.build(args.root)["user_cards"], now)
+    if not {"card_002", "card_003"} <= set(fee_dates):
+        print("오류: 연회비 시나리오가 가정한 card_002·card_003 이 연회비 있는 카드가 아님", file=sys.stderr)
+        sys.exit(1)
+    head_sql, commit = sql.rsplit("\nCOMMIT;", 1)
+    sql = head_sql + "\n".join(annual_fee_sql(fee_dates, args.reset)) + "\n\nCOMMIT;" + commit
     sys.stdout.reconfigure(encoding="utf-8", newline="\n")
     sys.stdout.write(head + "\n" + sql)
     print(" · ".join(f"{t} {len(r)}" for t, r in tables.items()), file=sys.stderr)

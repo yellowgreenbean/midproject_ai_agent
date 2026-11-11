@@ -8,7 +8,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 
-from app.db import engine
+from app.common.db import engine
 from app.main import app
 
 REQUIRED = ["trm_001", "trm_002", "trm_003"]

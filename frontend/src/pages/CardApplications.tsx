@@ -1,7 +1,8 @@
 // 카드 신청·배송 조회 (docs/기획서.md Part 4 CARD-F05) — 단계 막대와, 단계마다 할 일 버튼
-// 1차는 실제 배송이 없어 「배송 완료」를 시연용 버튼으로 넘긴다(기획서 1-2 ⑥).
+// 1차는 실제 배송이 없어 「배송 시작」·「배송 완료」를 시연용 버튼으로 넘긴다(기획서 1-2 ⑥).
+// 신청 취소는 배송 시작 전(승인까지)만 — 본인 확인 없이 확인 창만 (사용자 결정 2026-11-10)
 import { useState } from 'react'
-import { activateCard, markDelivered, type CardApplication } from '../api'
+import { activateCard, cancelCardApplication, markDelivered, shipCard, type CardApplication } from '../api'
 import { APPLICATION_STEPS, CARD_TYPE_LABEL, dots } from '../cardRules'
 import { cardArtOf } from './cardArt'
 
@@ -24,10 +25,12 @@ export default function CardApplications({ list, onChange }: Props) {
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<{ id: string; text: string } | null>(null) // 실패는 그 신청 칸에만
 
-  async function next(app: CardApplication) {
+  async function next(app: CardApplication, cancel = false) {
+    if (cancel && !window.confirm(`${app.productName} 신청을 취소할까요? 필요하면 다시 신청할 수 있어요.`)) return
     setBusy(app.id)
     setError(null)
-    const r = app.status === 'SHIPPING' ? await markDelivered(app.id) : await activateCard(app.id)
+    const step = cancel ? cancelCardApplication : app.status === 'APPROVED' ? shipCard : app.status === 'SHIPPING' ? markDelivered : activateCard
+    const r = await step(app.id)
     setBusy(null)
     if (!r.success) return setError({ id: app.id, text: r.error.message })
     onChange(r.data)
@@ -48,6 +51,17 @@ export default function CardApplications({ list, onChange }: Props) {
           </div>
           <Steps app={a} />
           {a.deliveryAddress && <p className="prod-fine">받는 곳: {a.deliveryAddress}</p>}
+          {a.status === 'APPROVED' && (
+            <div className="card-app-actions">
+              <p className="prod-fine">카드를 만들고 있어요. 배송이 시작되기 전까지 신청을 취소할 수 있어요.</p>
+              <button type="button" className="btn-secondary" disabled={busy === a.id} onClick={() => void next(a)}>
+                배송 시작으로 바꾸기 (시연용)
+              </button>
+              <button type="button" className="btn-secondary" disabled={busy === a.id} onClick={() => void next(a, true)}>
+                신청 취소
+              </button>
+            </div>
+          )}
           {a.status === 'SHIPPING' && (
             <div className="card-app-actions">
               <p className="prod-fine">배송 중에는 신청을 취소할 수 없어요. 받은 뒤 해지할 수 있어요.</p>

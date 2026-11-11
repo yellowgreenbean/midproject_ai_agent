@@ -36,7 +36,7 @@ from app.models import AuthSession, LocalCredential, Notification, PasswordReset
 from app.routers.auth import _audit, step_up_locked
 from app.routers.signup import normalize_email, password_error, take_email_proof
 from app.rules import PASSWORD_RESET_TTL, RECOVERABLE_STATUSES, STEP_UP_MAX_FAILURES, USERNAME_VISIBLE, now_kst
-from app.schemas import KstDatetime
+from app.common.naming import KstDatetime
 from app.security import digest, hash_password, login_throttle, new_id, verify_password
 
 router = APIRouter(tags=["password"])

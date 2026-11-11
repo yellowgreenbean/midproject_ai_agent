@@ -17,6 +17,13 @@ from app.rules import INCOMING_TYPES
 from app.security import new_id
 
 
+def open_balance(db, account_id: str, now: datetime) -> AccountBalance:
+    """새 계좌의 잔액 행(0원). 계좌 파트는 잔액을 만들지 않고 여기에 맡긴다(Part 2 ACCT-F01 정상 흐름 8)."""
+    bal = AccountBalance(account_id=account_id, currency="KRW", balance=0, updated_at=now)
+    db.add(bal)
+    return bal
+
+
 def lock_balances(db, account_ids) -> dict[str, AccountBalance]:
     ids = sorted(set(account_ids))
     rows = db.scalars(select(AccountBalance).where(AccountBalance.account_id.in_(ids))
@@ -33,4 +40,7 @@ def post(db, bal: AccountBalance, type: str, amount: int, now: datetime, **field
     tx = Transaction(id=new_id("tx"), account_id=bal.account_id, type=type, amount=amount,
                      balance_after=bal.balance, created_at=now, **fields)
     db.add(tx)
+    from app.routers.notifications import on_transaction_confirmed  # 거래 확정 이벤트 발행 (TRX-F04 → ACCT-F06)
+
+    on_transaction_confirmed(db, tx)
     return tx

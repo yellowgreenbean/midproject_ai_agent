@@ -56,7 +56,19 @@ export default function CardBillPage({ id }: { id: string }) {
           </p>
         </div>
       </section>
-      {b.lowBalance && <p className="prod-warn">결제 계좌 잔액이 모자라요. 결제일 전에 채워 두세요.</p>}
+      {b.lowBalance && (
+        <p className="prod-warn">
+          결제 계좌 잔액이 {won(b.shortfall)} 모자라요. 결제일 전에 채워 두세요.{' '}
+          {b.accountId && (
+            <a
+              className="more"
+              href={`#/transfer?${new URLSearchParams({ toAccount: b.accountId, amount: String(b.shortfall), at: new Date(Date.parse(`${b.paymentDate}T18:00:00+09:00`) - 86_400_000).toISOString() })}`}
+            >
+              채우기 송금 <Icon name="chevron" size={14} />
+            </a>
+          )}
+        </p>
+      )}
 
       <dl className="panel prod-info">
         <div>

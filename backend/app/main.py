@@ -1,16 +1,33 @@
+import threading
+from contextlib import asynccontextmanager
 from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from app import errors
+from app import errors, jobs
 from app.config import settings
 from app.routers import (
-    accounts, auth, cards, favorites, password, pin, signup, subscriptions, transactions, transfer_targets, transfers, users,
-    withdrawal,
+    accounts, agent, auth, card_applications, card_bills, card_points, cards, consents, external, favorites, notifications, password, pin, products, signup, subscriptions,
+    transactions, transfer_targets, transfers, users, withdrawal,
 )
 
-app = FastAPI(title="두린은행 계좌·거래 API", version="0.3.0")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    # 1분 스케줄러 (Part 5 8장 「배치가 1분마다」, 사용자 결정 2026-11-10). 서버를 끄면 같이 멈춘다.
+    # shortcut: 서버 프로세스 안의 스레드 — 서버가 꺼져 있던 동안의 예약은 다시 켰을 때 밀린 것부터 실행한다
+    stop = threading.Event()
+    if settings.scheduler_enabled:
+        def loop():
+            while not stop.wait(60):
+                jobs.run_minutely()
+        threading.Thread(target=loop, name="scheduler", daemon=True).start()
+    yield
+    stop.set()
+
+
+app = FastAPI(title="두린은행 계좌·거래 API", version="0.3.0", lifespan=lifespan)
 errors.install(app)
 
 UNSAFE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
@@ -47,13 +64,21 @@ app.include_router(password.router)
 app.include_router(pin.router)
 app.include_router(withdrawal.router)
 app.include_router(users.router)
+app.include_router(consents.router)
 app.include_router(accounts.router)
 app.include_router(transactions.router)
 app.include_router(transfers.router)
 app.include_router(transfer_targets.router)
 app.include_router(favorites.router)
+app.include_router(notifications.router)
+app.include_router(external.router)
+app.include_router(products.router)
 app.include_router(subscriptions.router)
 app.include_router(cards.router)
+app.include_router(card_bills.router)
+app.include_router(card_applications.router)
+app.include_router(card_points.router)
+app.include_router(agent.router)
 
 
 @app.get("/health", tags=["health"])

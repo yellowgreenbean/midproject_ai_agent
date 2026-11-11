@@ -4,10 +4,12 @@
 # 실행: python3 scripts/load_dummy.py [더미 폴더] > dummy.sql
 #       docker exec -i midproject-postgres psql -U app -d midproject -v ON_ERROR_STOP=1 < dummy.sql
 # 카드 부모 데이터(카드사·상품·업종·가맹점·결제일 규칙)는 derive_card_parents.py 에서 같이 만든다.
+# 상품설명서 연결(product_documents)은 data/rag/products 의 md 파일 이름에서 만든다(더미 폴더 옆 ../rag/products).
 # 모든 INSERT 는 ON CONFLICT DO NOTHING — 여러 번 넣어도 결과가 같다. 한 트랜잭션이라 하나라도 실패하면 아무것도 안 들어간다.
 #
 # 더미에 없어서 이 파일이 정하는 값 (기획서에 규칙이 생기면 여기만 고친다)
 #   - card_transactions.id = 'ctx_' + 승인번호, card_bills.id = 'bill_' + 카드 id + '_' + 결제 연월 (더미에 id 가 없음)
+#   - card_bill_items.id = 'cbi_' + 승인번호 + '_' + 회차 — 청구서 이용 기간 안의 승인 내역(취소 뺀 금액)
 #   - transactions.display_name = 적요(resAccountDesc3). 상대 은행·계좌번호는 더미에 없어 NULL
 #   - user_cards.card_number_masked = 카드 번호를 4자리씩 '-' 로 끊음 (예: 4214-****-****-0001)
 #   - 기준 시각 = 계좌 잔액 기준 시각(balance_as_of)의 최댓값. 청구서 상태(규칙 2)를 이 시각으로 정한다
@@ -120,6 +122,24 @@ def build(root):
          "rules_json": r["rules_json"]}
         for r in prod["product_rules"]
     ]
+    # 상품설명서 연결: data/rag/products/prod_XXX[_YYY].md 파일 이름의 번호마다 한 줄 (prod_015_016.md 는 두 상품).
+    # 제목은 두린 이름으로 짓는다(원본 문서엔 실제 은행 이름이 있음). source_url = RAG 문서 이름(챗봇 출처와 같은 값)
+    rag_dir = os.path.join(root, "..", "rag", "products")
+    names = {p["id"]: p["name"] for p in prod["products"]}
+    docs = []
+    for f in sorted(os.listdir(rag_dir)) if os.path.isdir(rag_dir) else []:
+        if not f.endswith(".md"):
+            continue
+        head = open(os.path.join(rag_dir, f), encoding="utf-8").read(300)
+        src = next((ln.split(":", 1)[1].strip() for ln in head.splitlines() if ln.startswith("source:")), f)
+        for n in f[len("prod_"):-len(".md")].split("_"):
+            pid = f"prod_{n}"
+            if pid not in names:
+                errs.append(f"상품설명서 {f} 의 {pid} 가 products.json 에 없음")
+                continue
+            docs.append({"id": f"doc_{pid}", "product_id": pid, "title": f"{names[pid]} 상품설명서", "source_url": src,
+                         "version_date": None})
+    tables["product_documents"] = docs
     tables["subscriptions"] = [
         {**{k: s[k] for k in ("id", "user_id", "product_id", "source_account_id")},
          "principal": num(s["principal"]), "monthly_amount": num(s["monthly_amount"]),
@@ -136,6 +156,7 @@ def build(root):
     for b in bills:
         bills_by_card[b["card_id"]].append(b)
     user_cards = []
+    product_by_id = {p["id"]: p for p in tables["card_products"]}
     for c in cards:
         credit = parents.card_type_of(c["resCardType"]) == "CREDIT"
         if credit:
@@ -153,14 +174,17 @@ def build(root):
             errs.append(f"카드 {c['id']} 의 연결·결제 계좌를 찾을 수 없음")
         no = c["resCardNo"]
         valid = c["resValidPeriod"]  # YYYYMM → 그 달 말일 (빈 값이면 NULL, 규칙 6)
+        product = product_by_id[lookup["card_product_id"][c["resCardName"]]]
         user_cards.append({
-            "id": c["id"], "user_id": c["user_id"], "card_product_id": lookup["card_product_id"][c["resCardName"]],
+            "id": c["id"], "user_id": c["user_id"], "card_product_id": product["id"],
             "source": "TOSS_ISSUED", "card_number_masked": "-".join(no[i:i + 4] for i in range(0, len(no), 4)),
             "last4": no[-4:],
             "expires_at": day_in(int(valid[:4]), int(valid[4:6]), 99).isoformat() if valid else None,
             "linked_account_id": acct["id"] if acct else None, "payment_day": payment_day,
             "credit_limit": c["credit_limit"], "status": c["status"],
             "issued_at": ts(c["resIssueDate"]) if c["resIssueDate"] else None,
+            # 연회비: 상품의 연회비(card_benefits.json) — 국내전용(LOCAL) 브랜드면 국내전용, 아니면 해외겸용
+            "annual_fee_amount": product["annual_fee_domestic" if product["brand"] == "LOCAL" else "annual_fee_overseas"],
         })
     tables["user_cards"] = user_cards
 
@@ -219,12 +243,29 @@ def build(root):
         })
     tables["card_bills"] = card_bills
 
+    # 청구서 항목: 이용 기간(usage_start~usage_end) 안의 승인 내역, 취소를 뺀 금액. 일시불만(더미에 할부 없음) — 1회차 전액
+    # 합계가 청구서 금액과 같아야 한다 (check_dummy.py 「카드 청구 합계 = 승인내역 합계」와 같은 규칙)
+    bill_items = []
+    for bill in card_bills:
+        items = [t for t in ctx if t["user_card_id"] == bill["user_card_id"] and t["amount"] > t["canceled_amount"]
+                 and bill["usage_start"] <= t["transacted_at"][:10] <= bill["usage_end"]]
+        for t in items:
+            if t["installment_months"] > 1:
+                errs.append(f"승인 {t['approval_no']} 할부 — 청구서 항목(회차별 나누기) 규칙이 아직 없음")
+            bill_items.append({"id": f"cbi_{t['approval_no']}_1", "bill_id": bill["id"], "card_transaction_id": t["id"],
+                               "installment_seq": 1, "principal_amount": t["amount"] - t["canceled_amount"],
+                               "fee_amount": 0})
+        if sum(t["amount"] - t["canceled_amount"] for t in items) != bill["total_amount"]:
+            errs.append(f"청구 {bill['id']} 금액이 이용 기간 승인 합계와 다름")
+    tables["card_bill_items"] = bill_items
+
     if errs:
         raise ValueError("\n".join(errs))
     # FK 순서: 부모가 먼저. derive() 의 카드 부모 표 뒤에 회원 → 계좌 → … → 카드 순
     order = ["users", "accounts", "account_balances", "transactions", "products", "product_rates", "product_rules",
-             "subscriptions", "subscription_payments", "card_companies", "card_products", "categories", "merchants",
-             "billing_cycle_rules", "user_cards", "card_transactions", "card_bills"]
+             "product_documents", "subscriptions", "subscription_payments", "card_companies", "card_products", "categories", "merchants",
+             "billing_cycle_rules", "card_performance_tiers", "card_benefit_limit_groups", "card_benefits", "user_cards",
+             "card_transactions", "card_bills", "card_bill_items"]
     return {t: tables[t] for t in order}
 
 

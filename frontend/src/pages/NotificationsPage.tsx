@@ -5,6 +5,16 @@ import { getNotifications, readAllNotifications, type AppNotification } from '..
 import './ProductPages.css'
 import './AccountPages.css'
 
+/** 알림을 누르면 갈 곳과 글자 — 잔액 부족(LOW_BALANCE)은 청구서(event_id = 청구서 id, 당일 알림은 끝에 :D-0)에서 「채우기 송금」,
+ * 입출금은 그 계좌, 포인트 소멸 예정은 포인트 화면(현금화), 연회비는 그 카드 */
+function link(n: AppNotification): { href: string; label: string } | null {
+  if (n.type === 'LOW_BALANCE' && n.eventId) return { href: `#/card-bills/${n.eventId.split(':')[0]}`, label: '청구서 보고 채우기' }
+  if (n.type === 'TRANSACTION' && n.accountId) return { href: `#/accounts/${n.accountId}`, label: '계좌 보기' }
+  if (n.type === 'POINT_EXPIRING') return { href: '#/cards/points', label: '포인트 현금으로 바꾸기' }
+  if (n.type === 'ANNUAL_FEE' && n.cardId) return { href: `#/cards/${n.cardId}`, label: '카드 보기' }
+  return null
+}
+
 /** 2026-11-05T09:30:00+09:00 → 11.05 09:30 */
 const when = (iso: string) => `${iso.slice(5, 7)}.${iso.slice(8, 10)} ${iso.slice(11, 16)}`
 
@@ -24,7 +34,7 @@ export default function NotificationsPage() {
     <AppShell title="알림" current="#/notifications" busy={!list && !error}>
       <section className="prod-head">
         <h2 className="prod-title is-dup">알림</h2>
-        <p className="prod-sub">입금·출금과 예금·적금 만기를 알려 드려요. 계좌마다 계좌 상세에서 끌 수 있어요.</p>
+        <p className="prod-sub">입금·출금, 예금·적금 만기, 카드 결제일·연회비·포인트 소멸을 알려 드려요. 입출금 알림은 계좌 상세에서 끌 수 있어요.</p>
       </section>
       {error && (
         <p className="home-error" role="alert">
@@ -55,6 +65,11 @@ export default function NotificationsPage() {
                     {n.title}
                   </strong>
                   <small>{n.body}</small>
+                  {link(n) && (
+                    <a className="more" href={link(n)!.href}>
+                      {link(n)!.label}
+                    </a>
+                  )}
                 </span>
                 <small className="prod-muted">{when(n.createdAt)}</small>
               </li>

@@ -28,7 +28,7 @@ from app.rules import (
     STEP_UP_TTL,
     now_kst,
 )
-from app.schemas import KstDatetime
+from app.common.naming import KstDatetime
 from app.security import (
     hash_password,
     login_throttle,
@@ -245,13 +245,3 @@ def step_up(body: StepUpIn, login: Annotated[Login, Depends(get_login)], db: DB)
     _audit(db, user.id, "STEP_UP_PIN" if body.pin is not None else "STEP_UP", "SUCCESS", request_id)
     db.commit()
     return StepUpOut(step_up_challenge_id=challenge.id, expires_at=challenge.expires_at)
-
-
-def consume_step_up(db, challenge_id: str | None, login: Login, action: str) -> None:
-    """중요 작업 API 가 부른다: 번호가 이 회원·이 세션·이 action 의 것이고, 5분 안이고, 처음 쓰는 것인지 확인하고 「사용함」으로 표시.
-    커밋은 작업과 같이 한다 — 작업이 실패해 롤백되면 번호도 다시 쓸 수 있다."""
-    ch = db.get(StepUpChallenge, challenge_id, with_for_update=True) if challenge_id else None
-    if (ch is None or login.session is None or ch.user_id != login.user.id or ch.session_id != login.session.id
-            or ch.action != action or ch.consumed_at is not None or now_kst() >= ch.expires_at):
-        raise ApiError(403, "STEP_UP_REQUIRED", "본인 확인을 다시 해 주세요.")
-    ch.consumed_at = now_kst()

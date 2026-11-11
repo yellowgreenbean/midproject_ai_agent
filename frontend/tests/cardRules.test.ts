@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { byCategory, expiry, groupByPaymentDate, md, recentMonths } from '../src/cardRules.ts'
+import { byCategory, expiry, groupByPaymentDate, md, performanceText, recentMonths } from '../src/cardRules.ts'
 import type { CardBill } from '../src/api.ts'
 
 const tx = (category: string, amount: number, canceledAmount = 0) => ({ category, amount, canceledAmount })
@@ -38,4 +38,13 @@ test('이번 달부터 거꾸로 — 해를 넘어간다', () => {
 test('날짜 모양', () => {
   assert.equal(md('2026-11-04T09:00:00+09:00'), '11월 4일')
   assert.equal(expiry('2029-03-31T23:59:59+09:00'), '03/29')
+})
+
+test('실적 한 줄 — 못 넘음 · 구간 안 · 가장 높은 구간 · 분기', () => {
+  const p = (spent: number, tierLevel: number | null, tierMinSpend: number, nextMinSpend: number | null, period: 'MONTH' | 'QUARTER' = 'MONTH') =>
+    performanceText({ period, spent, tierLevel, tierMinSpend, nextMinSpend })
+  assert.equal(p(21300, null, 300000, 300000), '지난달 21,300원 썼어요. 300,000원 이상 쓰면 혜택을 받아요')
+  assert.equal(p(450000, 1, 300000, 600000), '지난달 450,000원 써서 1구간 혜택을 받는 중 · 150,000원 더 쓰면 다음 구간이에요')
+  assert.equal(p(1500000, 3, 1200000, null), '지난달 1,500,000원 써서 3구간 혜택을 받는 중 · 가장 높은 구간이에요')
+  assert.match(p(0, null, 3000000, 3000000, 'QUARTER'), /^지난 분기 0원 썼어요/)
 })

@@ -147,10 +147,10 @@ class AuthAuditLog(Base):
 
 
 class StepUpChallenge(Base):
-    """본인 확인 (이체·예약 이체·카드 신청/해지/관리·가입·계좌 상태 변경·탈퇴·정보 변경·PIN 등록/변경/재설정)"""
+    """본인 확인 (이체·예약 이체·카드 신청/해지/관리·가입·계좌 상태 변경·탈퇴·정보 변경·PIN 등록/변경/재설정·계좌 개설)"""
 
     __tablename__ = "step_up_challenges"
-    ACTION_VALUES = ("TRANSFER", "SCHEDULED_TRANSFER", "CARD_APPLICATION", "CARD_TERMINATION", "CARD_MANAGEMENT", "SUBSCRIPTION", "ACCOUNT_STATUS_CHANGE", "WITHDRAWAL", "PROFILE_CHANGE", "PIN_ENROLL", "PIN_CHANGE", "PIN_RESET")
+    ACTION_VALUES = ("TRANSFER", "SCHEDULED_TRANSFER", "CARD_APPLICATION", "CARD_TERMINATION", "CARD_MANAGEMENT", "SUBSCRIPTION", "ACCOUNT_STATUS_CHANGE", "WITHDRAWAL", "PROFILE_CHANGE", "PIN_ENROLL", "PIN_CHANGE", "PIN_RESET", "ACCOUNT_OPEN", "POINT_CASHOUT")
     __table_args__ = (
         one_of("action", ACTION_VALUES, "ck_step_up_challenges_action"),
         Index("idx_step_up_session", "session_id"),
